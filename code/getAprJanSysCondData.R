@@ -1,21 +1,33 @@
 library(RWDataPlot)
-# prep data for 5-year table
+library(dplyr)
+# prep data system condition table
 # mmm = min/most/max
+# if adding agg attribute, assumes aggFunction takes in the scenario name as its only
+# arguement 
+getSysCondData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFunction)
+{
+  slotAggList <- RWDataPlot::createSlotAggList('data/SysCond.csv')
+  # first scens is the folder names to search, second is the names to save in the data file
+  # use folder names for now
+  print('starting to process scenarios...')
+  print(paste('this could take some time as you are processing',length(scens),'scenarios'))
+  flush.console()
+  
+  RWDataPlot::getDataForAllScens(scens,scens,slotAggList, iFolder, oFile)
+  
+  if(addAggAttribute){
+    print('now reading the file in...')
+    flush.console()
+    zz <- read.table(oFile,header=T)
+    
+    print('adding attribute...')
+    flush.console()
+    
+    zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario))
+      
+    print('rewriting file...')
+    flush.console()
 
-# get all CRSS results through 2026 Mead and Powell EOCY elevations January Run
-aprScens <- c('Apr2015_2016_a3,DNF,IGa3,')
-aprScens <- paste0(aprScens,c(1981:2010,'MTOM_Min','MTOM_Most','MTOM_Max','Min','Most','Max'))
-slotAggList <- RWDataPlot::createSlotAggList('SysCond.csv')
-RWDataPlot::getDataForAllScens(aprScens[1],aprScens[1],slotAggList,'Scenario/','results/SysConditions.txt')
-
-aprRes <- read.table('results/SysConditions.txt',header=T)
-
-aprRes$Agg <- 1
-aprRes$Agg[aprRes$Scenario %in% c('Apr2015_2016_a3,DNF,IGa3,MTOM_Max',
-                                  'Apr2015_2016_a3,DNF,IGa3,MTOM_Most',
-                                  'Apr2015_2016_a3,DNF,IGa3,MTOM_Min')] <- 2
-aprRes$Agg[aprRes$Scenario %in% c('Apr2015_2016_a3,DNF,IGa3,Max',
-                                  'Apr2015_2016_a3,DNF,IGa3,Most',
-                                  'Apr2015_2016_a3,DNF,IGa3,Min')] <- 3
-
-write.table(aprRes, 'results/SysConditions.txt')
+    write.table(zz, oFile)
+  }
+}
