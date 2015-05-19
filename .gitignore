@@ -1,3 +1,7 @@
+# R Studio Files
+*.RProj
+*.RProj.user
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
