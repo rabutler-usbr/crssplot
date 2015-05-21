@@ -1,0 +1,5 @@
+KeySlots.rdf,Mead.Pool Elevation,AnnMinLTE,1000,meadLt1000
+KeySlots.rdf,Mead.Pool Elevation,AnnMinLTE,1020,meadLt1020
+KeySlots.rdf,Powell.Pool Elevation,WYMinLTE,3490,powellLt3490
+KeySlots.rdf,Shortage.ShortageFlag,EOCY,100,lbShortage
+KeySlots.rdf,Mead.Pool Elevation,AnnMinLTE,1025,meadLt1025
