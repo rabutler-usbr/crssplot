@@ -9,8 +9,15 @@ that the same aggregating code will work on a PC.
 
 1. Aggregate necessary data
   1. Append EOCY 2015 elevations from MTOM onto Mead/Powell EOCY elevations
-2. Create figures/tables
+    1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM 
+       Ensemble output spreadsheets.
+      1. Delete header rows, so that only header row is one that has years in them
+      1. Edit column names for Run0-Run2 to correspond to MTOM_Min, MTOM_Max, MTOM_Most
+      1. Add in column for other runs, e.g., min, most, max. Only need data for month of I.C.
+1. Combine with previous month data (at least for EOCY data)
+1. Create figures/tables
   1. provide numbers behind figures, where necessary 
+  
   
 ## Tables and Figures
   
