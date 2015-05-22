@@ -36,6 +36,8 @@ plotEOCYElev <- function(zz, yrs, var, myTitle)
 }
 
 # annText is text that's added to annotation
+# legendTitle 
+# legLoc is the location of the legend
 # nC is number of columns in legend
 # annSize is the size of the annotation
 plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4,
@@ -68,4 +70,38 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
     annotate('text', x = min(yy), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
     labs(y = 'Percent of Traces [%]')
   gg
+}
+
+# monthRun will be added to the title
+# legLoc is the location of the legend
+# nC is number of columns in legend
+plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, legLoc = 'bottom')
+{
+  zz <- dplyr::filter(zz, Year %in% yrs)
+  
+  # compute the chances of shortage/surplus
+  # averaging accross the traces results in total % of traces
+  zz <- zz %>%
+    dplyr::group_by(Year, Variable) %>%
+    dplyr::summarise(prob = mean(Value)*100)
+  zz$vName <- 'Shortage of Any Amount'
+  zz$vName[zz$Variable == 'lbSurplus'] <- 'Surplus of Any Amount'
+  # plot:
+  gg <- ggplot(zz, aes(Year, prob, color = vName))
+  
+  yL <- c(0,100)
+ 
+  myTitle <- paste('Percent of Traces with Lower Basin Surplus or Shortage\nResults from the',
+                    monthRun, 'CRSS Run*')
+  
+  gg <- gg + geom_line(size = 1) + 
+    coord_cartesian(ylim = yL) +
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
+    theme(panel.grid.minor = element_line(color = 'white', size = .4),
+          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
+    theme(legend.position = legLoc) +
+    labs(x = 'Year', y = '[%]', title = myTitle)
+  
 }
