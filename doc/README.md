@@ -36,7 +36,7 @@ that the same aggregating code will work on a PC.
   * P(2016 Short | WY 2016 Rel = 7.48)
   * P(2017 Short (by tier) | WY 2016 Rel = 7.48)
   * P(2017 Short (by tier) | WY 2016 Rel = 8.23) **this is currently coded as chance of upper 
-    elevation balancing with 8.23 release (See Issue #4)[https://github.com/rabutler/Process-CRSS-Res/issues/4]**
+    elevation balancing with 8.23 release [See Issue #4](https://github.com/rabutler/Process-CRSS-Res/issues/4)**
   * P(2017 Short (by tier) | WY 2016 Rel > 8.23)
 * Conditions leading to Shortage figure
   * uses data from MTOM
