@@ -16,6 +16,8 @@ that the same aggregating code will work on a PC.
 1. Combine with previous month data (at least for EOCY data)
 1. Create figures/tables
   1. provide numbers behind figures, where necessary 
+1. Convert May_SysTableFull2016_2026.csv to excel file
+1. create results PPT
   
 ### The Conditions Leading to A Shortage in 2016
 Uses MTOM results to develop this figure. See CRSS_DIR/MTOM/FirstYearCond/XXX.xlsx for example.
