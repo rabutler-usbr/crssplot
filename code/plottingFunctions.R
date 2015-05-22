@@ -104,4 +104,35 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
     theme(legend.position = legLoc) +
     labs(x = 'Year', y = '[%]', title = myTitle)
   
+  gg
+}
+
+
+plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
+{
+  
+  zz <- zz %>% 
+    dplyr::group_by(Year,Variable) %>%
+    dplyr::summarize(prob = mean(Value)*100)
+  
+  # rename variables for plotting
+  zz$VName<- 'Step 1 Shortage'
+  zz$VName[zz$Variable == 'lbShortageStep2'] <- 'Step 2 Shortage'
+  zz$VName[zz$Variable == 'lbShortageStep3'] <- 'Step 3 Shortage'
+  
+  yL <- c(0,100)
+  
+  gg <- ggplot(zz,aes(Year,prob,fill = VName))
+  
+  gg1 <- gg + geom_bar(stat = 'identity') + 
+    coord_cartesian(ylim = yL) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
+    theme(panel.grid.minor = element_line(color = 'white', size = .4),
+          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_fill_discrete(guide = guide_legend(title = '')) + 
+    theme(legend.position = 'bottom') +
+    labs(x = 'Year', y = '[%]', title = 'Lower Basin Shortages by Tier') +
+    annotate('text', x = min(zz$Year), y = 95, label = annText, vjust=0, hjust=0,size = annSize)
+  gg
 }
