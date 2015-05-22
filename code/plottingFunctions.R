@@ -58,7 +58,7 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
   
   yL <- c(0,100)
   
-  gg <- ggplot(zz2, aes(Year, Value, color = vName))
+  gg <- ggplot(zz, aes(Year, Value, color = vName))
   gg <- gg + geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
     scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
@@ -67,7 +67,7 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
           panel.grid.major = element_line(color = 'white', size = .6)) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
     theme(legend.position = legLoc, axis.text.x = element_text(angle = 90,vjust=.5)) +
-    annotate('text', x = min(yy), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
     labs(y = 'Percent of Traces [%]')
   gg
 }
@@ -110,7 +110,7 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
 
 plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
 {
-  
+  zz <- dplyr::filter(zz, Year %in% yrs)
   zz <- zz %>% 
     dplyr::group_by(Year,Variable) %>%
     dplyr::summarize(prob = mean(Value)*100)
@@ -124,7 +124,7 @@ plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
   
   gg <- ggplot(zz,aes(Year,prob,fill = VName))
   
-  gg1 <- gg + geom_bar(stat = 'identity') + 
+  gg <- gg + geom_bar(stat = 'identity') + 
     coord_cartesian(ylim = yL) + 
     scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
     scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
