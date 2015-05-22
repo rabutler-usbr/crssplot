@@ -9,8 +9,7 @@ that the same aggregating code will work on a PC.
 
 1. Aggregate necessary data
   1. Append EOCY 2015 elevations from MTOM onto Mead/Powell EOCY elevations
-    1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM 
-       Ensemble output spreadsheets.
+    1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM Ensemble output spreadsheets.
       1. Delete header rows, so that only header row is one that has years in them
       1. Edit column names for Run0-Run2 to correspond to MTOM_Min, MTOM_Max, MTOM_Most
       1. Add in column for other runs, e.g., min, most, max. Only need data for month of I.C.
@@ -18,7 +17,16 @@ that the same aggregating code will work on a PC.
 1. Create figures/tables
   1. provide numbers behind figures, where necessary 
   
-  
+### The Conditions Leading to A Shortage in 2016
+Uses MTOM results to develop this figure. See CRSS_DIR/MTOM/FirstYearCond/XXX.xlsx for example.
+1. Copy over Shortage.Shortage Flag, Powell.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
+1. Sum the Oct-Dec Powell.Outflow for current year
+1. Copy the 1981-2010 columns of the Oct-Dec release, WYRelease, Shortage, and Dec Elevation to the appropriate columns in the DataToExport worksheet.
+  * The LBPrct sheet should not change aslong as the LB inflows are using 1981-2010
+1. Export the DataToExport worksheet to csv file.
+1. Code to create the figure is called in main.R, but it is in plotFirstYearShortCond.R
+  * **Will likely need to edit the annotation calls in main.R**
+
 ## Tables and Figures
   
 * System conditions table

@@ -1,12 +1,14 @@
 library(CRSSIO)
 library(dplyr)
 library(reshape2)
+library(grid)
 source('code/makeScenNames.R')
 source('code/getSysCondData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getEOCYData.R')
 source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
+source('code/plotFirstYearShortCond.R')
 
 # script should create everything necessary for the results in order
 
@@ -29,6 +31,9 @@ annText <- 'Results from the May 2015 CRSS Run'
 critStatsProc <- 'May_CritStats.csv'
 critFigs <- 'May2015_CritFigs.pdf'
 condProbFile <- 'May_CondProbs.csv'
+# mtom results file for creating conditions leading to shortage in 2016
+mtomResFile <- '../CRSS.2015/MTOM/FirstYearCondMTOM/MayMTOMResults.csv'
+shortCondFig <- 'shortConditionsFig.pdf'
 
 ## System Conditions Table Data
 if(FALSE){
@@ -180,6 +185,19 @@ cpt1 <- rbind(cpt1,cpt2,cpt3)
 cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
 cpt1$PrctChance <- cpt1$PrctChance*100
 write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
+
+# pulled annotation out of generic function
+
+lbLabel <- 'LB total side inflow percent\nof average (1981-2010)'
+# filterOn being set to pe shows results for traces that are <= 1077
+shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe')
+shortCond <- shortCond + annotate('segment', x = 5.1, xend = 3.7, y = 1071.1, yend = 1071.35, 
+         arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
+  annotate('text', x = 5.2, y = 1071,label = lbLabel, size = 4, hjust = 0)
+
+pdf(paste0(oFigs,shortCondFig),width = 9, height = 6)
+print(shortCond)
+dev.off()
 
 #rm(list = ls())
 
