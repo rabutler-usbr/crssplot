@@ -32,4 +32,12 @@ that the same aggregating code will work on a PC.
   * Percent traces < 3490 
   * Percent of traces < 1025, 1020, 1000
   * Percent of traces in LB Shortage and Level 3 shortage
+* Conditional probabilities
+  * P(2016 Short | WY 2016 Rel = 7.48)
+  * P(2017 Short (by tier) | WY 2016 Rel = 7.48)
+  * P(2017 Short (by tier) | WY 2016 Rel = 8.23) **this is currently coded as chance of upper 
+    elevation balancing with 8.23 release (See Issue #4)[https://github.com/rabutler/Process-CRSS-Res/issues/4]**
+  * P(2017 Short (by tier) | WY 2016 Rel > 8.23)
+* Conditions leading to Shortage figure
+  * uses data from MTOM
 	
