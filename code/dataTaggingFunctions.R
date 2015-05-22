@@ -18,3 +18,32 @@ aggBasedOnIC <- function(scen)
   
   zz
 }
+
+# assumes adding attribute based on something in scenario names
+# if not found in attMap, will default to attribute name.
+# scenI: the index into the scenario name to use
+# attMap: name mapping vector to connect attribute info to new value
+addAttByScenName <- function(scen, scenI, attMap)
+{
+  scen <- simplify2array(strsplit(as.character(scen),',',fixed = T))[scenI,]
+  
+  zz <- scen
+  for(i in 1:length(attMap)){
+    zz[zz==names(attMap)[i]] <- attMap[i]
+  }
+  
+  zz
+}
+
+# use this for april which has different number of dimensions
+aggBasedOnIC_april <- function(scen)
+{
+  scen <- simplify2array(strsplit(as.character(scen),',',fixed = T))[4,]
+  
+  zz <- rep(-99,length(scen))
+  zz[scen %in% 1981:2010] <- 1
+  zz[scen %in% c('MTOM_Max','MTOM_Most','MTOM_Min')] <- 2
+  zz[scen %in% c('Min','Most','Max')] <- 3
+  
+  zz
+}

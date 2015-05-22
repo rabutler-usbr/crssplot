@@ -1,7 +1,10 @@
+library(CRSSIO)
+library(dplyr)
 source('code/makeScenNames.R')
 source('code/getSysCondData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getEOCYData.R')
+source('code/plottingFunctions.R')
 
 # script should create everything necessary for the results in order
 
@@ -15,6 +18,11 @@ pICFile <- '../CRSS.2015/MTOM/MTOM_May15_PowellPE.csv'
 mICFile <- '../CRSS.2015/MTOM/MTOM_May15_MeadPE.csv'
 icMonth <- '15-Dec' # IC are from December 2015
 critStatsFile <- 'May_CritStats.txt'
+sysCondTable <- 'May_SysTableFull2016_2026.csv'
+prevMonthPEFile <- 'April/April_MPPE_EOCY.txt'
+startMonthMap <- c('May2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
+oFigs <- '../CRSS.2015/figs/'
+eocyFigs <- 'May2015_MPEOCY.pdf'
 
 ## System Conditions Table Data
 if(FALSE){
@@ -30,16 +38,46 @@ if(FALSE){
 }
 
 ## Get Crit Stats Data
-if(TRUE){
+if(FALSE){
   getSritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
 }
 
-# before combining with previous month, need to denote starting month of simulation?
-if(FALSE){
-  # add 'Start Month' attribute to January run, and April run
-  aprRes$StartMonth <- 'Apr2015'
-  janRes$StartMonth <- 'Jan2015'
-}
+
+## Create tables, figures, and data behind figures
+# 1) system conditions table
+sysCond <- read.table(paste0(resFolder,sysCondFile),header = T)
+# trim to 2016-2026 and 30 trace ensemble I.C.; Agg == 1 limits to using 30 ensemble I.C. 
+sysCond <- dplyr::filter(sysCond, Year %in% 2016:2026 & Agg == 1)
+# create the system cond. table
+sysTable <- CRSSIO::createSysCondTable(sysCond, 2016:2026)
+# save the sys cond table
+write.csv(sysTable[['fullTable']], paste0(resFolder,sysCondTable))
+
+# 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
+# read in current month data
+peCur <- read.table(paste0(resFolder,curMonthPEFile),header = T)
+pePrev <- read.table(paste0(resFolder,prevMonthPEFile),header = T) # read in prev. month data
+# add start month attributes to both months' data
+peCur <- dplyr::mutate(peCur, StartMonth = addAttByScenName(Scenario, 1, startMonthMap))
+pePrev <- dplyr::mutate(pePrev, StartMonth = addAttByScenName(Scenario, 1, startMonthMap))
+# combine previous and current elevations
+pe <- rbind(peCur, pePrev)
+rm(peCur, pePrev)
+# plot
+# only use the 30 ensemble (Agg = 1)
+powellPE <- plotEOCYElev(dplyr::filter(pe, Agg == 1), 2015:2026, 'Powell.Pool Elevation', 
+                         'Powell End-of-December Year Elevation')
+meadPE <- plotEOCYElev(dplyr::filter(pe, Agg == 1), 2015:2026, 'Mead.Pool Elevation', 
+                         'Mead End-of-December Year Elevation')
+
+# save figures
+pdf(paste0(oFigs,eocyFigs), width = 8, height = 6)
+print(powellPE)
+print(meadPE)
+dev.off()
+
+rm(pe, powellPE, meadPE)
+
 
 rm(list = ls())
 
