@@ -6,6 +6,7 @@ source('code/getSysCondData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getEOCYData.R')
 source('code/plottingFunctions.R')
+source('code/getCondProbs.R')
 
 # script should create everything necessary for the results in order
 
@@ -27,6 +28,7 @@ eocyFigs <- 'May2015_MPEOCY.pdf'
 annText <- 'Results from the May 2015 CRSS Run'
 critStatsProc <- 'May_CritStats.csv'
 critFigs <- 'May2015_CritFigs.pdf'
+condProbFile <- 'May_CondProbs.csv'
 
 ## System Conditions Table Data
 if(FALSE){
@@ -46,6 +48,7 @@ if(FALSE){
   getSritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
 }
 
+if(FALSE){
 print("starting to create figures and tables")
 flush.console()
 print("creating system conditions table")
@@ -134,6 +137,49 @@ print(ssPlot)
 print(shortStack)
 dev.off()
 write.csv(cs,paste0(oFigs,critStatsProc),row.names = F)
+}
 
-rm(list = ls())
+## CONDITIONAL PROBABILITIES
+# use sysCond
+if(is.na(match('sysCond',ls()))){
+  sysCond <- read.table(paste0(resFolder,sysCondFile),header = T) 
+  sysCond <- dplyr::filter(sysCond, Year %in% 2016:2026 & Agg == 1)
+  sysTable <- CRSSIO::createSysCondTable(sysCond, 2016:2026)
+}
+cp1 <- getConditionalProbs(sysCond, 2016, 2016, 'lbShortage','mer748')
+cp2 <- getConditionalProbs(sysCond, 2016, 2016, 'lbShortage','ueb823')
+cp3 <- getConditionalProbs(sysCond, 2016,2016, 'lbShortage',c('eq','uebGt823'))
+cp4 <- getConditionalProbs(sysCond, 2017, 2016, c('lbShortage','lbShortageStep1','lbShortageStep2',
+                                               'lbShortageStep3'), 'mer748')
+cp5 <- getConditionalProbs(sysCond, 2017, 2016, c('lbShortage','lbShortageStep1','lbShortageStep2',
+                                               'lbShortageStep3'), 'ueb823')
+cp6 <- getConditionalProbs(sysCond, 2017, 2016, c('lbShortage','lbShortageStep1','lbShortageStep2',
+                                               'lbShortageStep3'), c('eq','uebGt823'))
+
+# create data table from the above values
+cpt1 <- data.frame('ChanceOf' = c(paste(2016,names(cp1)),paste(2017,names(cp4))),
+                   'PrctChance' = c(cp1,cp4))
+rr <- which(rownames(sysTable$fullTable) == 'Mid-Elevation Release Tier - annual release = 7.48 maf')
+cc <- which(colnames(sysTable$fullTable) == 2016)
+cpt1$PowellWYRel <- paste('7.48 MAF;',sysTable$fullTable[rr,cc])
+
+cpt2 <- data.frame('ChanceOf' = c(paste(2016,names(cp2)),paste(2017,names(cp5))),
+                   'PrctChance' = c(cp2,cp5))
+rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release = 8.23 maf")
+cpt2$PowellWYRel <- paste('8.23 MAF;',sysTable$fullTable[rr,cc])
+
+cpt3 <- data.frame('ChanceOf' = c(paste(2016,names(cp3)),paste(2017,names(cp6))),
+                   'PrctChance' = c(cp3,cp6))
+rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release > 8.23 maf")
+rr2 <- which(rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf")
+cpt3$PowellWYRel <- paste('> 8.23 MAF;',sysTable$fullTable[rr,cc] + sysTable$fullTable[rr2,cc])
+
+cpt1 <- rbind(cpt1,cpt2,cpt3)
+
+# rearrange columns
+cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
+cpt1$PrctChance <- cpt1$PrctChance*100
+write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
+
+#rm(list = ls())
 
