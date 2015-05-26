@@ -3,6 +3,7 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(grid)
+library(gridExtra)
 
 plotEOCYElev <- function(zz, yrs, var, myTitle)
 {
@@ -110,6 +111,7 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
 
 plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
 {
+
   zz <- dplyr::filter(zz, Year %in% yrs)
   zz <- zz %>% 
     dplyr::group_by(Year,Variable) %>%
@@ -134,5 +136,85 @@ plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
     theme(legend.position = 'bottom') +
     labs(x = 'Year', y = '[%]', title = 'Lower Basin Shortages by Tier') +
     annotate('text', x = min(zz$Year), y = 95, label = annText, vjust=0, hjust=0,size = annSize)
+  gg
+}
+
+# assumes zz is data already read in and will return one variable for the given yrs
+# rownames of zz should be years, and colnames should be variable names
+getSingleVarData <- function(zz, yrs, var)
+{
+  rr <- match(yrs, rownames(zz))
+  cc <- which(colnames(zz) == var)
+  zz[rr,cc]
+}
+
+formatSimpleTable <- function(zz, scenNames, yrs)
+{
+  zzRound <- round(zz,0)
+
+  zzRound <- matrix(paste0(zzRound,'%'),nrow = nrow(zz), byrow = F)
+
+  # check to see if values are non-zero, but rounded to zero
+  # if they are, replace with '< 1%'
+  for(i in 1:nrow(zz)){
+    for(j in 1:ncol(zz)){
+      if(zz[i,j] > 0 & zzRound[i,j] == '0%'){
+        zzRound[i,j] <- '< 1%'
+      }
+    }
+  }
+  rownames(zzRound) <- c(scenNames, 'Difference')
+  colnames(zzRound) <- yrs
+  
+  zzRound <- as.data.frame(zzRound)
+  zzRound
+}
+
+# scenNames: names to use for row names
+# iFiles: character vector with paths to the two files to use get the data from multiple scenarios
+# scenNames and iFiles should be the same length
+# yrs to show
+# Assumes that there are only two scenarios to process
+creat5YrSimpleTable <- function(scenNames, iFiles, yrs)
+{
+  if(length(scenNames) != length(iFiles) | length(scenNames) != 2){
+    stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
+               'Please ensure scenNames and iFiles have two scenarios each.'))
+  }
+ 
+  i1 <- read.csv(iFiles[1],row.names = 1)
+  i2 <- read.csv(iFiles[2],row.names = 1)
+  cc <- scan(iFiles[1], sep = ',', nlines = 1, what = 'character')
+  cc2 <- scan(iFiles[2],sep = ',', nlines = 1, what = 'character')
+  colnames(i1) <- cc[2:length(cc)]
+  colnames(i2) <- cc2[2:length(cc2)]
+
+  shortTable <- rbind(getSingleVarData(i1,yrs,'LB Shortage'),
+                      getSingleVarData(i2,yrs,'LB Shortage'))
+  shortTable <- rbind(shortTable, shortTable[2,] - shortTable[1,])
+  pTable <-  rbind(getSingleVarData(i1,yrs,'Powell < 3,490\' in Any Month'),
+                   getSingleVarData(i2,yrs,'Powell < 3,490\' in Any Month'))
+  pTable <- rbind(pTable, pTable[2,] - pTable[1,])
+  
+  shortTable <- formatSimpleTable(shortTable, scenNames, yrs)
+  pTable <- formatSimpleTable(pTable, scenNames, paste('WY',yrs))
+  
+  shortGrob <- gridExtra::tableGrob(shortTable,gpar.coltext = gpar(cex = 1), 
+                                    gpar.rowtext = gpar(cex = 1), show.hlines = T,
+                                    core.just = 'right')
+  pGrob <- gridExtra::tableGrob(pTable,gpar.coltext = gpar(cex = 1), 
+                                gpar.rowtext = gpar(cex = 1), show.hlines = T, 
+                                core.just = 'right')
+  
+  shortLabel <- '% Traces with Lower Basin Shortage'
+  pLabel <- '% Traces below 3,490\' (power pool) at Powell'
+  
+  gg <- qplot(1:7,1:7,geom = 'blank') + theme_bw() +
+    theme(line = element_blank(), text = element_blank()) +
+    annotation_custom(grob = pGrob, xmin = 0, ymin = 2,xmax = 7, ymax = 6) + 
+    annotation_custom(grob = shortGrob, xmin = 0, ymin = 4,xmax = 6, ymax = 7.2) +
+    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 6, face = 'bold') +
+    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 6, face = 'bold')
+    
   gg
 }

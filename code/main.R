@@ -34,6 +34,13 @@ condProbFile <- 'May_CondProbs.csv'
 # mtom results file for creating conditions leading to shortage in 2016
 mtomResFile <- '../CRSS.2015/MTOM/FirstYearCondMTOM/MayMTOMResults.csv'
 shortCondFig <- 'shortConditionsFig.pdf'
+# for the 5-year simple table
+ss5 <- c('April CRSS', 'May CRSS')
+# should match files for critStatsFile:
+critStatsIn <- c('../CRSS.2015/results/April/CriticalElevationData_CRSS.Apr2015.csv',
+                 '../CRSS.2015/figs/May_CritStats.csv')
+yy5 <- 2016:2020
+simple5YrFile <- 'May2015_5yrSimple.pdf'
 
 ## System Conditions Table Data
 if(FALSE){
@@ -197,6 +204,12 @@ shortCond <- shortCond + annotate('segment', x = 5.1, xend = 3.7, y = 1071.1, ye
 
 pdf(paste0(oFigs,shortCondFig),width = 9, height = 6)
 print(shortCond)
+dev.off()
+
+## create the 5-yr simple table that compares to the previous run
+simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)
+pdf(paste0(oFigs,simple5YrFile),width = 8, height = 8)
+print(simple5Yr)
 dev.off()
 
 #rm(list = ls())
