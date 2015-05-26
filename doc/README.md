@@ -18,8 +18,9 @@ that the same aggregating code will work on a PC.
   1. provide numbers behind figures, where necessary 
 1. Convert May_SysTableFull2016_2026.csv to excel file
 1. create results PPT
+1. Convert the pdf files to png files
   
-### The Conditions Leading to A Shortage in 2016
+### The Conditions Leading to a Shortage in 2016
 Uses MTOM results to develop this figure. See CRSS_DIR/MTOM/FirstYearCond/XXX.xlsx for example.
 1. Copy over Shortage.Shortage Flag, Powell.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
 1. Sum the Oct-Dec Powell.Outflow for current year
