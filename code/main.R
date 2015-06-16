@@ -12,18 +12,21 @@ source('code/plotFirstYearShortCond.R')
 
 # script should create everything necessary for the results in order
 
+# -------------------------------------------------------------------------------------
+#                                    USER INPUT
+# -------------------------------------------------------------------------------------
 # scenarios are orderd model,supply,demand,policy,initial conditions
 scens <- makeAllScenNames('May2015_2016','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most','Most'))
-iFolder <- 'M:/Shared/CRSS/CRSS.2015/Scenario'
-resFolder <- '../CRSS.2015/results/'
-sysCondFile <- 'MaySysCond.txt'
-curMonthPEFile <- 'May_MeadPowellPE.txt'
-pICFile <- '../CRSS.2015/MTOM/MTOM_May15_PowellPE.csv'
-mICFile <- '../CRSS.2015/MTOM/MTOM_May15_MeadPE.csv'
+iFolder <- 'M:/Shared/CRSS/CRSS.2015/Scenario' # folder with scenario folders created by RiverSMART
+resFolder <- '../CRSS.2015/results/' # folder to save procssed text files to
+sysCondFile <- 'MaySysCond.txt' # file name of system conditions data
+curMonthPEFile <- 'May_MeadPowellPE.txt' # file name of Powell and Mead PE data
+pICFile <- '../CRSS.2015/MTOM/MTOM_May15_PowellPE.csv' # input file name of MTOM results for Powell PE
+mICFile <- '../CRSS.2015/MTOM/MTOM_May15_MeadPE.csv' # input file name of MTOM results for Mead PE
 icMonth <- '15-Dec' # IC are from December 2015
-critStatsFile <- 'May_CritStats.txt'
-sysCondTable <- 'May_SysTableFull2016_2026.csv'
-prevMonthPEFile <- 'April/April_MPPE_EOCY.txt'
+critStatsFile <- 'May_CritStats.txt' # file name for critical stats data
+sysCondTable <- 'May_SysTableFull2016_2026.csv' # file name for the system conditions procssed file
+prevMonthPEFile <- 'April/April_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
 startMonthMap <- c('May2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
 oFigs <- '../CRSS.2015/figs/'
 eocyFigs <- 'May2015_MPEOCY.pdf'
@@ -41,6 +44,10 @@ critStatsIn <- c('../CRSS.2015/results/April/CriticalElevationData_CRSS.Apr2015.
                  '../CRSS.2015/figs/May_CritStats.csv')
 yy5 <- 2016:2020
 simple5YrFile <- 'May2015_5yrSimple.pdf'
+
+# -------------------------------------------------------------------------------------
+#                               END USER INPUT
+# -------------------------------------------------------------------------------------
 
 ## System Conditions Table Data
 if(FALSE){
