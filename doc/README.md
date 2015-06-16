@@ -8,6 +8,7 @@ The aggregating code was run on a computer with 48GB of memory. There is not gua
 that the same aggregating code will work on a PC. 
 
 Detailed instructions:
+
 1. Get initial conditions data from MTOM results
   1. Append EOCY 2015 elevations from MTOM onto Mead/Powell EOCY elevations
     1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM Ensemble output spreadsheets. The Ensemble Output spreadsheet should be requested from 
@@ -20,6 +21,7 @@ Detailed instructions:
 1. Run main.R `source(main.R)`
       
 Overall process:      
+
 1. Aggregate necessary data, and apply attributes
 1. Combine with previous month(s) CRSS data (at least for EOCY data)
 1. Create figures/tables
