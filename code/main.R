@@ -36,6 +36,7 @@ annText <- 'Results from the May 2015 CRSS Run' # text that will be added to fig
 critStatsProc <- 'May_CritStats.csv'
 critFigs <- 'May2015_CritFigs.pdf'
 condProbFile <- 'May_CondProbs.csv'
+createShortConditions <- FALSE
 # mtom results file for creating conditions leading to shortage in 2016
 mtomResFile <- '../CRSS.2015/MTOM/FirstYearCondMTOM/MayMTOMResults.csv'
 shortCondFig <- 'shortConditionsFig.pdf'
@@ -202,18 +203,20 @@ cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
 cpt1$PrctChance <- cpt1$PrctChance*100
 write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
 
+# 4) Create the conditions leading to Shortage plot from MTOM results
 # pulled annotation out of generic function
-
-lbLabel <- 'LB total side inflow percent\nof average (1981-2010)'
-# filterOn being set to pe shows results for traces that are <= 1077
-shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe')
-shortCond <- shortCond + annotate('segment', x = 5.1, xend = 3.7, y = 1071.1, yend = 1071.35, 
-         arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
-  annotate('text', x = 5.2, y = 1071,label = lbLabel, size = 4, hjust = 0)
-
-pdf(paste0(oFigs,shortCondFig),width = 9, height = 6)
-print(shortCond)
-dev.off()
+if(shortCondFig){
+  lbLabel <- 'LB total side inflow percent\nof average (1981-2010)'
+  # filterOn being set to pe shows results for traces that are <= 1077
+  shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe')
+  shortCond <- shortCond + annotate('segment', x = 5.1, xend = 3.7, y = 1071.1, yend = 1071.35, 
+           arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
+    annotate('text', x = 5.2, y = 1071,label = lbLabel, size = 4, hjust = 0)
+  
+  pdf(paste0(oFigs,shortCondFig),width = 9, height = 6)
+  print(shortCond)
+  dev.off()
+}
 
 ## create the 5-yr simple table that compares to the previous run
 simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)
