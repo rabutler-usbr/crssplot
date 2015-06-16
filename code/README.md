@@ -1,5 +1,5 @@
 ## Files Used In Creating the May 2015 CRSS Results
-**main.R** is the script used to process all of the results at once. It relies on:
+***main.R*** is the script used to process all of the results at once. It relies on:
 * makeScenNames.R
 * getSysCondData.R
 * dataTaggingFunctions.R
