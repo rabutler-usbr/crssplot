@@ -11,49 +11,54 @@ source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
 
 # script should create everything necessary for the results in order
-
+CRSSDIR=Sys.getenv("CRSS_DIR")
 # -------------------------------------------------------------------------------------
 #                                    USER INPUT
 # -------------------------------------------------------------------------------------
 # scenarios are orderd model,supply,demand,policy,initial conditions
-scens <- makeAllScenNames('May2015_2016','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most','Most'))
-iFolder <- 'M:/Shared/CRSS/CRSS.2015/Scenario' # folder with scenario folders created by RiverSMART
-resFolder <- '../CRSS.2015/results/' # folder to save procssed text files to (intermediate processed data)
-sysCondFile <- 'MaySysCond.txt' # file name of system conditions data
-curMonthPEFile <- 'May_MeadPowellPE.txt' # file name of Powell and Mead PE data
-pICFile <- '../CRSS.2015/MTOM/MTOM_May15_PowellPE.csv' # input file name of MTOM results for Powell PE
-mICFile <- '../CRSS.2015/MTOM/MTOM_May15_MeadPE.csv' # input file name of MTOM results for Mead PE
+scens <- makeAllScenNames('Jun2015_2016','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most','Most'))
+iFolder <- 'Z:/Shared/CRSS/CRSS.2015/Scenario' # folder with scenario folders created by RiverSMART
+resFolder <- paste0(CRSSDIR,'/results/') # folder to save procssed text files to (intermediate processed data)
+sysCondFile <- 'JunSysCond.txt' # file name of system conditions data
+curMonthPEFile <- 'Jun_MeadPowellPE.txt' # file name of Powell and Mead PE data
+pICFile <- paste0(CRSSDIR,'/MTOM/MTOM_Jun15_PowellPE.csv') # input file name of MTOM results for Powell PE
+mICFile <- paste0(CRSSDIR,'/MTOM/MTOM_Jun15_MeadPE.csv') # input file name of MTOM results for Mead PE
 icMonth <- '15-Dec' # IC are from December 2015
-critStatsFile <- 'May_CritStats.txt' # file name for critical stats data
-sysCondTable <- 'May_SysTableFull2016_2026.csv' # file name for the system conditions procssed file
+critStatsFile <- 'Jun_CritStats.txt' # file name for critical stats data
+sysCondTable <- 'Jun_SysTableFull2016_2026.csv' # file name for the system conditions procssed file
 prevMonthPEFile <- 'April/April_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots
-startMonthMap <- c('May2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
-oFigs <- '../CRSS.2015/figs/' # folder location to save figures and fully procssed tables
-eocyFigs <- 'May2015_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
-annText <- 'Results from the May 2015 CRSS Run' # text that will be added to figures
-critStatsProc <- 'May_CritStats.csv'
-critFigs <- 'May2015_CritFigs.pdf'
-condProbFile <- 'May_CondProbs.csv'
+startMonthMap <- c('Jun2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
+oFigs <- paste0(CRSSDIR,'/figs/') # folder location to save figures and fully procssed tables
+eocyFigs <- 'Jun2015_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
+annText <- 'Results from the Jun 2015 CRSS Run' # text that will be added to figures
+critStatsProc <- 'Jun_CritStats.csv'
+critFigs <- 'Jun2015_CritFigs.pdf'
+condProbFile <- 'Jun_CondProbs.csv'
 # mtom results file for creating conditions leading to shortage in 2016
-mtomResFile <- '../CRSS.2015/MTOM/FirstYearCondMTOM/MayMTOMResults.csv'
+mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JunMTOMResults.csv')
 shortCondFig <- 'shortConditionsFig.pdf'
 # for the 5-year simple table
-ss5 <- c('April CRSS', 'May CRSS')
+ss5 <- c('April CRSS', 'Jun CRSS')
 # should match files for critStatsFile:
-critStatsIn <- c('../CRSS.2015/results/April/CriticalElevationData_CRSS.Apr2015.csv',
-                 '../CRSS.2015/figs/May_CritStats.csv')
+critStatsIn <- paste0(CRSSDIR,c('/results/April/CriticalElevationData_CRSS.Apr2015.csv',
+                 '/figs/Jun_CritStats.csv'))
 yy5 <- 2016:2020
-simple5YrFile <- 'May2015_5yrSimple.pdf'
+simple5YrFile <- 'Jun2015_5yrSimple.pdf'
+createShortConditions <- FALSE
 
 # -------------------------------------------------------------------------------------
 #                               END USER INPUT
 # -------------------------------------------------------------------------------------
 
 ## System Conditions Table Data
-if(FALSE){
-  getSysCondData(scens, iFolder, paste0(resFolder,sysConFile),TRUE, aggBasedOnIC)
+if(TRUE){
+  print('starting getSysCondData')
+  flush.console()
+  getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggBasedOnIC)
+  print('finished getSysCondData')
+  flush.console()
 }
 
 if(FALSE){
@@ -65,11 +70,15 @@ if(FALSE){
 }
 
 ## Get Crit Stats Data
-if(FALSE){
+if(TRUE){
+  print('starting getCritStats')
+  flush.console()
   getSritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
+  print('finished getCrityStats')
+  flush.console()
 }
 
-if(FALSE){
+if(TRUE){
 print("starting to create figures and tables")
 flush.console()
 print("creating system conditions table")
@@ -204,6 +213,7 @@ write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
 
 # pulled annotation out of generic function
 
+if(createShortConditions){
 lbLabel <- 'LB total side inflow percent\nof average (1981-2010)'
 # filterOn being set to pe shows results for traces that are <= 1077
 shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe')
@@ -214,6 +224,7 @@ shortCond <- shortCond + annotate('segment', x = 5.1, xend = 3.7, y = 1071.1, ye
 pdf(paste0(oFigs,shortCondFig),width = 9, height = 6)
 print(shortCond)
 dev.off()
+}
 
 ## create the 5-yr simple table that compares to the previous run
 simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)

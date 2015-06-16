@@ -11,7 +11,7 @@ SystemConditions.rdf,SummaryOutputData.EqualizationAt823,AnnualRaw,NA,eq823
 SystemConditions.rdf,SummaryOutputData.MidElevationReleaseAt748,AnnualRaw,NA,mer748
 SystemConditions.rdf,SummaryOutputData.LowerBalancingAbove823,AnnualRaw,NA,lebGt823
 SystemConditions.rdf,SummaryOutputData.LowerBalancingAt823,AnnualRaw,NA,leb823
-Flags.rdf,Shortage.Step 1 Shortage Flag,EOCY,NA,lbShortageStep1
-Flags.rdf,Shortage.Step 2 Shortage Flag,EOCY,NA,lbShortageStep2
-Flags.rdf,Shortage.Step 3 Shortage Flag,EOCY,NA,lbShortageStep3
-Flags.rdf,MeadFloodControlData.MeadFloodControlFlag,EOCY,NA,lbFcSurplus
+SystemConditions.rdf,SummaryOutputData.LBShortageStep1,AnnualRaw,NA,lbShortageStep1
+SystemConditions.rdf,SummaryOutputData.LBShortageStep2,AnnualRaw,NA,lbShortageStep2
+SystemConditions.rdf,SummaryOutputData.LBShortageStep3,AnnualRaw,NA,lbShortageStep3
+SystemConditions.rdf,SummaryOutputData.LBFloodControlSurplus,AnnualRaw,NA,lbFcSurplus
