@@ -31,6 +31,14 @@ Follow these instructions for updating the CRSS results:
     1. Make sure the csv file does not have any extra, empty rows. If above changes were made in Excel, it's worth opening in a text editor to see what the end of the file looks like. There should be one blank line at the end of the file, and not many rows that are comma seperated with no data.
 1. Edit the main.R file
   1. Edit the variables in the user input area, as necessary.
+  1. Be sure to add an additional value to `startMonthMap`. For example, if updating for new June results, do not only edit the May entry, but add in a June entry. This ensures backwards compatability with previous month results.
+  ```
+  # original value
+  startMonthMap <- c('May2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
+  # new value
+  startMonthMap <- c('Jun2015_2016' = 'Jun 2015 DNF', 'May2015_2016' = 'May 2015 DNF', 
+	  'Apr2015_2016_a3' = 'Apr 2015 DNF')
+  ```
 1. Prepare files for the Conditions Leading to a Shortage in 2016 plot ***or*** set `createShortConditions` in `main.R` to `FALSE`. Uses MTOM results to develop this figure. See CRSS_DIR/MTOM/FirstYearCond/XXX.xlsx for example.
   1. Copy over Shortage.Shortage Flag, Powell.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
   1. Sum the Oct-Dec Powell.Outflow for current year

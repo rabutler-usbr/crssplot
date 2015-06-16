@@ -29,7 +29,8 @@ sysCondTable <- 'Jun_SysTableFull2016_2026.csv' # file name for the system condi
 prevMonthPEFile <- 'April/April_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots
-startMonthMap <- c('Jun2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
+startMonthMap <- c('Jun2015_2016' = 'Jun 2015 DNF', 'May2015_2016' = 'May 2015 DNF', 
+	'Apr2015_2016_a3' = 'Apr 2015 DNF')
 oFigs <- paste0(CRSSDIR,'/figs/') # folder location to save figures and fully procssed tables
 eocyFigs <- 'Jun2015_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
 annText <- 'Results from the Jun 2015 CRSS Run' # text that will be added to figures
