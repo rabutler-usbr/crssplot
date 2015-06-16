@@ -7,13 +7,21 @@ results.
 The aggregating code was run on a computer with 48GB of memory. There is not guarantee 
 that the same aggregating code will work on a PC. 
 
-1. Aggregate necessary data
+Detailed instructions:
+1. Get initial conditions data from MTOM results
   1. Append EOCY 2015 elevations from MTOM onto Mead/Powell EOCY elevations
-    1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM Ensemble output spreadsheets.
-      1. Delete header rows, so that only header row is one that has years in them
-      1. Edit column names for Run0-Run2 to correspond to MTOM_Min, MTOM_Max, MTOM_Most
-      1. Add in column for other runs, e.g., min, most, max. Only need data for month of I.C.
-1. Combine with previous month data (at least for EOCY data)
+    1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM Ensemble output spreadsheets. The Ensemble Output spreadsheet should be requested from 
+      1. Delete header rows, so that only header row contains years (keep row 2)
+      1. Edit column names for columns B, C, and D to correspond to MTOM_Min, MTOM_Max, MTOM_Most
+      1. Add in column for other runs, e.g., Min, Most, Max. Only need data for month of I.C. For example, add in December 2015 elevation from latest 24-Month Study results.
+1. Edit the main.R file
+  1. Edit the variables in the user input area, as necessary.
+1. Set working directory to CRSS-Process-Res folder
+1. Run main.R `source(main.R)`
+      
+Overall process:      
+1. Aggregate necessary data, and apply attributes
+1. Combine with previous month(s) CRSS data (at least for EOCY data)
 1. Create figures/tables
   1. provide numbers behind figures, where necessary 
 1. Convert May_SysTableFull2016_2026.csv to excel file
