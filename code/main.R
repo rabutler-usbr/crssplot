@@ -18,7 +18,7 @@ source('code/plotFirstYearShortCond.R')
 # scenarios are orderd model,supply,demand,policy,initial conditions
 scens <- makeAllScenNames('May2015_2016','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most','Most'))
 iFolder <- 'M:/Shared/CRSS/CRSS.2015/Scenario' # folder with scenario folders created by RiverSMART
-resFolder <- '../CRSS.2015/results/' # folder to save procssed text files to
+resFolder <- '../CRSS.2015/results/' # folder to save procssed text files to (intermediate processed data)
 sysCondFile <- 'MaySysCond.txt' # file name of system conditions data
 curMonthPEFile <- 'May_MeadPowellPE.txt' # file name of Powell and Mead PE data
 pICFile <- '../CRSS.2015/MTOM/MTOM_May15_PowellPE.csv' # input file name of MTOM results for Powell PE
@@ -27,10 +27,12 @@ icMonth <- '15-Dec' # IC are from December 2015
 critStatsFile <- 'May_CritStats.txt' # file name for critical stats data
 sysCondTable <- 'May_SysTableFull2016_2026.csv' # file name for the system conditions procssed file
 prevMonthPEFile <- 'April/April_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
+# startMonthMap includes a map for the model name (from folder names), to a string that 
+# will show up on plots
 startMonthMap <- c('May2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
-oFigs <- '../CRSS.2015/figs/'
-eocyFigs <- 'May2015_MPEOCY.pdf'
-annText <- 'Results from the May 2015 CRSS Run'
+oFigs <- '../CRSS.2015/figs/' # folder location to save figures and fully procssed tables
+eocyFigs <- 'May2015_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
+annText <- 'Results from the May 2015 CRSS Run' # text that will be added to figures
 critStatsProc <- 'May_CritStats.csv'
 critFigs <- 'May2015_CritFigs.pdf'
 condProbFile <- 'May_CondProbs.csv'
