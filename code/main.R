@@ -54,10 +54,14 @@ createShortConditions <- FALSE
 
 ## System Conditions Table Data
 if(TRUE){
-  getSysCondData(scens, iFolder, paste0(resFolder,sysConFile),TRUE, aggBasedOnIC)
+  print('starting getSysCondData')
+  flush.console()
+  getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggBasedOnIC)
+  print('finished getSysCondData')
+  flush.console()
 }
 
-if(TRUE){
+if(FALSE){
   ## get the Mead and Powel EOCY Data
   getPowellMeadEOCYPE(scens, iFolder, paste0(resFolder,curMonthPEFile), TRUE, aggBasedOnIC)
   ## append initial conditions onto May data
@@ -67,7 +71,11 @@ if(TRUE){
 
 ## Get Crit Stats Data
 if(TRUE){
+  print('starting getCritStats')
+  flush.console()
   getSritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
+  print('finished getCrityStats')
+  flush.console()
 }
 
 if(TRUE){
