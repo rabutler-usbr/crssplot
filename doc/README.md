@@ -31,7 +31,7 @@ Follow these instructions for updating the CRSS results:
     1. Make sure the csv file does not have any extra, empty rows. If above changes were made in Excel, it's worth opening in a text editor to see what the end of the file looks like. There should be one blank line at the end of the file, and not many rows that are comma seperated with no data.
 1. Edit the main.R file
   1. Edit the variables in the user input area, as necessary.
-  1. Be sure to add an additional value to `startMonthMap`. For example, if updating for new June results, do not only edit the May entry, but add in a June entry. This ensures backwards compatability with previous month results.
+  1. Be sure to add an additional value to `startMonthMap`. For example, if updating for new June results, do not only edit the May entry, but add in a June entry. This ensures backwards compatability with previous month results. Example:
   ```
   # original value
   startMonthMap <- c('May2015_2016' = 'May 2015 DNF', 'Apr2015_2016_a3' = 'Apr 2015 DNF')
