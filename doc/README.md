@@ -48,7 +48,7 @@ Follow these instructions for updating the CRSS results:
     * **Will likely need to edit the x and y coordinates in the annotation calls in main.R**
 1. Set working directory to CRSS-Process-Res folder
 1. Make sure CRSS_DIR environment variable is set to the CRSS folder, e.g., C:/model/CRSS/CRSS.2015
-1. Run main.R: `source(code/main.R)`
+1. Run main.R: `source('code/main.R')`
 1. Convert [Month]_SysTableFull2016_2026.csv to excel file
 1. Verify results
   1. In the system conditions table, the first year conditions should sync with MTOM results. Percent of time in each tier at Powell, may not match exactly due to the April adjustments. For example, MTOM could show a different percent of traces switching from Upper Elevation Balancing to Equalization than CRSS. 
@@ -61,7 +61,7 @@ Follow these instructions for updating the CRSS results:
   1. Use the CondProbs.csv file to fill in the conditional probability table.
   1. Add other figures
 1. Send an email to the Reclamation only modeling team to review the results. Include the following files:
-  * Power Point File
+  * PowerPoint File
   * System Conditions Excel file
   * Critical Stats csv file
   * The 5-year simple table in the body of the email
