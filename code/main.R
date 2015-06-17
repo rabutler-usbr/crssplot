@@ -33,7 +33,7 @@ startMonthMap <- c('Jun2015_2016' = 'Jun 2015 DNF', 'May2015_2016' = 'May 2015 D
 	'Apr2015_2016_a3' = 'Apr 2015 DNF')
 oFigs <- paste0(CRSSDIR,'/figs/') # folder location to save figures and fully procssed tables
 eocyFigs <- 'Jun2015_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
-annText <- 'Results from the Jun 2015 CRSS Run' # text that will be added to figures
+annText <- 'Results from the June 2015 CRSS Run' # text that will be added to figures
 critStatsProc <- 'Jun_CritStats.csv'
 critFigs <- 'Jun2015_CritFigs.pdf'
 condProbFile <- 'Jun_CondProbs.csv'

@@ -160,6 +160,8 @@ formatSimpleTable <- function(zz, scenNames, yrs)
     for(j in 1:ncol(zz)){
       if(zz[i,j] > 0 & zzRound[i,j] == '0%'){
         zzRound[i,j] <- '< 1%'
+      } else if(zz[i,j] < 0 & zzRound[i,j] == '0%'){
+        zzRound[i,j] <- '< -1%'
       }
     }
   }
