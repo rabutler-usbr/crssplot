@@ -17,7 +17,9 @@ CRSSDIR=Sys.getenv("CRSS_DIR")
 # -------------------------------------------------------------------------------------
 # scenarios are orderd model,supply,demand,policy,initial conditions
 scens <- makeAllScenNames('Jun2015_2016','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most','Most'))
-iFolder <- 'Z:/Shared/CRSS/CRSS.2015/Scenario' # folder with scenario folders created by RiverSMART
+# scens.limit should only include the 30 ensemble i.c. and not most/min/max runs
+scens.limit <- makeAllScenNames('Jun2015_2016','DNF','2007Dems','IG',1981:2010)
+iFolder <- 'M:/Shared/CRSS/CRSS.2015/Scenario' # folder with scenario folders created by RiverSMART
 resFolder <- paste0(CRSSDIR,'/results/') # folder to save procssed text files to (intermediate processed data)
 sysCondFile <- 'JunSysCond.txt' # file name of system conditions data
 curMonthPEFile <- 'Jun_MeadPowellPE.txt' # file name of Powell and Mead PE data
@@ -31,7 +33,7 @@ prevMonthPEFile <- 'April/April_MPPE_EOCY.txt' # file name that contains the pre
 # will show up on plots
 startMonthMap <- c('Jun2015_2016' = 'Jun 2015 DNF', 'May2015_2016' = 'May 2015 DNF', 
 	'Apr2015_2016_a3' = 'Apr 2015 DNF')
-oFigs <- paste0(CRSSDIR,'/figs/') # folder location to save figures and fully procssed tables
+oFigs <- paste0(CRSSDIR,'/figs/06_June/') # folder location to save figures and fully procssed tables
 eocyFigs <- 'Jun2015_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
 annText <- 'Results from the June 2015 CRSS Run' # text that will be added to figures
 critStatsProc <- 'Jun_CritStats.csv'
@@ -78,6 +80,17 @@ if(TRUE){
   print('finished getCrityStats')
   flush.console()
 }
+
+## Create the KeySlots csv file, but only want to include data for the 30 Ensemble and not
+## the Most or MTOM_Most
+print('Creating KeySlots csv file')
+flush.console()
+RWDataPlot::getDataForAllScens(scens.limit,scens.limit,RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
+                               iFolder, paste0(oFigs,'/KeySlots.txt'))
+# now read in txt file and write out csv file and delete txt file (inefficient I know)
+zz <- read.txt(paste0(oFigs,'/KeySlots.txt'),header=T)
+write.csv(zz, paste0(oFigs,'/KeySlots.csv'),row.names = F)
+file.remove(paste0(oFigs,'/KeySlots.txt'))
 
 if(TRUE){
 print("starting to create figures and tables")
@@ -232,6 +245,7 @@ simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)
 pdf(paste0(oFigs,simple5YrFile),width = 8, height = 8)
 print(simple5Yr)
 dev.off()
+
 
 #rm(list = ls())
 

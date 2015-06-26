@@ -1,0 +1,12 @@
+KeySlots.rdf,LBShort.AnnualMexicoShort,Monthly,NA,LBShort.AnnualMexicoShort
+KeySlots.rdf,LBShort.AnnualLBMexicoShort,Monthly,NA,LBShort.AnnualLBMexicoShort
+KeySlots.rdf,TotVal.Powell,Monthly,NA,TotVal.Powell
+KeySlots.rdf,Surplus.SurplusFlag,Monthly,NA,Surplus.SurplusFlag
+KeySlots.rdf,Surplus.Flood Control Surplus Flag,Monthly,NA,Surplus.Flood Control Surplus Flag
+KeySlots.rdf,Shortage.ShortageFlag,Monthly,NA,Shortage.ShortageFlag
+KeySlots.rdf,PowellOperation.Powell10YearWYRelease,Monthly,NA,PowellOperation.Powell10YearWYRelease
+KeySlots.rdf,PowellOperation.PowellWYRelease,Monthly,NA,PowellOperation.PowellWYRelease
+KeySlots.rdf,Mead.Outflow,Monthly,NA,Mead.Outflow
+KeySlots.rdf,Mead.Pool Elevation,Monthly,NA,Mead.Pool Elevation
+KeySlots.rdf,Powell.Outflow,Monthly,NA,Powell.Outflow
+KeySlots.rdf,Powell.Pool Elevation,Monthly,NA,Powell.Pool Elevation
