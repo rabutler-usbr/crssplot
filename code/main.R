@@ -88,7 +88,7 @@ flush.console()
 RWDataPlot::getDataForAllScens(scens.limit,scens.limit,RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
                                iFolder, paste0(oFigs,'/KeySlots.txt'))
 # now read in txt file and write out csv file and delete txt file (inefficient I know)
-zz <- read.txt(paste0(oFigs,'/KeySlots.txt'),header=T)
+zz <- read.table(paste0(oFigs,'/KeySlots.txt'),header=T)
 write.csv(zz, paste0(oFigs,'/KeySlots.csv'),row.names = F)
 file.remove(paste0(oFigs,'/KeySlots.txt'))
 
