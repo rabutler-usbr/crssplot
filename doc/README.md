@@ -4,7 +4,7 @@ The following attempts to document the process used in the May CRSS run to compu
 results. 
 
 **Warning:** the code aggregates data from 30 individual CRSS runs. This can be memory intensive.
-The aggregating code was run on a computer with 48GB of memory. There is not guarantee 
+The aggregating code was run on a computer with 48GB of memory. There is no guarantee 
 that the same aggregating code will work on a PC. 
 
 ### Overall Process  
