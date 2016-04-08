@@ -23,6 +23,7 @@ Follow these instructions for updating the CRSS results:
 1. Use the Post-process function in RiverSMART to create the necessary Excel files for posting to Stakeholder Workgroup. 
 1. Copy over all of the scenario folders from the local machine to the server.
 1. Get initial conditions data from MTOM results
+  1. Ensure that Powell Operation flag from MTOM results are the operations that Powell started the year in. (When reviewing CRSS results, the years that are 7.48 MAF release years in the first modeled year from CRSS, may have elevations at Powell > 3,575'.)  
   1. Append EOCY 2015 elevations from MTOM onto Mead/Powell EOCY elevations
     1. Need to save csv file from the Powell elevations and Mead elevations from the MTOM Ensemble output spreadsheets. The Ensemble Output spreadsheet should be requested from BCOO and saved to Manoa under the MTOM directory.
       1. Delete header rows, so that only header row contains years (keep row 2)
