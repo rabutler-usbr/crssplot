@@ -2,7 +2,7 @@
 Repository includes code used to process CRSS results, starting in April 2015.
 
 Code relies on [RWDataPlot](https://github.com/rabutler/RWDataPlot) and 
-[CRSSIO](https://github.com/rabutler/CRSSIO) (custom R Packages) and the following packages available on CRAN:
+[CRSSIO](https://github.com/BoulderCodeHub/CRSSIO) (custom R Packages) and the following packages available on CRAN:
 * devtools
 * dplyr
 * ggplot2
@@ -15,7 +15,7 @@ Ensure the above packages are installed on the computer. RWDataPlot and CRSSIO c
 ```
 library(devtools)
 devtools::install_github('rabutler/RWDataPlot')
-devtools::install_github('rabutler/CRSSIO')
+devtools::install_github('BoulderCodeHub/CRSSIO')
 ```
 
 Ensure that the environment variable CRSS_DIR is set on the computer.
