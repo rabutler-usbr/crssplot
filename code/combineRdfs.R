@@ -3,9 +3,9 @@ source('code/makeScenNames.R')
 source('code/combineRdfHelpers.R')
 
 # ----- USER INPUT -------
-scens <- makeAllScenNames('Apr2015_2016_a3','DNF','IGa3',1981:1983)
-rdfs <- c('KeySlots.rdf','MPPE.rdf','SystemConditions.rdf')
-sPath <- 'C:/alan/CRSS/CRSS.2016/Scenario'
+scens <- makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:1983)
+rdfs <- paste0(c('KeySlots','Flags','SystemConditions','OWDAnn','Res','xtraRes'),'.rdf')
+sPath <- 'M:/Shared/CRSS/2016/Scenario/AprilWorking/CRSS.Apr2016.Results'
 batchPath <- sPath
 # ----- END USER INPUT -------
 
