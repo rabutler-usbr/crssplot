@@ -44,7 +44,8 @@ pICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_PowellPE.csv') # input file name of 
 mICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_MeadPE.csv') # input file name of MTOM results for Mead PE
 icMonth <- '16-Dec' # IC are from December 2015
 
-yrs2show <- 2016:2030
+yrs2show <- 2017:2026
+peYrs <- 2016:2026
 
 prevMonthPEFile <- 'Jan/Jan_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
 
@@ -152,9 +153,9 @@ if(TRUE){
   # 1) system conditions table
   sysCond <- read.table(paste0(resFolder,sysCondFile),header = T)
   # trim to 2016-2026 and 30 trace ensemble I.C.; Agg == 1 limits to using 30 ensemble I.C. 
-  sysCond <- dplyr::filter(sysCond, Year %in% 2017:2030 & Agg == 1)
+  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
   # create the system cond. table
-  sysTable <- CRSSIO::createSysCondTable(sysCond, 2017:2030)
+  sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   # save the sys cond table
   write.csv(sysTable[['fullTable']], paste0(oFigs,sysCondTable))
   
@@ -172,9 +173,9 @@ if(TRUE){
   rm(peCur, pePrev)
   # plot
   # only use the 30 ensemble (Agg = 1)
-  powellPE <- plotEOCYElev(dplyr::filter(peCur, Agg == 1), 2017:2060, 'Powell.Pool Elevation', 
+  powellPE <- plotEOCYElev(dplyr::filter(peCur, Agg == 1), peYrs, 'Powell.Pool Elevation', 
                            'Powell End-of-December Year Elevation')
-  meadPE <- plotEOCYElev(dplyr::filter(peCur, Agg == 1), 2017:2060, 'Mead.Pool Elevation', 
+  meadPE <- plotEOCYElev(dplyr::filter(peCur, Agg == 1), peYrs, 'Mead.Pool Elevation', 
                            'Mead End-of-December Year Elevation')
   
   # save figures
@@ -195,11 +196,11 @@ if(TRUE){
   # filter to only use 30 ensemble and to drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
   critStatsFig1 <- plotCritStats(dplyr::filter(critStats, Agg == 1, Variable != 'meadLt1020'), 
-                                 2016:2026, annText)
+                                 yrs2show, annText)
   critStatsFig2 <- plotCritStats(dplyr::filter(critStats, Agg == 1, Variable != 'meadLt1025'), 
-                                 2016:2026, annText)
+                                 yrs2show, annText)
   # create data table to save crit stats
-  cs <- dplyr::filter(critStats, Year %in% 2016:2026, Agg == 1)
+  cs <- dplyr::filter(critStats, Year %in% yrs2show, Agg == 1)
   
   # rename the variables to strings
   cs$vName <- 'LB Shortage'
@@ -217,12 +218,12 @@ if(TRUE){
   # shortage surplus figure
   # defaults ok for legendTitle, nC, and legLoc
   ssPlot <- plotShortageSurplus(dplyr::filter(sysCond, Variable %in% c('lbShortage', 'lbSurplus'),
-                                              Agg == 1), 2017:2026, 'April 2016')
+                                              Agg == 1), yrs2show, 'April 2016')
     
   # stacked barplot of different shortage tiers
   # default for annSize is ok
   shortStack <- plotShortStackedBar(dplyr::filter(sysCond, Variable %in% c('lbShortageStep1',
-                                    'lbShortageStep2','lbShortageStep3')), 2017:2026, annText)
+                                    'lbShortageStep2','lbShortageStep3')), yrs2show, annText)
 
 # save figures and table
   pdf(paste0(oFigs,critFigs),width = 8, height = 6)
@@ -238,32 +239,32 @@ if(TRUE){
 # use sysCond
 if(is.na(match('sysCond',ls()))){
   sysCond <- read.table(paste0(resFolder,sysCondFile),header = T) 
-  sysCond <- dplyr::filter(sysCond, Year %in% 2017:2027 & Agg == 1)
-  sysTable <- CRSSIO::createSysCondTable(sysCond, 2017:2027)
+  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
+  sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
 }
-cp1 <- getConditionalProbs(sysCond, 2017, 2017, 'lbShortage','mer748')
-cp2 <- getConditionalProbs(sysCond, 2017, 2017, 'lbShortage','ueb823')
-cp3 <- getConditionalProbs(sysCond, 2017,2017, 'lbShortage',c('eq','uebGt823'))
-cp4 <- getConditionalProbs(sysCond, 2018, 2017, c('lbShortage','lbShortageStep1','lbShortageStep2',
+cp1 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','mer748')
+cp2 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','ueb823')
+cp3 <- getConditionalProbs(sysCond, yrs2show[1],yrs2show[1], 'lbShortage',c('eq','uebGt823'))
+cp4 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
                                                'lbShortageStep3'), 'mer748')
-cp5 <- getConditionalProbs(sysCond, 2018, 2017, c('lbShortage','lbShortageStep1','lbShortageStep2',
+cp5 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
                                                'lbShortageStep3'), 'ueb823')
-cp6 <- getConditionalProbs(sysCond, 2018, 2017, c('lbShortage','lbShortageStep1','lbShortageStep2',
+cp6 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
                                                'lbShortageStep3'), c('eq','uebGt823'))
 
 # create data table from the above values
-cpt1 <- data.frame('ChanceOf' = c(paste(2017,names(cp1)),paste(2018,names(cp4))),
+cpt1 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp1)),paste(yrs2show[2],names(cp4))),
                    'PrctChance' = c(cp1,cp4))
 rr <- which(rownames(sysTable$fullTable) == 'Mid-Elevation Release Tier - annual release = 7.48 maf')
-cc <- which(colnames(sysTable$fullTable) == 2017)
+cc <- which(colnames(sysTable$fullTable) == yrs2show[1])
 cpt1$PowellWYRel <- paste('7.48 MAF;',sysTable$fullTable[rr,cc])
 
-cpt2 <- data.frame('ChanceOf' = c(paste(2017,names(cp2)),paste(2018,names(cp5))),
+cpt2 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp2)),paste(yrs2show[2],names(cp5))),
                    'PrctChance' = c(cp2,cp5))
 rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release = 8.23 maf")
 cpt2$PowellWYRel <- paste('8.23 MAF;',sysTable$fullTable[rr,cc])
 
-cpt3 <- data.frame('ChanceOf' = c(paste(2017,names(cp3)),paste(2018,names(cp6))),
+cpt3 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp3)),paste(yrs2show[2],names(cp6))),
                    'PrctChance' = c(cp3,cp6))
 rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release > 8.23 maf")
 rr2 <- which(rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf")
