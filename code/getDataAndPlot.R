@@ -1,5 +1,6 @@
-source('C:/alan/GeneralCode/generalPlotting.R')
-##source('C:/alan/CRSS/code/get5YrTable.R')
+
+source('code/generalPlotting.R')
+
 library(reshape2)
 library(plyr)
 library(RWDataPlot)
