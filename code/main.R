@@ -1,6 +1,5 @@
-rm(list=ls())
 
-setwd("C:\\Users\\JShirey\\Desktop\\RCodes\\Process-CRSS-Res-master")
+rm(list=ls())
 
 library(CRSSIO)
 library(dplyr)
