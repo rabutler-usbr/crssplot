@@ -33,7 +33,7 @@ getSysCondData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFun
 }
 
 
-getSritStatsData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFunction)
+getCritStatsData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFunction)
 {
   slotAggList <- RWDataPlot::createSlotAggList('data/CritStatsList.csv')
   # first scens is the folder names to search, second is the names to save in the data file
