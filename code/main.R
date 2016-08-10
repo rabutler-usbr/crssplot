@@ -14,9 +14,9 @@ source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
 source('code/get5YrTable.R')
 
-# -------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #                                    USER INPUT
-# -------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
@@ -26,45 +26,85 @@ source('code/get5YrTable.R')
 # can read model output from the server, but save figures locally.
 CRSSDIR <- Sys.getenv("CRSS_DIR")
 iFolder <- 'M:/Shared/CRSS/2016'
+# set crssMonth to the month CRSS was run. data and figures will be saved in 
+# a folder with this name
+crssMonth <- 'Aug'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions
 scens <- makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most'))
+
 # scens.limit should only include the 30 ensemble i.c. and not most/min/max runs
 scens.limit <- makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010)
-iFolder <- file.path(iFolder, 'Scenario') # folder with scenario folders created by RiverSMART
-resFolder <- paste0(CRSSDIR,'/results/') # folder to save procssed text files to (intermediate processed data)
-sysCondFile <- 'AprSysCond_Test.txt' # file name of system conditions data
-curMonthPEFile <- 'Apr_MeadPowellPE.txt' # file name of Powell and Mead PE data
-pICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_PowellPE.csv') # input file name of MTOM results for Powell PE
-mICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_MeadPE.csv') # input file name of MTOM results for Mead PE
-icMonth <- '16-Dec' # IC are from December 2015
-critStatsFile <- '/Apr2016_CritStats.txt' # file name for critical stats data
-sysCondTable <- 'Apr_SysTableFull2016_2030.csv' # file name for the system conditions procssed file
-prevMonthPEFile <- 'Jan/Jan_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
+
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots[]
 startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF')
-oFigs <- paste0(CRSSDIR,'/figs/April/') # folder location to save figures and fully procssed tables
-eocyFigs <- 'Apr2016_MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
+
+pICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_PowellPE.csv') # input file name of MTOM results for Powell PE
+mICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_MeadPE.csv') # input file name of MTOM results for Mead PE
+icMonth <- '16-Dec' # IC are from December 2015
+
+yrs2show <- 2016:2030
+
+prevMonthPEFile <- 'Jan/Jan_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
+
 annText <- 'Results from the April 2016 CRSS Run' # text that will be added to figures
-critStatsProc <- 'Apr2016_CritStats.csv'
-critFigs <- 'Apr2016_CritFigs2026.pdf'
-condProbFile <- 'Apr2016_CondProbs.csv'
+
 # mtom results file for creating conditions leading to shortage in 2016
 mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #changed to may b/c jun results file DNE
-shortCondFig <- 'Apr2016_shortConditionsFig.pdf'
+
 # for the 5-year simple table
 ss5 <- c('Jan CRSS', 'April CRSS')
+
 # should match files for critStatsFile:
 critStatsIn <- paste0(CRSSDIR,c('/results/Jan/Jan_CritStats_DNF.csv',
-                 '/figs/Apr2016_CritStats.csv'))
+                                '/figs/Apr2016_CritStats.csv'))
 yy5 <- 2017:2021
-simple5YrFile <- 'Apr2016_5yrSimple.pdf'
-createShortConditions <- FALSE
 
-# -------------------------------------------------------------------------------------
+# "switches" to create/not create different figures
+createShortConditions <- FALSE
 #                               END USER INPUT
-# -------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+#       SETUP DIRECTORIES AND FILENAMES
+# -----------------------------------------------------------------------------
+iFolder <- file.path(iFolder, 'Scenario') # folder with scenario folders created by RiverSMART
+
+# folder location to save figures and fully procssed tables
+oFigs <- file.path(CRSSDIR,'results', crssMonth) 
+if(!file.exists(oFigs)){
+  message(paste('Creating folder:', oFigs))
+  dir.create(oFigs)
+}
+
+# folder to save procssed text files to (intermediate processed data)
+resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
+if(!file.exists(resFolder)){
+  message(paste('Creating folder:', resFolder))
+  dir.create(resFolder)
+}
+
+sysCondFile <- 'SysCond_Test.txt' # file name of system conditions data
+curMonthPEFile <- 'MeadPowellPE.txt' # file name of Powell and Mead PE data
+
+critStatsFile <- 'CritStats.txt' # file name for critical stats data
+# file name for the system conditions procssed file
+sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
+
+eocyFigs <- 'MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
+
+critStatsProc <- 'CritStats.csv'
+critFigs <- 'CritFigs2026.pdf'
+condProbFile <- 'CondProbs.csv'
+
+shortCondFig <- 'shortConditionsFig.pdf'
+
+simple5YrFile <- '5yrSimple.pdf'
+
+# -----------------------------------------------------------------------------
+#       Process results
+# -----------------------------------------------------------------------------
 
 ## System Conditions Table Data
 if(TRUE){
@@ -257,6 +297,4 @@ pdf(paste0(oFigs,simple5YrFile),width = 8, height = 8)
 print(simple5Yr)
 dev.off()
 
-
-#rm(list = ls())
 
