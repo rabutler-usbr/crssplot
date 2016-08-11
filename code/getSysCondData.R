@@ -9,11 +9,12 @@ getScenarioData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFu
   slotAggList <- RWDataPlot::createSlotAggList(slaInput) # or 
   # first scens is the folder names to search, second is the names to save in the data file
   # use folder names for now
-  message('starting to process scenarios...')
-  message(paste('this could take some time as you are processing',length(scens),'scenarios'))
   
   # convert the scens list to a vector for processing all scenarios at once
   scensVec <- do.call(c,scens)
+  
+  message('starting to process scenarios...')
+  message(paste('this could take some time as you are processing',length(scensVec),'scenarios'))
   
   zz <- RWDataPlot::getDataForAllScens(scensVec,scensVec,slotAggList, iFolder, oFile, TRUE)
 
