@@ -71,6 +71,7 @@ createShortConditions <- FALSE
 #       SETUP DIRECTORIES AND FILENAMES
 # -----------------------------------------------------------------------------
 iFolder <- file.path(iFolder, 'Scenario') # folder with scenario folders created by RiverSMART
+message('Scenario data will be read in from: ', iFolder)
 
 # folder location to save figures and fully procssed tables
 oFigs <- file.path(CRSSDIR,'results', crssMonth) 
@@ -78,6 +79,7 @@ if(!file.exists(oFigs)){
   message(paste('Creating folder:', oFigs))
   dir.create(oFigs)
 }
+message('Figures and tables will be saved to: ', oFigs)
 
 # folder to save procssed text files to (intermediate processed data)
 resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
@@ -85,6 +87,7 @@ if(!file.exists(resFolder)){
   message(paste('Creating folder:', resFolder))
   dir.create(resFolder)
 }
+message('Intermediate data will be saved to: ', resFolder)
 
 sysCondFile <- 'SysCond_Test.txt' # file name of system conditions data
 curMonthPEFile <- 'MeadPowellPE.txt' # file name of Powell and Mead PE data
@@ -109,11 +112,9 @@ simple5YrFile <- '5yrSimple.pdf'
 
 ## System Conditions Table Data
 if(TRUE){
-  print('starting getSysCondData')
-  flush.console()
+  message('starting getSysCondData')
   getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggBasedOnIC)
-  print('finished getSysCondData')
-  flush.console()
+  message('finished getSysCondData')
 }
 
 if(TRUE){
@@ -126,17 +127,14 @@ if(TRUE){
 
 ## Get Crit Stats Data
 if(TRUE){
-  print('starting getCritStats')
-  flush.console()
+  message('starting getCritStats')
   getCritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
-  print('finished getCrityStats')
-  flush.console()
+  message('finished getCrityStats')
 }
 
 ## Create the KeySlots csv file, but only want to include data for the 30 Ensemble and not
 ## the Most or MTOM_Most
-print('Creating KeySlots csv file')
-flush.console()
+message('Creating KeySlots csv file')
 RWDataPlot::getDataForAllScens(scens.limit,scens.limit,RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
                                iFolder, paste0(oFigs,'/KeySlots.txt'))
 # now read in txt file and write out csv file and delete txt file (inefficient I know)
@@ -145,10 +143,8 @@ write.csv(zz, paste0(oFigs,'/KeySlots.csv'),row.names = F)
 file.remove(paste0(oFigs,'/KeySlots.txt'))
 
 if(TRUE){
-  print("starting to create figures and tables")
-  flush.console()
-  print("creating system conditions table")
-  flush.console()
+  message("starting to create figures and tables")
+  message("creating system conditions table")
   ## Create tables, figures, and data behind figures
   # 1) system conditions table
   sysCond <- read.table(paste0(resFolder,sysCondFile),header = T)
@@ -161,8 +157,7 @@ if(TRUE){
   
   # 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
   # read in current month data
-  print("EOCY elevation figures")
-  flush.console()
+  message("EOCY elevation figures")
   peCur <- read.table(paste0(resFolder,curMonthPEFile),header = T)
   pePrev <- read.table(paste0(resFolder,prevMonthPEFile),header = T) # read in prev. month data
   # add start month attributes to both months' data
@@ -189,8 +184,7 @@ if(TRUE){
   
   # 3) Critical elevation thresholds; figures and data table
   # have sysCond for some, and read in crit stats for others
-  print("starting critical stats")
-  flush.console()
+  message("starting critical stats")
   critStats <- read.table(paste0(resFolder,critStatsFile),header = T)
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # filter to only use 30 ensemble and to drop Mead LT 1025 from one plot and Mead LT 1020 from 
