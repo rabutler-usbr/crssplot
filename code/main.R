@@ -60,6 +60,8 @@ ss5 <- c('Jan CRSS', 'April CRSS')
 # should match files for critStatsFile:
 critStatsIn <- paste0(CRSSDIR,c('/results/Jan/Jan_CritStats_DNF.csv',
                                 '/figs/Apr2016_CritStats.csv'))
+
+# years to use for the simple 5-year table
 yy5 <- 2017:2021
 
 # "switches" to create/not create different figures
@@ -68,6 +70,9 @@ getSysCondData <- TRUE
 getPeData <- TRUE
 getCSData <- TRUE
 createKeySlotsCsv <- FALSE
+makeFiguresAndTables <- FALSE
+computeConditionalProbs <- FALSE
+createSimple5yrTable <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -147,7 +152,7 @@ if(createKeySlotsCsv){
   message('Done creating KeySlots csv file')
 }
 
-if(TRUE){
+if(makeFiguresAndTables){
   message("starting to create figures and tables")
   message("creating system conditions table")
   ## Create tables, figures, and data behind figures
@@ -234,48 +239,49 @@ if(TRUE){
   write.csv(cs,paste0(oFigs,critStatsProc),row.names = F)
 }
 
-## CONDITIONAL PROBABILITIES
-# use sysCond
-if(is.na(match('sysCond',ls()))){
-  sysCond <- read.table(paste0(resFolder,sysCondFile),header = T) 
-  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
-  sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
+if(computeConditionalProbs){
+  ## CONDITIONAL PROBABILITIES
+  # use sysCond
+  if(is.na(match('sysCond',ls()))){
+    sysCond <- read.table(paste0(resFolder,sysCondFile),header = T) 
+    sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
+    sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
+  }
+  cp1 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','mer748')
+  cp2 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','ueb823')
+  cp3 <- getConditionalProbs(sysCond, yrs2show[1],yrs2show[1], 'lbShortage',c('eq','uebGt823'))
+  cp4 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
+                                                 'lbShortageStep3'), 'mer748')
+  cp5 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
+                                                 'lbShortageStep3'), 'ueb823')
+  cp6 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
+                                                 'lbShortageStep3'), c('eq','uebGt823'))
+  
+  # create data table from the above values
+  cpt1 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp1)),paste(yrs2show[2],names(cp4))),
+                     'PrctChance' = c(cp1,cp4))
+  rr <- which(rownames(sysTable$fullTable) == 'Mid-Elevation Release Tier - annual release = 7.48 maf')
+  cc <- which(colnames(sysTable$fullTable) == yrs2show[1])
+  cpt1$PowellWYRel <- paste('7.48 MAF;',sysTable$fullTable[rr,cc])
+  
+  cpt2 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp2)),paste(yrs2show[2],names(cp5))),
+                     'PrctChance' = c(cp2,cp5))
+  rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release = 8.23 maf")
+  cpt2$PowellWYRel <- paste('8.23 MAF;',sysTable$fullTable[rr,cc])
+  
+  cpt3 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp3)),paste(yrs2show[2],names(cp6))),
+                     'PrctChance' = c(cp3,cp6))
+  rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release > 8.23 maf")
+  rr2 <- which(rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf")
+  cpt3$PowellWYRel <- paste('> 8.23 MAF;',sysTable$fullTable[rr,cc] + sysTable$fullTable[rr2,cc])
+  
+  cpt1 <- rbind(cpt1,cpt2,cpt3)
+  
+  # rearrange columns
+  cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
+  cpt1$PrctChance <- cpt1$PrctChance*100
+  write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
 }
-cp1 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','mer748')
-cp2 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','ueb823')
-cp3 <- getConditionalProbs(sysCond, yrs2show[1],yrs2show[1], 'lbShortage',c('eq','uebGt823'))
-cp4 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
-                                               'lbShortageStep3'), 'mer748')
-cp5 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
-                                               'lbShortageStep3'), 'ueb823')
-cp6 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
-                                               'lbShortageStep3'), c('eq','uebGt823'))
-
-# create data table from the above values
-cpt1 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp1)),paste(yrs2show[2],names(cp4))),
-                   'PrctChance' = c(cp1,cp4))
-rr <- which(rownames(sysTable$fullTable) == 'Mid-Elevation Release Tier - annual release = 7.48 maf')
-cc <- which(colnames(sysTable$fullTable) == yrs2show[1])
-cpt1$PowellWYRel <- paste('7.48 MAF;',sysTable$fullTable[rr,cc])
-
-cpt2 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp2)),paste(yrs2show[2],names(cp5))),
-                   'PrctChance' = c(cp2,cp5))
-rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release = 8.23 maf")
-cpt2$PowellWYRel <- paste('8.23 MAF;',sysTable$fullTable[rr,cc])
-
-cpt3 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp3)),paste(yrs2show[2],names(cp6))),
-                   'PrctChance' = c(cp3,cp6))
-rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release > 8.23 maf")
-rr2 <- which(rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf")
-cpt3$PowellWYRel <- paste('> 8.23 MAF;',sysTable$fullTable[rr,cc] + sysTable$fullTable[rr2,cc])
-
-cpt1 <- rbind(cpt1,cpt2,cpt3)
-
-# rearrange columns
-cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
-cpt1$PrctChance <- cpt1$PrctChance*100
-write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
-
 # pulled annotation out of generic function
 
 if(createShortConditions){
@@ -291,10 +297,11 @@ if(createShortConditions){
   dev.off()
 }
 
-## create the 5-yr simple table that compares to the previous run
-simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)
-pdf(paste0(oFigs,simple5YrFile),width = 8, height = 8)
-print(simple5Yr)
-dev.off()
-
+if(createSimple5yrTable){
+  ## create the 5-yr simple table that compares to the previous run
+  simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)
+  pdf(paste0(oFigs,simple5YrFile),width = 8, height = 8)
+  print(simple5Yr)
+  dev.off()
+}
 
