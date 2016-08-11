@@ -47,3 +47,15 @@ aggBasedOnIC_april <- function(scen)
   
   zz
 }
+
+# Scenario is assumed to be the full scenario name, and scens is a list of 
+# scenarios that should be combined together
+aggFromScenList <- function(Scenario, scens)
+{
+  tmp <- which(sapply(1:length(scens), function(x) Scenario %in% scens[[x]]) == TRUE)
+  if(length(tmp) > 1){
+    stop(Scenario, ' was found in multiple scenario lists. It can only be grouped in one set of scenarios.')
+  }
+  
+  names(scens)[tmp] # returns the name of the group of scenarios
+}
