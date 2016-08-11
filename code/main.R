@@ -67,6 +67,7 @@ createShortConditions <- FALSE
 getSysCondData <- TRUE
 getPeData <- TRUE
 getCSData <- TRUE
+createKeySlotsCsv <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -138,13 +139,13 @@ if(getCSData){
 
 ## Create the KeySlots csv file, but only want to include data for the 30 Ensemble and not
 ## the Most or MTOM_Most
-message('Creating KeySlots csv file')
-RWDataPlot::getDataForAllScens(scens.limit,scens.limit,RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
-                               iFolder, paste0(oFigs,'/KeySlots.txt'))
-# now read in txt file and write out csv file and delete txt file (inefficient I know)
-zz <- read.table(paste0(oFigs,'/KeySlots.txt'),header=T)
-write.csv(zz, paste0(oFigs,'/KeySlots.csv'),row.names = F)
-file.remove(paste0(oFigs,'/KeySlots.txt'))
+if(createKeySlotsCsv){
+  message('Creating KeySlots csv file')
+  RWDataPlot::getDataForAllScens(scens.limit,scens.limit,
+                                 RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
+                                 iFolder, paste0(oFigs,'/KeySlots.csv'), FALSE)
+  message('Done creating KeySlots csv file')
+}
 
 if(TRUE){
   message("starting to create figures and tables")
