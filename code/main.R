@@ -108,7 +108,7 @@ if(!file.exists(resFolder)){
 message('Intermediate data will be saved to: ', resFolder)
 
 sysCondFile <- 'SysCond.feather' # file name of system conditions data
-curMonthPEFile <- 'MeadPowellPE.txt' # file name of Powell and Mead PE data
+curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
 
 critStatsFile <- 'CritStats.feather' # file name for critical stats data
 # file name for the system conditions procssed file
@@ -138,7 +138,8 @@ if(getSysCondData){
 
 if(getPeData){
   ## get the Mead and Powel EOCY Data
-  getPowellMeadEOCYPE(scens, iFolder, paste0(resFolder,curMonthPEFile), TRUE, aggBasedOnIC)
+  getScenarioData(scens, iFolder, file.path(resFolder,curMonthPEFile), TRUE, 
+                  aggBasedOnIC, 'data/MPPE_EOCY.csv')
   ## append initial conditions onto May data
   getAndAppendIC(scens, paste0(resFolder,curMonthPEFile), pIcFile, mICFile, icMonth, 
                  TRUE, aggBasedOnIC)

@@ -3,30 +3,6 @@ library(dplyr)
 # prep data for 10/50/90 figures for April Run compare to January Run
 # mmm = min/most/max
 
-getPowellMeadEOCYPE <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFunction)
-{
-  # get all CRSS results through 2026 Mead and Powell EOCY elevations January Run
-  slotAggList <- RWDataPlot::createSlotAggList('data/MPPE_EOCY.csv')
-  RWDataPlot::getDataForAllScens(scens,scens,slotAggList,iFolder,oFile)
-  
-  if(addAggAttribute){
-    print('now reading the file in...')
-    flush.console()
-    zz <- read.table(oFile,header=T)
-    
-    print('adding attribute...')
-    flush.console()
-    
-    zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario))
-    
-    print('rewriting file...')
-    flush.console()
-    
-    write.table(zz, oFile)
-  }
-  
-}
-
 # Want to show initial conditions on 10/50/90 figures, so have to append IC for each run
 # using the MTOM results
 # assumes that it is only powell and mead initial conditions
