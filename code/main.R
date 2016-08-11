@@ -30,15 +30,22 @@ iFolder <- 'M:/Shared/CRSS/2016'
 # a folder with this name
 crssMonth <- 'Aug'
 
-# scenarios are orderd model,supply,demand,policy,initial conditions
-scens <- makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',c(1981:2010,'MTOM_Most'))
-
-# scens.limit should only include the 30 ensemble i.c. and not most/min/max runs
-scens.limit <- makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010)
+# scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
+# scens should be a list, each entry is a scenario name, and the entry is a 
+# character vector of length 1 to n. 
+# all of the values in each entry of the list are combined together and processed
+# as one scenario. So for a run that has 30 initial conditions, all 30 runs are 
+# averaged/combined together. the name of the entries in the list are used for 
+# the scenario name
+scens <- list(
+  'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
+  'Aug2016' = 'Aug2016_2017,DNF,2007Dems,IG'
+)
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
-# will show up on plots[]
-startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF')
+# will show up on plots;
+startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
+                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF')
 
 pICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_PowellPE.csv') # input file name of MTOM results for Powell PE
 mICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_MeadPE.csv') # input file name of MTOM results for Mead PE
