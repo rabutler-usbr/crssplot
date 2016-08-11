@@ -16,14 +16,14 @@ getScenarioData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFu
   scensVec <- do.call(c,scens)
   
   zz <- RWDataPlot::getDataForAllScens(scensVec,scensVec,slotAggList, iFolder, oFile, TRUE)
-  
+
   if(addAggAttribute){
     message('adding attribute...')
     
-    if(as.character(quote(aggFunction)) == 'aggFromScenList'){
-      zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario, scens))
+    if(aggFunction == 'aggFromScenList'){
+      zz <- dplyr::mutate(zz, Agg = eval(call(aggFunction, Scenario, scens)))
     } else{
-      zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario))
+      zz <- dplyr::mutate(zz, Agg = eval(call(aggFunction, Scenario)))
     }
     
     message('rewriting file...')

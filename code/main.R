@@ -13,7 +13,7 @@ source('code/getEOCYData.R')
 source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
-source('code/get5YrTable.R')
+#source('code/get5YrTable.R')
 
 # -----------------------------------------------------------------------------
 #                                    USER INPUT
@@ -39,7 +39,7 @@ crssMonth <- 'Aug'
 # averaged/combined together. the name of the entries in the list are used for 
 # the scenario name
 scens <- list(
-  'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
+  'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:1982),
   'Aug2016' = 'Aug2016_2017,DNF,2007Dems,IG'
 )
 
@@ -75,8 +75,8 @@ yy5 <- 2017:2021
 # "switches" to create/not create different figures
 createShortConditions <- FALSE
 getSysCondData <- TRUE
-getPeData <- TRUE
-getCSData <- TRUE
+getPeData <- FALSE
+getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
 computeConditionalProbs <- FALSE
@@ -131,8 +131,8 @@ simple5YrFile <- '5yrSimple.pdf'
 ## System Conditions Table Data
 if(getSysCondData){
   message('starting getSysCondData')
-  getScenarioData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, 
-                  aggFromScenList, 'data/SysCond.csv')
+  getScenarioData(scens, iFolder, file.path(resFolder,sysCondFile),TRUE, 
+                  'aggFromScenList', 'data/SysCond.csv')
   message('finished getSysCondData')
 }
 
@@ -148,7 +148,7 @@ if(getPeData){
 if(getCSData){
   message('starting getCritStats')
   getScenarioData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, 
-                  aggFromScenList, 'data/CritStatsList.csv')
+                  'aggFromScenList', 'data/CritStatsList.csv')
   message('finished getCrityStats')
 }
 
