@@ -5,6 +5,7 @@ library(CRSSIO)
 library(dplyr)
 library(reshape2)
 library(grid)
+library(feather)
 source('code/makeScenNames.R')
 source('code/getSysCondData.R')
 source('code/dataTaggingFunctions.R')
@@ -106,7 +107,7 @@ if(!file.exists(resFolder)){
 }
 message('Intermediate data will be saved to: ', resFolder)
 
-sysCondFile <- 'SysCond_Test.txt' # file name of system conditions data
+sysCondFile <- 'SysCond.feather' # file name of system conditions data
 curMonthPEFile <- 'MeadPowellPE.txt' # file name of Powell and Mead PE data
 
 critStatsFile <- 'CritStats.txt' # file name for critical stats data
@@ -130,7 +131,7 @@ simple5YrFile <- '5yrSimple.pdf'
 ## System Conditions Table Data
 if(getSysCondData){
   message('starting getSysCondData')
-  getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggBasedOnIC)
+  getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggFromScenList)
   message('finished getSysCondData')
 }
 

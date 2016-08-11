@@ -9,26 +9,25 @@ getSysCondData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFun
   slotAggList <- RWDataPlot::createSlotAggList('data/SysCond.csv')
   # first scens is the folder names to search, second is the names to save in the data file
   # use folder names for now
-  print('starting to process scenarios...')
-  print(paste('this could take some time as you are processing',length(scens),'scenarios'))
-  flush.console()
+  message('starting to process scenarios...')
+  message(paste('this could take some time as you are processing',length(scens),'scenarios'))
   
-  RWDataPlot::getDataForAllScens(scens,scens,slotAggList, iFolder, oFile)
+  # convert the scens list to a vector for processing all scenarios at once
+  scensVec <- do.call(c,scens)
+  
+  zz <- RWDataPlot::getDataForAllScens(scensVec,scensVec,slotAggList, iFolder, oFile, TRUE)
   
   if(addAggAttribute){
-    print('now reading the file in...')
-    flush.console()
-    zz <- read.table(oFile,header=T)
+    message('adding attribute...')
     
-    print('adding attribute...')
-    flush.console()
+    if(as.character(quote(aggFunction)) == 'aggFromScenList'){
+      zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario, scens))
+    } else{
+      zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario))
+    }
     
-    zz <- dplyr::mutate(zz, Agg = aggFunction(Scenario))
-      
-    print('rewriting file...')
-    flush.console()
-
-    write.table(zz, oFile)
+    message('rewriting file...')
+    write_feather(zz, oFile)
   }
 }
 
