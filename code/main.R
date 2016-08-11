@@ -13,7 +13,6 @@ source('code/getEOCYData.R')
 source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
-#source('code/get5YrTable.R')
 
 # -----------------------------------------------------------------------------
 #                                    USER INPUT
