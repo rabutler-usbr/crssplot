@@ -75,8 +75,8 @@ yy5 <- 2017:2021
 # "switches" to create/not create different figures
 createShortConditions <- FALSE
 getSysCondData <- FALSE
-getPeData <- FALSE
-getCSData <- TRUE
+getPeData <- TRUE
+getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
 computeConditionalProbs <- FALSE
@@ -139,7 +139,7 @@ if(getSysCondData){
 if(getPeData){
   ## get the Mead and Powel EOCY Data
   getScenarioData(scens, iFolder, file.path(resFolder,curMonthPEFile), TRUE, 
-                  aggBasedOnIC, 'data/MPPE_EOCY.csv')
+                  'aggFromScenList', 'data/MPPE_EOCY.csv')
   ## append initial conditions onto May data
   getAndAppendIC(scens, paste0(resFolder,curMonthPEFile), pIcFile, mICFile, icMonth, 
                  TRUE, aggBasedOnIC)
