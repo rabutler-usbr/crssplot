@@ -131,7 +131,8 @@ simple5YrFile <- '5yrSimple.pdf'
 ## System Conditions Table Data
 if(getSysCondData){
   message('starting getSysCondData')
-  getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggFromScenList)
+  getScenarioData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, 
+                  aggFromScenList, 'data/SysCond.csv')
   message('finished getSysCondData')
 }
 
@@ -146,7 +147,8 @@ if(getPeData){
 ## Get Crit Stats Data
 if(getCSData){
   message('starting getCritStats')
-  getCritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
+  getScenarioData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, 
+                  aggFromScenList, 'data/CritStatsList.csv')
   message('finished getCrityStats')
 }
 
