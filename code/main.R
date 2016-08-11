@@ -64,6 +64,10 @@ yy5 <- 2017:2021
 
 # "switches" to create/not create different figures
 createShortConditions <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
+getCSData <- TRUE
+
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
 
@@ -111,13 +115,13 @@ simple5YrFile <- '5yrSimple.pdf'
 # -----------------------------------------------------------------------------
 
 ## System Conditions Table Data
-if(TRUE){
+if(getSysCondData){
   message('starting getSysCondData')
   getSysCondData(scens, iFolder, paste0(resFolder,sysCondFile),TRUE, aggBasedOnIC)
   message('finished getSysCondData')
 }
 
-if(TRUE){
+if(getPeData){
   ## get the Mead and Powel EOCY Data
   getPowellMeadEOCYPE(scens, iFolder, paste0(resFolder,curMonthPEFile), TRUE, aggBasedOnIC)
   ## append initial conditions onto May data
@@ -126,7 +130,7 @@ if(TRUE){
 }
 
 ## Get Crit Stats Data
-if(TRUE){
+if(getCSData){
   message('starting getCritStats')
   getCritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, aggBasedOnIC)
   message('finished getCrityStats')
