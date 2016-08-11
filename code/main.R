@@ -74,9 +74,9 @@ yy5 <- 2017:2021
 
 # "switches" to create/not create different figures
 createShortConditions <- FALSE
-getSysCondData <- TRUE
+getSysCondData <- FALSE
 getPeData <- FALSE
-getCSData <- FALSE
+getCSData <- TRUE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
 computeConditionalProbs <- FALSE
@@ -110,7 +110,7 @@ message('Intermediate data will be saved to: ', resFolder)
 sysCondFile <- 'SysCond.feather' # file name of system conditions data
 curMonthPEFile <- 'MeadPowellPE.txt' # file name of Powell and Mead PE data
 
-critStatsFile <- 'CritStats.txt' # file name for critical stats data
+critStatsFile <- 'CritStats.feather' # file name for critical stats data
 # file name for the system conditions procssed file
 sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
 
@@ -147,9 +147,9 @@ if(getPeData){
 ## Get Crit Stats Data
 if(getCSData){
   message('starting getCritStats')
-  getScenarioData(scens, iFolder, paste0(resFolder,critStatsFile),TRUE, 
+  getScenarioData(scens, iFolder, file.path(resFolder,critStatsFile),TRUE, 
                   'aggFromScenList', 'data/CritStatsList.csv')
-  message('finished getCrityStats')
+  message('finished getCritStats')
 }
 
 ## Create the KeySlots csv file, but only want to include data for the 30 Ensemble and not
