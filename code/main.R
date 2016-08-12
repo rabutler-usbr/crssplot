@@ -50,6 +50,12 @@ icList <- list(
   'Aug2016' = c(3605.83, 1078.93)
 )
 
+# the mainScenGroup is the scenario to use when creating the current month's 
+# 5-year table, etc. In the plots, we want to show the previous months runs,
+# but in the tables, we only want the current month run. This should match names
+# in scens and icList
+mainScenGroup <- 'Aug2016'
+
 # IC for each run
 icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec') 
 
@@ -62,8 +68,6 @@ startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF'
 
 yrs2show <- 2017:2026
 peYrs <- 2016:2026
-
-prevMonthPEFile <- 'Jan/Jan_MPPE_EOCY.txt' # file name that contains the previous CRSS run PE data
 
 annText <- 'Results from the April 2016 CRSS Run' # text that will be added to figures
 
@@ -96,6 +100,13 @@ createSimple5yrTable <- FALSE
 # -----------------------------------------------------------------------------
 #       SETUP DIRECTORIES AND FILENAMES
 # -----------------------------------------------------------------------------
+
+# some sanity checks that UI is correct:
+if(!(mainScenGroup %in% names(scens)))
+  stop(mainScenGroup, ' is not found in scens.')
+if(!(mainScenGroup %in% names(icList)))
+  stop(mainScenGroup, ' is not found in icList')
+
 iFolder <- file.path(iFolder, 'Scenario') # folder with scenario folders created by RiverSMART
 message('Scenario data will be read in from: ', iFolder)
 
@@ -178,34 +189,30 @@ if(makeFiguresAndTables){
   message("creating system conditions table")
   ## Create tables, figures, and data behind figures
   # 1) system conditions table
-  sysCond <- read.table(paste0(resFolder,sysCondFile),header = T)
-  # trim to 2016-2026 and 30 trace ensemble I.C.; Agg == 1 limits to using 30 ensemble I.C. 
-  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
+  sysCond <- read_feather(file.path(resFolder,sysCondFile))
+  # trim to specified years and the current main scenario group 
+  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == mainScenGroup)
   # create the system cond. table
   sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   # save the sys cond table
-  write.csv(sysTable[['fullTable']], paste0(oFigs,sysCondTable))
+  write.csv(sysTable[['fullTable']], file.path(oFigs,sysCondTable))
   
   # 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
   # read in current month data
   message("EOCY elevation figures")
-  peCur <- read.table(paste0(resFolder,curMonthPEFile),header = T)
-  pePrev <- read.table(paste0(resFolder,prevMonthPEFile),header = T) # read in prev. month data
+  pe <- read_feather(file.path(resFolder,curMonthPEFile))
+  
   # add start month attributes to both months' data
-  peCur <- dplyr::mutate(peCur, StartMonth = addAttByScenName(Scenario, 1, startMonthMap))
-  pePrev <- dplyr::mutate(pePrev, StartMonth = addAttByScenName(Scenario, 1, startMonthMap))
-  # combine previous and current elevations
-  pe <- rbind(peCur, pePrev)
-  rm(peCur, pePrev)
+  pe <- dplyr::mutate(pe, StartMonth = addAttByScenName(Scenario, 1, startMonthMap))
+
   # plot
-  # only use the 30 ensemble (Agg = 1)
-  powellPE <- plotEOCYElev(dplyr::filter(peCur, Agg == 1), peYrs, 'Powell.Pool Elevation', 
+  powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
                            'Powell End-of-December Year Elevation')
-  meadPE <- plotEOCYElev(dplyr::filter(peCur, Agg == 1), peYrs, 'Mead.Pool Elevation', 
+  meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
                            'Mead End-of-December Year Elevation')
   
   # save figures
-  pdf(paste0(oFigs,eocyFigs), width = 8, height = 6)
+  pdf(file.path(oFigs,eocyFigs), width = 8, height = 6)
   print(powellPE)
   print(meadPE)
   dev.off()
