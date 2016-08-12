@@ -38,43 +38,40 @@ crssMonth <- 'Apr'
 # averaged/combined together. the name of the entries in the list are used for 
 # the scenario name
 scens <- list(
-  'JanDNF' = 'January 2016 Official Run/DNF,CRSS,Jan2016,IG',
   'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
-  'Apr2016Most' = 'Apr2016_2017,DNF,2007Dems,IG,MTOM_Most'
+  'Aug2016' = 'Apr2016_2017,DNF,2007Dems,IG,MTOM_Most'
 )
 
 # for each group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  'JanDNF' = c(3605.83, 1078.93),
   'Apr2016' = c(file.path(CRSSDIR,'MTOM','MTOM_APR16_PowellPE.csv'),
                 file.path(CRSSDIR,'MTOM','MTOM_APR16_MeadPE.csv')),
-  'Apr2016Most' = c(3605.83, 1078.93)
+  'Aug2016' = c(3605.83, 1078.93)
 )
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'Apr2016'
-mainScenGroup.name <- 'April 2016'
+mainScenGroup <- 'Aug2016'
+mainScenGroup.name <- 'August 2016'
 
 # IC for each run
-icMonth <- c('JanDNF' = '15-Dec', 'Apr2016' = '16-Dec', 'Apr2016Most' = '16-Dec') 
+icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
 startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
-                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF',
-                   'DNF' = 'Jan 2016 DNF', 'VIC' = 'Jan 2016 VIC',
-                   'January 2016 Official Run/DNF' = 'Jan 2016 DNF')
+                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF')
 
 yrs2show <- 2017:2026
 peYrs <- 2015:2060
 
-annText <- 'Results from the April 2016 CRSS Run' # text that will be added to figures
+annText <- 'Results from the August 2016 CRSS Run' # text that will be added to figures
 
 # mtom results file for creating conditions leading to shortage in 2016
+# **** not used for August 2016 runs ***
 mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #changed to may b/c jun results file DNE
 
 # for the 5-year simple table
@@ -82,7 +79,7 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #c
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table also; 
-ss5 <- c('JanDNF' = 'January DNF CRSS', 'Apr2016' = 'April DNF CRSS')
+ss5 <- c('Apr2016' = 'April CRSS', 'Aug2016' = 'August CRSS')
 
 # years to use for the simple 5-year table
 yy5 <- 2017:2021
