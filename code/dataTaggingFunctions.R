@@ -25,7 +25,9 @@ aggBasedOnIC <- function(scen)
 # attMap: name mapping vector to connect attribute info to new value
 addAttByScenName <- function(scen, scenI, attMap)
 {
-  scen <- simplify2array(strsplit(as.character(scen),',',fixed = T))[scenI,]
+  scen <- strsplit(as.character(scen),',',fixed = T)
+  
+  scen <- sapply(1:length(scen), function(x) scen[[x]][scenI])
   
   zz <- scen
   for(i in 1:length(attMap)){
