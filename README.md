@@ -10,6 +10,8 @@ Code relies on [RWDataPlot](https://github.com/rabutler/RWDataPlot) and
 * gridExtra
 * reshape2
 * scales
+* feather
+* tidyr
 
 Ensure the above packages are installed on the computer. RWDataPlot and CRSSIO can be installed as follows:
 ```
