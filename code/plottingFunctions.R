@@ -178,7 +178,7 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 #' @param iFile character vector with path to the critStatsData
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-creat5YrSimpleTable <- function(scenNames, iFile, yrs)
+creat5YrSimpleTable <- function(scenNames, iFile, yrs, addFootnote = NA)
 {
   if(length(scenNames) != 2){
     stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
@@ -228,14 +228,19 @@ creat5YrSimpleTable <- function(scenNames, iFile, yrs)
   pGrob <- gridExtra::tableGrob(pTable, theme = myTheme)
   
   shortLabel <- '% Traces with Lower Basin Shortage'
-  pLabel <- '% Traces below 3,490\' (power pool) at Powell'
+  pLabel <- '% Traces below 3,490 feet (minimum power pool) at Lake Powell'
   
   gg <- qplot(1:7,1:7,geom = 'blank') + theme_bw() +
     theme(line = element_blank(), text = element_blank()) +
     annotation_custom(grob = pGrob, xmin = 0, ymin = 2,xmax = 7, ymax = 6) + 
     annotation_custom(grob = shortGrob, xmin = 0, ymin = 4,xmax = 6, ymax = 7.2) +
-    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 6, fontface = 'bold') +
-    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 6, fontface = 'bold')
+    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 4, fontface = 'bold') +
+    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 4, fontface = 'bold')
+  
+  if(!is.na(addFootnote)){
+    gg <- gg +
+      annotate('text', x = 1.5, y = 3.4, label = addFootnote, hjust = 0, size = 2)
+  }
     
   gg
 }

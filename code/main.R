@@ -79,17 +79,19 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #c
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table also; 
-ss5 <- c('Apr2016' = 'April CRSS', 'Aug2016' = 'August CRSS')
+ss5 <- c('Apr2016' = 'April MTOM*/CRSS', 'Aug2016' = 'August CRSS')
+# this should either be a footnote corresponding to one of the ss5 names or NA
+tableFootnote <- '* 2017 Lower Basin Shortage conditions are projected from MTOM;\nOctober-December 2016 Lake Powell elevations are projected from MTOM.'
 
 # years to use for the simple 5-year table
 yy5 <- 2017:2021
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
-getPeData <- TRUE
-getCSData <- TRUE
+getSysCondData <- FALSE
+getPeData <- FALSE
+getCSData <- FALSE
 createKeySlotsCsv <- FALSE
-makeFiguresAndTables <- TRUE
+makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- TRUE
@@ -329,7 +331,8 @@ if(createShortConditions){
 
 if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
-  simple5Yr <- creat5YrSimpleTable(ss5, file.path(resFolder,critStatsFile), yy5)
+  simple5Yr <- creat5YrSimpleTable(ss5, file.path(resFolder,critStatsFile), yy5,
+                                   tableFootnote)
   pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
   dev.off()
