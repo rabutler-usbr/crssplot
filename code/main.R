@@ -25,10 +25,10 @@ source('code/plotFirstYearShortCond.R')
 # it could be the same as CRSSDIR, but is allowed to be different so that you
 # can read model output from the server, but save figures locally.
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2016'
+iFolder <- 'M:/Shared/CRSS/2016/Scenario/January 2016 Official Run'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Aug'
+crssMonth <- 'Jan'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario name, and the entry is a 
@@ -38,37 +38,37 @@ crssMonth <- 'Aug'
 # averaged/combined together. the name of the entries in the list are used for 
 # the scenario name
 scens <- list(
-  'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:1982),
-  'Aug2016' = 'Aug2016_2017,DNF,2007Dems,IG'
+  'JanDNF' = 'DNF,CRSS,Jan2016,IG',
+  'JanVIC' = 'VIC,CRSS,Jan2016,IG'
 )
 
 # for each group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  'Apr2016' = c(file.path(CRSSDIR,'MTOM','MTOM_APR16_PowellPE.csv'),
-                file.path(CRSSDIR,'MTOM','MTOM_APR16_MeadPE.csv')),
-  'Aug2016' = c(3605.83, 1078.93)
+  'JanDNF' = c(3605.83, 1078.93),
+  'JanVIC' = c(3605.83, 1078.93)
 )
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'Aug2016'
-mainScenGroup.name <- 'August 2016'
+mainScenGroup <- 'JanDNF'
+mainScenGroup.name <- 'January 2016'
 
 # IC for each run
-icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec') 
+icMonth <- c('JanDNF' = '15-Dec', 'JanVIC' = '15-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
 startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
-                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF')
+                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF',
+                   'DNF' = 'Jan 2016 DNF', 'VIC' = 'Jan 2016 VIC')
 
 yrs2show <- 2017:2026
-peYrs <- 2016:2026
+peYrs <- 2015:2060
 
-annText <- 'Results from the August 2016 CRSS Run' # text that will be added to figures
+annText <- 'Results from the January 2016 CRSS Run' # text that will be added to figures
 
 # mtom results file for creating conditions leading to shortage in 2016
 mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #changed to may b/c jun results file DNE
@@ -77,18 +77,19 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #c
 # names are the names that will show up in the 5-year simple table
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
-ss5 <- c('Apr2016' ='April CRSS', 'Aug2016' = 'August CRSS')
+# this is the order they will show up in the table also; 
+ss5 <- c('JanVIC' ='January VIC CRSS', 'JanDNF' = 'January DNF CRSS')
 
 # years to use for the simple 5-year table
 yy5 <- 2017:2021
 
 # "switches" to create/not create different figures
-createShortConditions <- FALSE
-getSysCondData <- FALSE
-getPeData <- FALSE
-getCSData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
+getCSData <- TRUE
 createKeySlotsCsv <- FALSE
-makeFiguresAndTables <- FALSE
+makeFiguresAndTables <- TRUE
+createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- TRUE
 
@@ -105,7 +106,6 @@ if(!(mainScenGroup %in% names(scens)))
 if(!(mainScenGroup %in% names(icList)))
   stop(mainScenGroup, ' is not found in icList')
 
-iFolder <- file.path(iFolder, 'Scenario') # folder with scenario folders created by RiverSMART
 message('Scenario data will be read in from: ', iFolder)
 
 # folder location to save figures and fully procssed tables
