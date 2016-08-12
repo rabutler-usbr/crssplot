@@ -55,6 +55,7 @@ icList <- list(
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
 mainScenGroup <- 'Aug2016'
+mainScenGroup.name <- 'August 2016'
 
 # IC for each run
 icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec') 
@@ -64,22 +65,19 @@ icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec')
 startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
                    'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF')
 
-
-
 yrs2show <- 2017:2026
 peYrs <- 2016:2026
 
-annText <- 'Results from the April 2016 CRSS Run' # text that will be added to figures
+annText <- 'Results from the August 2016 CRSS Run' # text that will be added to figures
 
 # mtom results file for creating conditions leading to shortage in 2016
 mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #changed to may b/c jun results file DNE
 
 # for the 5-year simple table
-ss5 <- c('Jan CRSS', 'April CRSS')
-
-# should match files for critStatsFile:
-critStatsIn <- paste0(CRSSDIR,c('/results/Jan/Jan_CritStats_DNF.csv',
-                                '/figs/Apr2016_CritStats.csv'))
+# names are the names that will show up in the 5-year simple table
+# the values are the Scenario Group variable names that will be filtered from the
+# critStats file
+ss5 <- c('Apr2016' ='April CRSS', 'Aug2016' = 'August CRSS')
 
 # years to use for the simple 5-year table
 yy5 <- 2017:2021
@@ -92,7 +90,7 @@ getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
 computeConditionalProbs <- FALSE
-createSimple5yrTable <- FALSE
+createSimple5yrTable <- TRUE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -223,16 +221,18 @@ if(makeFiguresAndTables){
   # 3) Critical elevation thresholds; figures and data table
   # have sysCond for some, and read in crit stats for others
   message("starting critical stats")
-  critStats <- read.table(paste0(resFolder,critStatsFile),header = T)
+  critStats <- read_feather(file.path(resFolder,critStatsFile))
   # defaults are ok for legendTitle, legLoc, nC, and annSize
-  # filter to only use 30 ensemble and to drop Mead LT 1025 from one plot and Mead LT 1020 from 
+  # drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
-  critStatsFig1 <- plotCritStats(dplyr::filter(critStats, Agg == 1, Variable != 'meadLt1020'), 
+  critStatsFig1 <- plotCritStats(dplyr::filter(critStats, Agg == mainScenGroup, 
+                                               Variable != 'meadLt1020'), 
                                  yrs2show, annText)
-  critStatsFig2 <- plotCritStats(dplyr::filter(critStats, Agg == 1, Variable != 'meadLt1025'), 
+  critStatsFig2 <- plotCritStats(dplyr::filter(critStats, Agg == mainScenGroup, 
+                                               Variable != 'meadLt1025'), 
                                  yrs2show, annText)
   # create data table to save crit stats
-  cs <- dplyr::filter(critStats, Year %in% yrs2show, Agg == 1)
+  cs <- dplyr::filter(critStats, Year %in% yrs2show, Agg == mainScenGroup)
   
   # rename the variables to strings
   cs$vName <- 'LB Shortage'
@@ -250,7 +250,8 @@ if(makeFiguresAndTables){
   # shortage surplus figure
   # defaults ok for legendTitle, nC, and legLoc
   ssPlot <- plotShortageSurplus(dplyr::filter(sysCond, Variable %in% c('lbShortage', 'lbSurplus'),
-                                              Agg == 1), yrs2show, 'April 2016')
+                                              Agg == mainScenGroup), 
+                                yrs2show, mainScenGroup.name)
     
   # stacked barplot of different shortage tiers
   # default for annSize is ok
@@ -258,13 +259,13 @@ if(makeFiguresAndTables){
                                     'lbShortageStep2','lbShortageStep3')), yrs2show, annText)
 
 # save figures and table
-  pdf(paste0(oFigs,critFigs),width = 8, height = 6)
+  pdf(file.path(oFigs,critFigs),width = 8, height = 6)
   print(critStatsFig1)
   print(critStatsFig2)
   print(ssPlot)
   print(shortStack)
   dev.off()
-  write.csv(cs,paste0(oFigs,critStatsProc),row.names = F)
+  write.csv(cs,file.path(oFigs,critStatsProc),row.names = F)
 }
 
 if(computeConditionalProbs){
@@ -310,8 +311,8 @@ if(computeConditionalProbs){
   cpt1$PrctChance <- cpt1$PrctChance*100
   write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
 }
-# pulled annotation out of generic function
 
+# pulled annotation out of generic function
 if(createShortConditions){
   lbLabel <- 'LB total side inflow percent\nof average (1981-2010)'
   # filterOn being set to pe shows results for traces that are <= 1077
@@ -327,8 +328,8 @@ if(createShortConditions){
 
 if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
-  simple5Yr <- creat5YrSimpleTable(ss5, critStatsIn, yy5)
-  pdf(paste0(oFigs,simple5YrFile),width = 8, height = 8)
+  simple5Yr <- creat5YrSimpleTable(ss5, file.path(resFolder,critStatsFile), yy5)
+  pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
   dev.off()
 }
