@@ -28,7 +28,7 @@ CRSSDIR <- Sys.getenv("CRSS_DIR")
 iFolder <- 'M:/Shared/CRSS/2016/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Apr'
+crssMonth <- 'Aug'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario name, and the entry is a 
@@ -39,7 +39,7 @@ crssMonth <- 'Apr'
 # the scenario name
 scens <- list(
   'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
-  'Aug2016' = 'Apr2016_2017,DNF,2007Dems,IG,MTOM_Most'
+  'Aug2016' = 'Aug2016_2017,DNF,2007Dems,IG'
 )
 
 # for each group name, it should be either 2 number or 2 file paths, both ordered
