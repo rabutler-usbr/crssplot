@@ -42,14 +42,23 @@ scens <- list(
   'Aug2016' = 'Aug2016_2017,DNF,2007Dems,IG'
 )
 
+# for each group name, it should be either 2 number or 2 file paths, both ordered
+# powell, then mead.
+icList <- list(
+  'Apr2016' = c(file.path(CRSSDIR,'MTOM','MTOM_APR16_PowellPE.csv'),
+                file.path(CRSSDIR,'MTOM','MTOM_APR16_MeadPE.csv')),
+  'Aug2016' = c(3605.83, 1078.93)
+)
+
+# IC for each run
+icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec') 
+
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
 startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
                    'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF')
 
-pICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_PowellPE.csv') # input file name of MTOM results for Powell PE
-mICFile <- paste0(CRSSDIR,'/MTOM/MTOM_APR16_MeadPE.csv') # input file name of MTOM results for Mead PE
-icMonth <- '16-Dec' # IC are from December 2015
+
 
 yrs2show <- 2017:2026
 peYrs <- 2016:2026
@@ -74,7 +83,7 @@ yy5 <- 2017:2021
 # "switches" to create/not create different figures
 createShortConditions <- FALSE
 getSysCondData <- FALSE
-getPeData <- TRUE
+getPeData <- FALSE
 getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
@@ -107,6 +116,7 @@ if(!file.exists(resFolder)){
 message('Intermediate data will be saved to: ', resFolder)
 
 sysCondFile <- 'SysCond.feather' # file name of system conditions data
+tmpPEFile <- 'tempPE.feather'
 curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
 
 critStatsFile <- 'CritStats.feather' # file name for critical stats data
@@ -137,11 +147,12 @@ if(getSysCondData){
 
 if(getPeData){
   ## get the Mead and Powel EOCY Data
-  getScenarioData(scens, iFolder, file.path(resFolder,curMonthPEFile), TRUE, 
+  getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
                   'aggFromScenList', 'data/MPPE_EOCY.csv')
   ## append initial conditions onto May data
-  getAndAppendIC(scens, paste0(resFolder,curMonthPEFile), pIcFile, mICFile, icMonth, 
-                 TRUE, aggBasedOnIC)
+  getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
+                 file.path(resFolder,curMonthPEFile), icList, icMonth, 
+                 TRUE, 'aggFromScenList')
 }
 
 ## Get Crit Stats Data
