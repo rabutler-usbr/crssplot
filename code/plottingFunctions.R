@@ -172,41 +172,60 @@ formatSimpleTable <- function(zz, scenNames, yrs)
   zzRound
 }
 
-# scenNames: names to use for row names
-# iFiles: character vector with paths to the two files to use get the data from multiple scenarios
-# scenNames and iFiles should be the same length
-# yrs to show
+#' @param scenNames a named character vector; names are the names that will show up in
+#'            the finished table and the entries are the Scenario Group variable
+#'            names that will be used to filter the scenarios
+#' @param iFile character vector with path to the critStatsData
+#' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-creat5YrSimpleTable <- function(scenNames, iFiles, yrs)
+creat5YrSimpleTable <- function(scenNames, iFile, yrs)
 {
-  if(length(scenNames) != length(iFiles) | length(scenNames) != 2){
+  if(length(scenNames) != 2){
     stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
                'Please ensure scenNames and iFiles have two scenarios each.'))
   }
  
-  i1 <- read.csv(iFiles[1],row.names = 1)
-  i2 <- read.csv(iFiles[2],row.names = 1)
-  cc <- scan(iFiles[1], sep = ',', nlines = 1, what = 'character')
-  cc2 <- scan(iFiles[2],sep = ',', nlines = 1, what = 'character')
-  colnames(i1) <- cc[2:length(cc)]
-  colnames(i2) <- cc2[2:length(cc2)]
-
-  shortTable <- rbind(getSingleVarData(i1,yrs,'LB Shortage'),
-                      getSingleVarData(i2,yrs,'LB Shortage'))
-  shortTable <- rbind(shortTable, shortTable[2,] - shortTable[1,])
-  pTable <-  rbind(getSingleVarData(i1,yrs,'Powell < 3,490\' in Any Month'),
-                   getSingleVarData(i2,yrs,'Powell < 3,490\' in Any Month'))
-  pTable <- rbind(pTable, pTable[2,] - pTable[1,])
+  i1 <- read_feather(iFile) %>% filter(Year %in% yrs) %>%
+    filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
+    mutate(ScenName = scenNames[Agg]) %>%
+    group_by(Year, Variable, ScenName) %>%
+    dplyr::summarise(PrctTraces = mean(Value))
   
-  shortTable <- formatSimpleTable(shortTable, scenNames, yrs)
-  pTable <- formatSimpleTable(pTable, scenNames, paste('WY',yrs))
+  shortTable <- i1 %>%
+    filter(Variable == 'lbShortage') %>%
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::spread(Year, PrctTraces) %>%
+    slice(match(scenNames, ScenName))
   
-  shortGrob <- gridExtra::tableGrob(shortTable,gpar.coltext = gpar(cex = 1), 
-                                    gpar.rowtext = gpar(cex = 1), show.hlines = T,
-                                    core.just = 'right')
-  pGrob <- gridExtra::tableGrob(pTable,gpar.coltext = gpar(cex = 1), 
-                                gpar.rowtext = gpar(cex = 1), show.hlines = T, 
-                                core.just = 'right')
+  rns <- c(shortTable$ScenName)
+  
+  shortTable <- select(shortTable, -ScenName)
+    
+  shortTable <- as.matrix(rbind(shortTable, shortTable[2,] - shortTable[1,]))
+  shortTable <- formatSimpleTable(shortTable, rns, yrs)
+  
+  pTable <-  i1 %>%
+    filter(Variable == 'powellLt3490') %>%
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::spread(Year, PrctTraces) %>%
+    slice(match(scenNames, ScenName))
+  rns <- c(pTable$ScenName)
+  
+  pTable <- select(pTable, -ScenName)
+  
+  pTable <- as.matrix(rbind(pTable, pTable[2,] - pTable[1,]))
+  pTable <- formatSimpleTable(pTable, rns, paste('WY',yrs))
+  
+  myTheme <- gridExtra::ttheme_default(
+    gpar.coltext = gpar(cex = 1), 
+    gpar.rowtext = gpar(cex = 1), show.hlines = T,
+    core.just = 'right'
+  )
+  
+  shortGrob <- gridExtra::tableGrob(shortTable, theme = myTheme)
+  pGrob <- gridExtra::tableGrob(pTable, theme = myTheme)
   
   shortLabel <- '% Traces with Lower Basin Shortage'
   pLabel <- '% Traces below 3,490\' (power pool) at Powell'
@@ -215,8 +234,8 @@ creat5YrSimpleTable <- function(scenNames, iFiles, yrs)
     theme(line = element_blank(), text = element_blank()) +
     annotation_custom(grob = pGrob, xmin = 0, ymin = 2,xmax = 7, ymax = 6) + 
     annotation_custom(grob = shortGrob, xmin = 0, ymin = 4,xmax = 6, ymax = 7.2) +
-    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 6, face = 'bold') +
-    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 6, face = 'bold')
+    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 6, fontface = 'bold') +
+    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 6, fontface = 'bold')
     
   gg
 }
