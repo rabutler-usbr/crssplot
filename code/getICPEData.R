@@ -29,7 +29,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
              groupName, ' group.')
       }
       mp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[2])
-      pp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[2])
+      pp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[1])
     } else{
       # use the IC from the file 
       # get all I.C. for April run, and append
