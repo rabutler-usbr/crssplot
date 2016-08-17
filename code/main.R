@@ -67,6 +67,7 @@ startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF'
 
 yrs2show <- 2017:2026
 peYrs <- 2015:2060
+peScatterYear <- 2017
 
 annText <- 'Results from the August 2016 CRSS Run' # text that will be added to figures
 
@@ -94,7 +95,8 @@ createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
-createSimple5yrTable <- TRUE
+createSimple5yrTable <- FALSE
+addPEScatterFig <- TRUE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -335,6 +337,18 @@ if(createSimple5yrTable){
                                    tableFootnote)
   pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
+  dev.off()
+}
+
+if(addPEScatterFig){
+  message("elevation scatter plot figure")
+  pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
+    filter(Agg == mainScenGroup)
+  gg <- singleYearPEScatter(pe, peScatterYear, 'Mead.Pool Elevation', 
+                            'August 2016 Official Run\nLake Mead December 2017 Elevations', 
+                            TRUE)
+  pdf(file.path(oFigs,paste0('meadScatterFigure_',peScatterYear,'.pdf')), width = 8, height = 6)
+  print(gg)
   dev.off()
 }
 

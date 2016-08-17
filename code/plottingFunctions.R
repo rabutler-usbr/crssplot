@@ -4,6 +4,7 @@ library(reshape2)
 library(ggplot2)
 library(grid)
 library(gridExtra)
+library(scales)
 
 plotEOCYElev <- function(zz, yrs, var, myTitle)
 {
@@ -41,6 +42,43 @@ plotEOCYElev <- function(zz, yrs, var, myTitle)
     theme(legend.key.height = unit(2,'line'), legend.key.width = grid::unit(2, 'line')) +
     scale_color_discrete(guide = guide_legend(title = 'Start Month')) +
     scale_linetype_manual(values = qLt)
+}
+
+singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
+{
+  zz <- zz %>% filter(Year == yr, Variable == var) %>%
+    mutate(TheColor = ifelse(Value <= 1075, '<= 1,075\'', 
+                             ifelse(Value <= 1076,"1,075'-1,076'",
+                                    ifelse(Value <= 1077, "1,076'-1,077'",
+                                           "> 1,077'"))))
+  
+  myCols <- c('<= 1,075\'' = '#b2182b',
+              "1,075'-1,076'" = '#ef8a62',
+              "1,076'-1,077'" = '#9970ab',
+              "> 1,077'" = '#2166ac')
+  zz$TheColor <- factor(zz$TheColor, levels = names(myCols))
+  
+  gg <- ggplot(zz, aes(Trace, Value, color = TheColor)) + geom_point(size = 3, shape = 18) +
+    labs(x = 'CRSS Trace Number', y = 'Pool Elevation (ft)', title = myTitle) + 
+    scale_y_continuous(label = scales::comma, minor_breaks = seq(800, 1200, 5)) +
+    scale_color_manual(values = myCols) +
+    theme(legend.title = element_blank())
+  
+  if(addThreshStats){
+    nn <- zz %>%
+      mutate(lt1075 = ifelse(Value <= 1075, 1, 0),
+             lt1076 = ifelse(Value <= 1076 & Value > 1075, 1, 0),
+             lt1077 = ifelse(Value <= 1077 & Value > 1075, 1, 0)) %>%
+      ungroup() %>%
+      summarise(lt1075 = sum(lt1075), lt1076 = sum(lt1076), lt1077 = sum(lt1077))
+    
+    myText <- paste(nn$lt1075, 'runs are below 1,075 ft\n','an additional',
+                    nn$lt1076, 'runs are within 1 ft of being below 1,075 ft\n',
+                    nn$lt1077, 'runs are within 2 ft of being below 1,075 ft')
+    
+    gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
+      annotate(geom = 'text', x = 1, y = max(zz$Value)-5, label = myText, hjust = 0)
+  }
 }
 
 # annText is text that's added to annotation
