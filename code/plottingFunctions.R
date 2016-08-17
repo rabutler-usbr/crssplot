@@ -24,10 +24,17 @@ plotEOCYElev <- function(zz, yrs, var, myTitle)
   qLt <- c(3,1,2)
   names(qLt) <- c('10th','50th','90th')
   
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
+  
   # plot
   gg <- ggplot(zz, aes(Year,Value, color = StartMonth, linetype = Percentile))
   gg <- gg + geom_line(size = 1) + 
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,5)) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs,
+                       labels = myLabs) + 
     theme(panel.grid.minor = element_line(color = 'white', size = .4),
           panel.grid.major = element_line(color = 'white', size = .6)) +
     labs(y = '[feet]', title = myTitle) +
