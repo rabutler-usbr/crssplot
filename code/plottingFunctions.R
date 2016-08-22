@@ -4,6 +4,7 @@ library(reshape2)
 library(ggplot2)
 library(grid)
 library(gridExtra)
+library(scales)
 
 plotEOCYElev <- function(zz, yrs, var, myTitle)
 {
@@ -24,16 +25,60 @@ plotEOCYElev <- function(zz, yrs, var, myTitle)
   qLt <- c(3,1,2)
   names(qLt) <- c('10th','50th','90th')
   
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
+  
   # plot
   gg <- ggplot(zz, aes(Year,Value, color = StartMonth, linetype = Percentile))
   gg <- gg + geom_line(size = 1) + 
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,5)) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs,
+                       labels = myLabs) + 
     theme(panel.grid.minor = element_line(color = 'white', size = .4),
           panel.grid.major = element_line(color = 'white', size = .6)) +
     labs(y = '[feet]', title = myTitle) +
     theme(legend.key.height = unit(2,'line'), legend.key.width = grid::unit(2, 'line')) +
     scale_color_discrete(guide = guide_legend(title = 'Start Month')) +
     scale_linetype_manual(values = qLt)
+}
+
+singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
+{
+  zz <- zz %>% filter(Year == yr, Variable == var) %>%
+    mutate(TheColor = ifelse(Value <= 1075, '<= 1,075\'', 
+                             ifelse(Value <= 1076,"1,075'-1,076'",
+                                    ifelse(Value <= 1077, "1,076'-1,077'",
+                                           "> 1,077'"))))
+  
+  myCols <- c('<= 1,075\'' = '#b2182b',
+              "1,075'-1,076'" = '#ef8a62',
+              "1,076'-1,077'" = '#9970ab',
+              "> 1,077'" = '#2166ac')
+  zz$TheColor <- factor(zz$TheColor, levels = names(myCols))
+  
+  gg <- ggplot(zz, aes(Trace, Value, color = TheColor)) + geom_point(size = 3, shape = 18) +
+    labs(x = 'CRSS Trace Number', y = 'Pool Elevation (ft)', title = myTitle) + 
+    scale_y_continuous(label = scales::comma, minor_breaks = seq(800, 1200, 5)) +
+    scale_color_manual(values = myCols) +
+    theme(legend.title = element_blank())
+  
+  if(addThreshStats){
+    nn <- zz %>%
+      mutate(lt1075 = ifelse(Value <= 1075, 1, 0),
+             lt1076 = ifelse(Value <= 1076 & Value > 1075, 1, 0),
+             lt1077 = ifelse(Value <= 1077 & Value > 1075, 1, 0)) %>%
+      ungroup() %>%
+      summarise(lt1075 = sum(lt1075), lt1076 = sum(lt1076), lt1077 = sum(lt1077))
+    
+    myText <- paste(nn$lt1075, 'runs are below 1,075 ft\n','an additional',
+                    nn$lt1076, 'runs are within 1 ft of being below 1,075 ft\n',
+                    nn$lt1077, 'runs are within 2 ft of being below 1,075 ft')
+    
+    gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
+      annotate(geom = 'text', x = 1, y = max(zz$Value)-5, label = myText, hjust = 0)
+  }
 }
 
 # annText is text that's added to annotation
@@ -172,51 +217,75 @@ formatSimpleTable <- function(zz, scenNames, yrs)
   zzRound
 }
 
-# scenNames: names to use for row names
-# iFiles: character vector with paths to the two files to use get the data from multiple scenarios
-# scenNames and iFiles should be the same length
-# yrs to show
+#' @param scenNames a named character vector; names are the names that will show up in
+#'            the finished table and the entries are the Scenario Group variable
+#'            names that will be used to filter the scenarios
+#' @param iFile character vector with path to the critStatsData
+#' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-creat5YrSimpleTable <- function(scenNames, iFiles, yrs)
+creat5YrSimpleTable <- function(scenNames, iFile, yrs, addFootnote = NA)
 {
-  if(length(scenNames) != length(iFiles) | length(scenNames) != 2){
+  if(length(scenNames) != 2){
     stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
                'Please ensure scenNames and iFiles have two scenarios each.'))
   }
  
-  i1 <- read.csv(iFiles[1],row.names = 1)
-  i2 <- read.csv(iFiles[2],row.names = 1)
-  cc <- scan(iFiles[1], sep = ',', nlines = 1, what = 'character')
-  cc2 <- scan(iFiles[2],sep = ',', nlines = 1, what = 'character')
-  colnames(i1) <- cc[2:length(cc)]
-  colnames(i2) <- cc2[2:length(cc2)]
-
-  shortTable <- rbind(getSingleVarData(i1,yrs,'LB Shortage'),
-                      getSingleVarData(i2,yrs,'LB Shortage'))
-  shortTable <- rbind(shortTable, shortTable[2,] - shortTable[1,])
-  pTable <-  rbind(getSingleVarData(i1,yrs,'Powell < 3,490\' in Any Month'),
-                   getSingleVarData(i2,yrs,'Powell < 3,490\' in Any Month'))
-  pTable <- rbind(pTable, pTable[2,] - pTable[1,])
+  i1 <- read_feather(iFile) %>% filter(Year %in% yrs) %>%
+    filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
+    mutate(ScenName = scenNames[Agg]) %>%
+    group_by(Year, Variable, ScenName) %>%
+    dplyr::summarise(PrctTraces = mean(Value))
   
-  shortTable <- formatSimpleTable(shortTable, scenNames, yrs)
-  pTable <- formatSimpleTable(pTable, scenNames, paste('WY',yrs))
+  shortTable <- i1 %>%
+    filter(Variable == 'lbShortage') %>%
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::spread(Year, PrctTraces) %>%
+    slice(match(scenNames, ScenName))
   
-  shortGrob <- gridExtra::tableGrob(shortTable,gpar.coltext = gpar(cex = 1), 
-                                    gpar.rowtext = gpar(cex = 1), show.hlines = T,
-                                    core.just = 'right')
-  pGrob <- gridExtra::tableGrob(pTable,gpar.coltext = gpar(cex = 1), 
-                                gpar.rowtext = gpar(cex = 1), show.hlines = T, 
-                                core.just = 'right')
+  rns <- c(shortTable$ScenName)
+  
+  shortTable <- select(shortTable, -ScenName)
+    
+  shortTable <- as.matrix(rbind(shortTable, shortTable[2,] - shortTable[1,]))
+  shortTable <- formatSimpleTable(shortTable, rns, yrs)
+  
+  pTable <-  i1 %>%
+    filter(Variable == 'powellLt3490') %>%
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::spread(Year, PrctTraces) %>%
+    slice(match(scenNames, ScenName))
+  rns <- c(pTable$ScenName)
+  
+  pTable <- select(pTable, -ScenName)
+  
+  pTable <- as.matrix(rbind(pTable, pTable[2,] - pTable[1,]))
+  pTable <- formatSimpleTable(pTable, rns, paste('WY',yrs))
+  
+  myTheme <- gridExtra::ttheme_default(
+    gpar.coltext = gpar(cex = 1), 
+    gpar.rowtext = gpar(cex = 1), show.hlines = T,
+    core.just = 'right'
+  )
+  
+  shortGrob <- gridExtra::tableGrob(shortTable, theme = myTheme)
+  pGrob <- gridExtra::tableGrob(pTable, theme = myTheme)
   
   shortLabel <- '% Traces with Lower Basin Shortage'
-  pLabel <- '% Traces below 3,490\' (power pool) at Powell'
+  pLabel <- '% Traces below 3,490 feet (minimum power pool) at Lake Powell'
   
   gg <- qplot(1:7,1:7,geom = 'blank') + theme_bw() +
     theme(line = element_blank(), text = element_blank()) +
     annotation_custom(grob = pGrob, xmin = 0, ymin = 2,xmax = 7, ymax = 6) + 
     annotation_custom(grob = shortGrob, xmin = 0, ymin = 4,xmax = 6, ymax = 7.2) +
-    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 6, face = 'bold') +
-    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 6, face = 'bold')
+    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 4, fontface = 'bold') +
+    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 4, fontface = 'bold')
+  
+  if(!is.na(addFootnote)){
+    gg <- gg +
+      annotate('text', x = 1.5, y = 3.4, label = addFootnote, hjust = 0, size = 2)
+  }
     
   gg
 }

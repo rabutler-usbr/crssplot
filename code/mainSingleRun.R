@@ -89,7 +89,7 @@ if(TRUE){
 if(TRUE){
   print('starting getCritStats')
   flush.console()
-  getSritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),FALSE, aggBasedOnIC)
+  getCritStatsData(scens, iFolder, paste0(resFolder,critStatsFile),FALSE, aggBasedOnIC)
   print('finished getCrityStats')
   flush.console()
 }
