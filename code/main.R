@@ -24,11 +24,14 @@ source('code/plotFirstYearShortCond.R')
 # iFolder is a path to the top level crss directory that contains the model output
 # it could be the same as CRSSDIR, but is allowed to be different so that you
 # can read model output from the server, but save figures locally.
+
+# ** make sure CRSS_DIR is set correctly before running
+
 CRSSDIR <- Sys.getenv("CRSS_DIR")
 iFolder <- 'M:/Shared/CRSS/2016/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Aug'
+crssMonth <- 'AugUpdate'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario name, and the entry is a 
@@ -38,35 +41,35 @@ crssMonth <- 'Aug'
 # averaged/combined together. the name of the entries in the list are used for 
 # the scenario name
 scens <- list(
-  'Apr2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
-  'Aug2016' = 'Aug2016_2017,DNF,2007Dems,IG'
+  'Aug2016Update' = 'Aug2016_2017,DNF,2007Dems,IG',
+  'Aug2016Bad' = 'Aug2016_2017_bad,DNF,2007Dems,IG_NSFBad'
 )
 
 # for each group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  'Apr2016' = c(file.path(CRSSDIR,'MTOM','MTOM_APR16_PowellPE.csv'),
-                file.path(CRSSDIR,'MTOM','MTOM_APR16_MeadPE.csv')),
-  'Aug2016' = c(3605.83, 1078.93)
+  'Aug2016Update' = c(3605.83, 1078.93),
+  'Aug2016Bad' = c(3605.83, 1078.93)
 )
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'Aug2016'
-mainScenGroup.name <- 'August 2016'
+mainScenGroup <- 'Aug2016Update'
+mainScenGroup.name <- 'August 2016 Update'
 
 # IC for each run
-icMonth <- c('Apr2016' = '16-Dec', 'Aug2016' = '16-Dec') 
+icMonth <- c('Apr2016' = '16-Dec', 'Aug2016Update' = '16-Dec', 'Aug2016Bad' = '16-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
 startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
-                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 DNF')
+                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 Fixed DNF',
+                   'Aug2016_2017_bad' = 'Aug 2016 Bad DNF')
 
 yrs2show <- 2017:2026
-peYrs <- 2015:2060
+peYrs <- 2015:2026
 peScatterYear <- 2017
 
 annText <- 'Results from the August 2016 CRSS Run' # text that will be added to figures
@@ -80,23 +83,23 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #c
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table also; 
-ss5 <- c('Apr2016' = 'April MTOM*/CRSS', 'Aug2016' = 'August CRSS')
+ss5 <- c('Aug2016Bad' = 'August CRSS Bad DNF', 'Aug2016Update' = 'August CRSS Fixed DNF')
 # this should either be a footnote corresponding to one of the ss5 names or NA
-tableFootnote <- '* 2017 Lower Basin Shortage conditions are projected from MTOM;\nOctober-December 2016 Lake Powell elevations are projected from MTOM.'
-
+tableFootnote <- ''
+  
 # years to use for the simple 5-year table
 yy5 <- 2017:2021
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
-getCSData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
+getCSData <- TRUE
 createKeySlotsCsv <- FALSE
-makeFiguresAndTables <- FALSE
+makeFiguresAndTables <- TRUE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- FALSE
-addPEScatterFig <- TRUE
+addPEScatterFig <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -181,7 +184,7 @@ if(getCSData){
 ## the Most or MTOM_Most
 if(createKeySlotsCsv){
   message('Creating KeySlots csv file')
-  RWDataPlot::getDataForAllScens(scens.limit,scens.limit,
+  RWDataPlot::getDataForAllScens(scens, scens,
                                  RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
                                  iFolder, paste0(oFigs,'/KeySlots.csv'), FALSE)
   message('Done creating KeySlots csv file')
@@ -227,17 +230,29 @@ if(makeFiguresAndTables){
   # have sysCond for some, and read in crit stats for others
   message("starting critical stats")
   critStats <- read_feather(file.path(resFolder,critStatsFile))
+  
+  # compare crit stats; call once each for powell LT 3490, shortage, and surplus
+  cs <- critStats %>%
+    mutate(AggName = ss5[Agg])
+  ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
+  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, 'Scenario')
+  shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
+  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 'Scenario')
+  
+  surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
+  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, 'Scenario')
+  
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
   critStatsFig1 <- plotCritStats(dplyr::filter(critStats, Agg == mainScenGroup, 
-                                               Variable != 'meadLt1020'), 
+                                               !(Variable %in% c('meadLt1020','lbSurplus'))), 
                                  yrs2show, annText)
   critStatsFig2 <- plotCritStats(dplyr::filter(critStats, Agg == mainScenGroup, 
-                                               Variable != 'meadLt1025'), 
+                                               !(Variable %in% c('meadLt1025','lbSurplus'))), 
                                  yrs2show, annText)
   # create data table to save crit stats
-  cs <- dplyr::filter(critStats, Year %in% yrs2show, Agg == mainScenGroup)
+  cs <- dplyr::filter(critStats, Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus')
   
   # rename the variables to strings
   cs$vName <- 'LB Shortage'
@@ -265,6 +280,9 @@ if(makeFiguresAndTables){
 
 # save figures and table
   pdf(file.path(oFigs,critFigs),width = 8, height = 6)
+  print(p3490Fig)
+  print(shortFig)
+  print(surpFig)
   print(critStatsFig1)
   print(critStatsFig2)
   print(ssPlot)
