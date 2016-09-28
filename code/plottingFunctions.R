@@ -81,6 +81,29 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
   }
 }
 
+compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle = '', 
+                             legLoc = 'right', nC = 1, annSize = 3)
+{
+
+  yL <- c(0,100)
+  gg <- zz %>%
+    filter(Year %in% yrs, Variable == variable) %>%
+    group_by(Year, AggName) %>%
+    summarise(Value = mean(Value)) %>%
+    ggplot(aes(Year, Value, color = AggName)) +
+    geom_line(size = 1) + 
+    coord_cartesian(ylim = yL) +
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
+    theme(panel.grid.minor = element_line(color = 'white', size = .4),
+          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
+    theme(legend.position = legLoc, axis.text.x = element_text(angle = 90,vjust=.5)) +
+    annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    labs(y = 'Percent of Traces [%]', title = plotTitle)
+  gg
+}
+
 # annText is text that's added to annotation
 # legendTitle 
 # legLoc is the location of the legend
