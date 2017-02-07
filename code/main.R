@@ -1,5 +1,6 @@
 
 rm(list=ls())
+setwd("C:\\Users\\JShirey\\Desktop\\RCodes\\Process-CRSS-Res-master")
 
 library(CRSSIO)
 library(dplyr)
@@ -28,10 +29,10 @@ source('code/plotFirstYearShortCond.R')
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2016/Scenario'
+iFolder <- 'Z:/Shared/CRSS/2017/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'AugUpdate'
+crssMonth <- 'Jan2017_2018'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario name, and the entry is a 
@@ -40,55 +41,61 @@ crssMonth <- 'AugUpdate'
 # as one scenario. So for a run that has 30 initial conditions, all 30 runs are 
 # averaged/combined together. the name of the entries in the list are used for 
 # the scenario name
-scens <- list(
-  'Aug2016Update' = 'Aug2016_2017,DNF,2007Dems,IG',
-  'Aug2016Bad' = 'Aug2016_2017_bad,DNF,2007Dems,IG_NSFBad'
-)
 
+#scens <- list(
+#  'Jan2018' = 'Jan2017_2018,DNF,2007Dems,IG,1981','Jan2017_2018,DNF,2007Dems,IG,1982'
+#  'Jan2017_SingleRun' = 'Aug2016_2017_v25,DNF,CT,IG,DCP',
+#  'Aug2017' = 'Aug2016_2017_v25,DNF,CT,IG,USMXDCP'
+#)
+scens <- list('Jan2018' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
+                'Jan2017_SingleRun' = 'Jan2017_2017,DNF,2007Dems,IG',
+                'Aug2017' = 'Aug2016_2017,DNF,2007Dems,IG'
+              )              
 # for each group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  'Aug2016Update' = c(3605.83, 1078.93),
-  'Aug2016Bad' = c(3605.83, 1078.93)
+  'Jan2018' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
+  'Jan2017_SingleRun' = c(3600.49, 1080.82),
+  'Aug2017' = c(3605.83, 1078.93)
 )
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'Aug2016Update'
-mainScenGroup.name <- 'August 2016 Update'
+mainScenGroup <- 'Jan2018'
+mainScenGroup.name <- 'January Official'
 
 # IC for each run
-icMonth <- c('Apr2016' = '16-Dec', 'Aug2016Update' = '16-Dec', 'Aug2016Bad' = '16-Dec') 
+icMonth <- c('Jan2018' = '17-Dec', 'Jan2017_SingleRun' = '16-Dec', 'Aug2017' = '16-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
-startMonthMap <- c('Apr2015_2016_a3' = 'Apr 2015 DNF','Jan2016' = 'Jan 2016 DNF',
-                   'Apr2016_2017' = 'Apr 2016 DNF', 'Aug2016_2017' = 'Aug 2016 Fixed DNF',
-                   'Aug2016_2017_bad' = 'Aug 2016 Bad DNF')
+startMonthMap <- c('Jan2018' = 'January Official', 'Jan2017_SingleRun' = 'January 2017 Start, ONF',
+                   'Aug2017' = 'August Official')
 
-yrs2show <- 2017:2026
-peYrs <- 2015:2026
+yrs2show <- 2018:2027
+peYrs <- 2017:2060
 peScatterYear <- 2017
 
-annText <- 'Results from the August 2016 CRSS Run' # text that will be added to figures
+annText <- 'Results from January Official MTOM/CRSS Combined Run' # text that will be added to figures
 
 # mtom results file for creating conditions leading to shortage in 2016
 # **** not used for August 2016 runs ***
-mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/AprilMTOMResults.csv') #changed to may b/c jun results file DNE
+mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #changed to may b/c jun results file DNE
 
 # for the 5-year simple table
 # names are the names that will show up in the 5-year simple table
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table also; 
-ss5 <- c('Aug2016Bad' = 'August CRSS Bad DNF', 'Aug2016Update' = 'August CRSS Fixed DNF')
+ss5 <- c('Jan2018' = 'January Official', 'Aug2017' = 'August Official')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- ''
   
 # years to use for the simple 5-year table
-yy5 <- 2017:2021
+yy5 <- 2018:2022
+oFigs= 'Z:/Shared/CRSS/2017/figs/'
 
 # "switches" to create/not create different figures
 getSysCondData <- TRUE
@@ -96,10 +103,10 @@ getPeData <- TRUE
 getCSData <- TRUE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
-createShortConditions <- FALSE
-computeConditionalProbs <- FALSE
-createSimple5yrTable <- FALSE
-addPEScatterFig <- FALSE
+createShortConditions <- TRUE
+computeConditionalProbs <- TRUE
+createSimple5yrTable <- TRUE
+addPEScatterFig <- TRUE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -162,6 +169,7 @@ if(getSysCondData){
   message('finished getSysCondData')
 }
 
+###FIX THIS - IC STUFF###
 if(getPeData){
   ## get the Mead and Powel EOCY Data
   getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
