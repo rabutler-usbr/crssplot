@@ -15,8 +15,8 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
   
   icSave <- data.frame()
   
-  for(i in 1:length(scens)){
-    groupName <- names(scens)[i]
+  for(j in 1:length(scens)){
+    groupName <- names(scens)[j]
     icData <- icList[[groupName]]
     
     # if icData is a string, then need to read the IC in; otherwise it's numeric
@@ -40,7 +40,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
       # expected column names (not in order) or the files that were read in
       ic <- c(paste0('X',1981:2015),'MTOM_Min','MTOM_Most','MTOM_Max','Min','Most','Max')
       # assumes IC are the 5th dimension of scenario names
-      scenIC<- simplify2array(strsplit(scens[[i]], ',', fixed = T))[5,]
+      scenIC<- simplify2array(strsplit(scens[[j]], ',', fixed = T))[5,]
       # row that contains the initial conditions
       rr <- which(rownames(mtomP) == icMonth)
       
@@ -68,7 +68,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
     mp$Variable <- 'Mead.Pool Elevation'
     ic <- rbind(pp,mp)
     ic$Trace <- 0
-    ic$Year <- as.numeric(paste0('20',simplify2array(strsplit(icMonth,'-'))[1])) #2015
+    ic$Year <- as.numeric(paste0('20',simplify2array(strsplit(icMonth,'-'))[1,j])) #2015
     # order ic
     ic <- ic[c('Scenario','Trace','Year','Variable','Value')]
     
