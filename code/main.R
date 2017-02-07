@@ -95,8 +95,8 @@ yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
 getSysCondData <- FALSE
-getPeData <- TRUE
-getCSData <- TRUE
+getPeData <- FALSE
+getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
 createShortConditions <- TRUE
@@ -177,7 +177,6 @@ if(getSysCondData){
   message('finished getSysCondData')
 }
 
-###FIX THIS - IC STUFF###
 if(getPeData){
   ## get the Mead and Powel EOCY Data
   getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
