@@ -68,11 +68,12 @@ icMonth <- c('Jan2018' = '17-Dec', 'Aug2017' = '16-Dec')
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
-startMonthMap <- c('Jan2018' = 'Jan 2017 Official',
-                   'Aug2017' = 'Aug 2016 Official')
+# this should use the folder name, no the shortened name from icMonth, or icList
+startMonthMap <- c('Jan2017_2018' = 'Jan 2017 Official',
+                   'Aug2016_2017' = 'Aug 2016 Official')
 
-yrs2show <- 2018:2027 # years to show the crit stats figures
-peYrs <- 2016:2060
+yrs2show <- 2018:2026 # years to show the crit stats figures
+peYrs <- 2016:2026
 peScatterYear <- 2017
 
 annText <- 'Results from January 2017 Official MTOM/CRSS Combined Run' # text that will be added to figures
@@ -85,8 +86,8 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #cha
 # names are the names that will show up in the 5-year simple table
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
-# this is the order they will show up in the table also; 
-ss5 <- c('Jan2018' = 'Jan 2017 Official', 'Aug2017' = 'Aug 2016 Official')
+# this is the order they will show up in the table, so list the newest run second
+ss5 <- c('Aug2017' = 'Aug 2016 Official', 'Jan2018' = 'Jan 2017 Official')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- ''
   
@@ -99,10 +100,10 @@ getPeData <- FALSE
 getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
-createShortConditions <- TRUE
+createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
-createSimple5yrTable <- TRUE
-addPEScatterFig <- TRUE
+createSimple5yrTable <- FALSE
+addPEScatterFig <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
