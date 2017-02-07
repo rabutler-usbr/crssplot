@@ -1,6 +1,5 @@
 
 rm(list=ls())
-setwd("C:\\Users\\JShirey\\Desktop\\RCodes\\Process-CRSS-Res-master")
 
 library(CRSSIO)
 library(dplyr)
@@ -29,7 +28,7 @@ source('code/plotFirstYearShortCond.R')
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'Z:/Shared/CRSS/2017/Scenario'
+iFolder <- 'M:/Shared/CRSS/2017/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
 crssMonth <- 'Jan2017_2018'
@@ -48,14 +47,12 @@ crssMonth <- 'Jan2017_2018'
 #  'Aug2017' = 'Aug2016_2017_v25,DNF,CT,IG,USMXDCP'
 #)
 scens <- list('Jan2018' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-                'Jan2017_SingleRun' = 'Jan2017_2017,DNF,2007Dems,IG',
                 'Aug2017' = 'Aug2016_2017,DNF,2007Dems,IG'
               )              
 # for each group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
   'Jan2018' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
-  'Jan2017_SingleRun' = c(3600.49, 1080.82),
   'Aug2017' = c(3605.83, 1078.93)
 )
 
@@ -67,18 +64,18 @@ mainScenGroup <- 'Jan2018'
 mainScenGroup.name <- 'January Official'
 
 # IC for each run
-icMonth <- c('Jan2018' = '17-Dec', 'Jan2017_SingleRun' = '16-Dec', 'Aug2017' = '16-Dec') 
+icMonth <- c('Jan2018' = '17-Dec', 'Aug2017' = '16-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
-startMonthMap <- c('Jan2018' = 'January Official', 'Jan2017_SingleRun' = 'January 2017 Start, ONF',
-                   'Aug2017' = 'August Official')
+startMonthMap <- c('Jan2018' = 'Jan 2017 Official',
+                   'Aug2017' = 'Aug 2016 Official')
 
-yrs2show <- 2018:2027
-peYrs <- 2017:2060
+yrs2show <- 2018:2027 # years to show the crit stats figures
+peYrs <- 2016:2060
 peScatterYear <- 2017
 
-annText <- 'Results from January Official MTOM/CRSS Combined Run' # text that will be added to figures
+annText <- 'Results from January 2017 Official MTOM/CRSS Combined Run' # text that will be added to figures
 
 # mtom results file for creating conditions leading to shortage in 2016
 # **** not used for August 2016 runs ***
@@ -89,13 +86,12 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #cha
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table also; 
-ss5 <- c('Jan2018' = 'January Official', 'Aug2017' = 'August Official')
+ss5 <- c('Jan2018' = 'Jan 2017 Official', 'Aug2017' = 'Aug 2016 Official')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- ''
   
 # years to use for the simple 5-year table
 yy5 <- 2018:2022
-oFigs= 'Z:/Shared/CRSS/2017/figs/'
 
 # "switches" to create/not create different figures
 getSysCondData <- TRUE
@@ -104,7 +100,7 @@ getCSData <- TRUE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
 createShortConditions <- TRUE
-computeConditionalProbs <- TRUE
+computeConditionalProbs <- FALSE
 createSimple5yrTable <- TRUE
 addPEScatterFig <- TRUE
 
