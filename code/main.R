@@ -85,6 +85,8 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #cha
 # yearToAnalyze is used in the plot labeling. This is typically the first year
 # of the MTOM run, e.g., 2017 for a January 2017 MTOM run
 yearToAnalyze <- 2017
+shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2018'
+shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
 
 # for the 5-year simple table
 # names are the names that will show up in the 5-year simple table
@@ -364,7 +366,8 @@ if(createShortConditions){
   shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe', yearToAnalyze)
   shortCond <- shortCond + annotate('segment', x = 7.2, xend = 6.4, y = 1070.4, yend = 1070.7, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
-    annotate('text', x = 7.3, y = 1070.3,label = lbLabel, size = 4, hjust = 0)
+    annotate('text', x = 7.3, y = 1070.3,label = lbLabel, size = 4, hjust = 0) +
+    ggtitle(shortCondTitle, subtitle = shortCondSubTitle)
   
   pdf(file.path(oFigs,shortCondFig),width = 9, height = 6)
   print(shortCond)
