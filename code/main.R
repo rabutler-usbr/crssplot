@@ -78,9 +78,13 @@ peScatterYear <- 2017
 
 annText <- 'Results from January 2017 Official MTOM/CRSS Combined Run' # text that will be added to figures
 
+# -------------------------------
+# Conditions leading to shortage from MTOM
 # mtom results file for creating conditions leading to shortage in 2016
-# **** not used for August 2016 runs ***
 mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #changed to may b/c jun results file DNE
+# yearToAnalyze is used in the plot labeling. This is typically the first year
+# of the MTOM run, e.g., 2017 for a January 2017 MTOM run
+yearToAnalyze <- 2017
 
 # for the 5-year simple table
 # names are the names that will show up in the 5-year simple table
@@ -99,8 +103,8 @@ getSysCondData <- FALSE
 getPeData <- FALSE
 getCSData <- FALSE
 createKeySlotsCsv <- FALSE
-makeFiguresAndTables <- TRUE
-createShortConditions <- FALSE
+makeFiguresAndTables <- FALSE
+createShortConditions <- TRUE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- FALSE
 addPEScatterFig <- FALSE
@@ -353,12 +357,14 @@ if(computeConditionalProbs){
 
 # pulled annotation out of generic function
 if(createShortConditions){
-  lbLabel <- 'LB total side inflow percent\nof average (1981-2010)'
+  lbLabel <- 'LB total side inflow percent\nof average (1981-2015)'
+  message('Using hard coded values for the arror in the shortage conditions figure.\n',
+          'You may need to update the values and re-run main.R')
   # filterOn being set to pe shows results for traces that are <= 1077
-  shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe')
-  shortCond <- shortCond + annotate('segment', x = 5.1, xend = 3.7, y = 1071.1, yend = 1071.35, 
+  shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe', yearToAnalyze)
+  shortCond <- shortCond + annotate('segment', x = 7.2, xend = 6.4, y = 1070.4, yend = 1070.7, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
-    annotate('text', x = 5.2, y = 1071,label = lbLabel, size = 4, hjust = 0)
+    annotate('text', x = 7.3, y = 1070.3,label = lbLabel, size = 4, hjust = 0)
   
   pdf(file.path(oFigs,shortCondFig),width = 9, height = 6)
   print(shortCond)
