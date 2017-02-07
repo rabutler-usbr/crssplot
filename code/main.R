@@ -94,7 +94,7 @@ tableFootnote <- ''
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
+getSysCondData <- FALSE
 getPeData <- TRUE
 getCSData <- TRUE
 createKeySlotsCsv <- FALSE
@@ -360,7 +360,7 @@ if(createShortConditions){
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
     annotate('text', x = 5.2, y = 1071,label = lbLabel, size = 4, hjust = 0)
   
-  pdf(paste0(oFigs,shortCondFig),width = 9, height = 6)
+  pdf(file.path(oFigs,shortCondFig),width = 9, height = 6)
   print(shortCond)
   dev.off()
 }
