@@ -38,7 +38,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
       
       # the years of ic, i.e., the MTOM runs and  hydrology years
       # expected column names (not in order) or the files that were read in
-      ic <- c(paste0('X',1981:2010),'MTOM_Min','MTOM_Most','MTOM_Max','Min','Most','Max')
+      ic <- c(paste0('X',1981:2015),'MTOM_Min','MTOM_Most','MTOM_Max','Min','Most','Max')
       # assumes IC are the 5th dimension of scenario names
       scenIC<- simplify2array(strsplit(scens[[i]], ',', fixed = T))[5,]
       # row that contains the initial conditions
@@ -55,7 +55,9 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
         } else{
           cTmp <- ic[which(ic == paste0('X',scenIC[i]))]
         }
-        
+        if(length(cTmp) == 0)
+          stop('I.C. not found in expected column names from the input file.')
+
         mp <- rbind(mp,data.frame('Scenario' = scens[[groupName]][i], 'Value' = mtomM[[cTmp]][rr]))
         pp <- rbind(pp,data.frame('Scenario' = scens[[groupName]][i], 'Value' = mtomP[[cTmp]][rr]))
       }
