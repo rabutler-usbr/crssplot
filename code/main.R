@@ -118,8 +118,20 @@ if(!(mainScenGroup %in% names(icList)))
   stop(mainScenGroup, ' is not found in icList')
 
 message('Scenario data will be read in from: ', iFolder)
+if(!file.exists(iFolder))
+  stop(iFolder, ' does not exist. Please ensure iFolder is set correctly.')
 
 # folder location to save figures and fully procssed tables
+if(!file.exists(CRSSDIR))
+  stop(CRSSDIR, 
+       ' does not exist. Please ensure CRSS_DIR environment variable is sest correctly')
+
+if(!file.exists(file.path(CRSSDIR, 'results'))){
+  message(paste(file.path(CRSSDIR, 'results'),
+                'does not exist. Creating this folder...'))
+  dir.create(file.path(CRSSDIR, 'results'))
+}
+
 oFigs <- file.path(CRSSDIR,'results', crssMonth) 
 if(!file.exists(oFigs)){
   message(paste('Creating folder:', oFigs))
