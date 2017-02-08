@@ -59,7 +59,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
   zz$TheColor <- factor(zz$TheColor, levels = names(myCols))
   
   gg <- ggplot(zz, aes(Trace, Value, color = TheColor)) + geom_point(size = 3, shape = 18) +
-    labs(x = 'CRSS Trace Number', y = 'Pool Elevation (ft)', title = myTitle) + 
+    labs(x = 'Trace Number', y = 'Pool Elevation [ft]', title = myTitle) + 
     scale_y_continuous(label = scales::comma, minor_breaks = seq(800, 1200, 5)) +
     scale_color_manual(values = myCols) +
     theme(legend.title = element_blank())
@@ -79,6 +79,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
     gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
       annotate(geom = 'text', x = 1, y = max(zz$Value)-5, label = myText, hjust = 0)
   }
+  gg
 }
 
 compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle = '', 
