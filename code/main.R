@@ -6,6 +6,8 @@ library(dplyr)
 library(reshape2)
 library(grid)
 library(feather)
+library(tidyr)
+library(stringr)
 source('code/makeScenNames.R')
 source('code/getSysCondData.R')
 source('code/dataTaggingFunctions.R')
@@ -73,8 +75,15 @@ startMonthMap <- c('Jan2017_2018' = 'Jan 2017 Official',
                    'Aug2016_2017' = 'Aug 2016 Official')
 
 yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2016:2026
+peYrs <- 2016:2026 # years to show the Mead/Powell 10/50/90 figures for
+
+# -------------------------------
+# plot a single year of Mead PE
 peScatterYear <- 2017
+# peScatterData should be set to either MTOM or CRSS
+# if relying on combined run, then this is likely MTOM; if using a CRSS only run,
+# then likely set to CRSS
+peScatterData <- 'MTOM'
 
 annText <- 'Results from January 2017 Official MTOM/CRSS Combined Run' # text that will be added to figures
 
@@ -106,10 +115,10 @@ getPeData <- FALSE
 getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- FALSE
-createShortConditions <- TRUE
+createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- FALSE
-addPEScatterFig <- FALSE
+addPEScatterFig <- TRUE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -385,11 +394,27 @@ if(createSimple5yrTable){
 
 if(addPEScatterFig){
   message("elevation scatter plot figure")
-  pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
-    filter(Agg == mainScenGroup)
+  
+  if(peScatterData == "CRSS"){
+    pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
+      filter(Agg == mainScenGroup)
+  } else if(peScatterData == "MTOM"){
+    pe <- read.csv(icList[[mainScenGroup]][2]) %>%
+      gather(Trace, Value, -X) %>%
+      mutate(Trace = getMTOMTraceNumber(Trace, t1 = 1981, tLen = 35),
+             Year = as.numeric(paste0('20', stringr::str_split_fixed(X,'-',2)[,1])),
+             Month = stringr::str_split_fixed(X,'-',2)[,2],
+             Variable = 'Mead.Pool Elevation') %>%
+      filter(Month == 'Dec')
+  } else{
+    stop("Invalid peScatterData variable")
+  }
+  scatterTitle <- paste('Lake Mead December', peScatterYear, 'Elevations from',
+                        peScatterData)
+
   gg <- singleYearPEScatter(pe, peScatterYear, 'Mead.Pool Elevation', 
-                            'August 2016 Official Run\nLake Mead December 2017 Elevations', 
-                            TRUE)
+                          scatterTitle, TRUE)
+  
   pdf(file.path(oFigs,paste0('meadScatterFigure_',peScatterYear,'.pdf')), width = 8, height = 6)
   print(gg)
   dev.off()
