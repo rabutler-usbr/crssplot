@@ -85,7 +85,7 @@ peScatterYear <- 2017
 # then likely set to CRSS
 peScatterData <- 'MTOM'
 
-annText <- 'Results from January 2017 Official MTOM/CRSS Combined Run' # text that will be added to figures
+annText <- 'Results from January 2017 CRSS Run' # text that will be added to figures
 
 # -------------------------------
 # Conditions leading to shortage from MTOM
@@ -114,11 +114,11 @@ getSysCondData <- FALSE
 getPeData <- FALSE
 getCSData <- FALSE
 createKeySlotsCsv <- FALSE
-makeFiguresAndTables <- FALSE
+makeFiguresAndTables <- TRUE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- FALSE
-addPEScatterFig <- TRUE
+addPEScatterFig <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -244,9 +244,9 @@ if(makeFiguresAndTables){
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
-                           'Powell End-of-December Year Elevation')
+                           'Powell End-of-December Elevation')
   meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
-                           'Mead End-of-December Year Elevation')
+                           'Mead End-of-December Elevation')
   
   # save figures
   pdf(file.path(oFigs,eocyFigs), width = 8, height = 6)
