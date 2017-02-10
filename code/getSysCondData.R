@@ -1,4 +1,4 @@
-library(RWDataPlot)
+library(RWDataPlyr)
 library(dplyr)
 # prep data system condition table
 # mmm = min/most/max
@@ -6,7 +6,7 @@ library(dplyr)
 # arguement 
 getScenarioData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFunction, slaInput)
 {
-  slotAggList <- RWDataPlot::createSlotAggList(slaInput) # or 
+  slotAggList <- RWDataPlyr::createSlotAggList(slaInput) # or 
   # first scens is the folder names to search, second is the names to save in the data file
   # use folder names for now
   
@@ -16,7 +16,7 @@ getScenarioData <- function(scens, iFolder, oFile, addAggAttribute = TRUE, aggFu
   message('starting to process scenarios...')
   message(paste('this could take some time as you are processing',length(scensVec),'scenarios'))
   
-  zz <- RWDataPlot::getDataForAllScens(scensVec,scensVec,slotAggList, iFolder, oFile, TRUE)
+  zz <- RWDataPlyr::getDataForAllScens(scensVec,scensVec,slotAggList, iFolder, oFile, TRUE)
 
   if(addAggAttribute){
     message('adding attribute...')

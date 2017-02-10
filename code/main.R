@@ -8,6 +8,7 @@ library(grid)
 library(feather)
 library(tidyr)
 library(stringr)
+library(RWDataPlyr)
 source('code/makeScenNames.R')
 source('code/getSysCondData.R')
 source('code/dataTaggingFunctions.R')
@@ -215,8 +216,8 @@ if(getCSData){
 ## the Most or MTOM_Most
 if(createKeySlotsCsv){
   message('Creating KeySlots csv file')
-  RWDataPlot::getDataForAllScens(scens, scens,
-                                 RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
+  RWDataPlyr::getDataForAllScens(scens, scens,
+                                 RWDataPlyr::createSlotAggList('data/KeySlotsProcess.csv'), 
                                  iFolder, paste0(oFigs,'/KeySlots.csv'), FALSE)
   message('Done creating KeySlots csv file')
 }

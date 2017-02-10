@@ -2,7 +2,7 @@
 # TRACE | SHORTAGE_2016 | HYDROLOGY START YEAR | 2015 WY RELEASE | OND 2015 RELEASE | 
 # LB SIDE INFLOWS MAGNITUDE | LB SIDE INFLOWS RANK | LB SIDE INFLOWS PRCT OF AVG
 
-library(RWDataPlot)
+library(RWDataPlyr)
 library(ggplot2)
 library(scales)
 library(reshape2)
@@ -137,8 +137,8 @@ get5YrStats <- function(X,oFile, nYrs = 5)
 getCond5YrData <- function(scen, scenPath, oPath, getData = TRUE)
 {
 	if(getData){
-		srA <- RWDataPlot::createSlotAggList('C:/alan/CRSS/CRSS.Jan2015/5YearDataInList.csv')
-		x <- RWDataPlot::getDataForAllScens(scen, scen, srA, scenPath, paste(oPath,'/5yrData.txt',sep = ''))
+		srA <- RWDataPlyr::createSlotAggList('C:/alan/CRSS/CRSS.Jan2015/5YearDataInList.csv')
+		x <- RWDataPlyr::getDataForAllScens(scen, scen, srA, scenPath, paste(oPath,'/5yrData.txt',sep = ''))
 	}
 	
 	zz <- read.table(paste(oPath,'/5yrData.txt',sep = ''), header =T)

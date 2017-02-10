@@ -4,8 +4,8 @@ setwd("C:\\Users\\JShirey\\Desktop\\RCodes\\Process-CRSS-Res-master")
 #setwd("C:\\model\\CRSS\\Process-CRSS-Res")
 #These lines are used to install CRSSIO from Alan's gitHUB
 #install.packages("devtools")
-#devtools::install_github("rabutler/RWDataPlot")
-#devtools::install_github("rabutler/CRSSIO")
+#devtools::install_github("BoulderCodeHub/RWDataPlyr")
+#devtools::install_github("BoulderCodeHub/CRSSIO")
 library(CRSSIO)
 
 library(reshape2)
@@ -98,7 +98,7 @@ if(TRUE){
 ## the Most or MTOM_Most
 print('Creating KeySlots csv file')
 flush.console()
-RWDataPlot::getDataForAllScens(scens.limit,scens.limit,RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
+RWDataPlyr::getDataForAllScens(scens.limit,scens.limit,RWDataPlot::createSlotAggList('data/KeySlotsProcess.csv'), 
                                iFolder, paste0(oFigs,'KeySlots.txt'))
 
 zz <- read.table(paste0(oFigs,'/KeySlots.txt'),header=T)
