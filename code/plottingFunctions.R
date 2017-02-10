@@ -59,7 +59,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
   zz$TheColor <- factor(zz$TheColor, levels = names(myCols))
   
   gg <- ggplot(zz, aes(Trace, Value, color = TheColor)) + geom_point(size = 3, shape = 18) +
-    labs(x = 'CRSS Trace Number', y = 'Pool Elevation (ft)', title = myTitle) + 
+    labs(x = 'Trace Number', y = 'Pool Elevation [ft]', title = myTitle) + 
     scale_y_continuous(label = scales::comma, minor_breaks = seq(800, 1200, 5)) +
     scale_color_manual(values = myCols) +
     theme(legend.title = element_blank())
@@ -79,6 +79,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
     gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
       annotate(geom = 'text', x = 1, y = max(zz$Value)-5, label = myText, hjust = 0)
   }
+  gg
 }
 
 compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle = '', 
@@ -120,6 +121,7 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
   zz$vName[zz$Variable == 'meadLt1020'] <- 'Mead < 1,020\'\nin Any Month'
   zz$vName[zz$Variable == 'meadLt1025'] <- 'Mead < 1,025\'\nin Any Month'
   zz$vName[zz$Variable == 'powellLt3490'] <- 'Powell < 3,490\'\nin Any Month'
+  zz$vName[zz$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
   
   # compute the percent of traces by averaging values 
   zz <- zz %>% dplyr::group_by(Year,Variable,vName) %>%
@@ -135,7 +137,9 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
     theme(panel.grid.minor = element_line(color = 'white', size = .4),
           panel.grid.major = element_line(color = 'white', size = .6)) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc, axis.text.x = element_text(angle = 90,vjust=.5)) +
+    theme(legend.position = legLoc, 
+          legend.key.size = unit(2, "line"),
+          axis.text.x = element_text(angle = 90,vjust=.5)) +
     annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
     labs(y = 'Percent of Traces [%]')
   gg

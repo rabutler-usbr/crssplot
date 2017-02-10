@@ -62,3 +62,12 @@ aggFromScenList <- function(Scenario, scens)
   
   zz
 }
+
+# tt is the trace;
+# assume it is in the form X1981, X1982, etc.
+getMTOMTraceNumber <- function(tt, t1 = 1981, tLen = 35)
+{
+  traceNum <- 1:tLen
+  names(traceNum) <- paste0('X', t1:(t1+tLen-1))
+  traceNum[tt]
+}

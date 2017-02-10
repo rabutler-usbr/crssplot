@@ -5,17 +5,9 @@ library(scales)
 library(reshape2)
 library(grid)
 
-dataYear = "2015"
-shortageYear = "2016"
-
-mtomPath <- 'MTOM/FirstYearCondMTOM/'
-
-iFile = paste0(mtomPath, dataYear,"Data",shortageYear,"Shortage.csv")
-oFile = paste0(mtomPath, dataYear,"Data",shortageYear,"Shortage.pdf")
-
 # filterOn: valid choices are 'shortage', 'pe'
 # if filterOn == pe, then will keep all traces that are <= 1077
-plotFirstYearShortCond <- function(iFile, filterOn = 'shortage')
+plotFirstYearShortCond <- function(iFile, filterOn = 'shortage', dataYear)
 {
   zz <- read.csv(iFile)
   
