@@ -115,10 +115,10 @@ getPeData <- FALSE
 getCSData <- FALSE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
-createShortConditions <- FALSE
+createShortConditions <- TRUE
 computeConditionalProbs <- FALSE
-createSimple5yrTable <- FALSE
-addPEScatterFig <- FALSE
+createSimple5yrTable <- TRUE
+addPEScatterFig <- TRUE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -291,6 +291,7 @@ if(makeFiguresAndTables){
   cs$vName[cs$Variable == 'meadLt1020'] <- 'Mead < 1,020\' in Any Month'
   cs$vName[cs$Variable == 'meadLt1025'] <- 'Mead < 1,025\' in Any Month'
   cs$vName[cs$Variable == 'powellLt3490'] <- 'Powell < 3,490\' in Any Month'
+  cs$vName[cs$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
   
   # compute the percent of traces by averaging values 
   cs <- cs %>% group_by(Year,Variable,vName) %>%
