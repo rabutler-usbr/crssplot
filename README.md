@@ -1,7 +1,7 @@
 ## Process CRSS Results
 Repository includes code used to process CRSS results, starting in April 2015.
 
-Code relies on [RWDataPlot](https://github.com/rabutler/RWDataPlot) and 
+Code relies on [RWDataPlyr](https://github.com/BoulderCodeHub/RWDataPlyr) and 
 [CRSSIO](https://github.com/BoulderCodeHub/CRSSIO) (custom R Packages) and the following packages available on CRAN:
 * devtools
 * dplyr
@@ -13,10 +13,10 @@ Code relies on [RWDataPlot](https://github.com/rabutler/RWDataPlot) and
 * feather
 * tidyr
 
-Ensure the above packages are installed on the computer. RWDataPlot and CRSSIO can be installed as follows:
+Ensure the above packages are installed on the computer. RWDataPlyr and CRSSIO can be installed as follows:
 ```
 library(devtools)
-devtools::install_github('rabutler/RWDataPlot')
+devtools::install_github('BoulderCodeHub/RWDataPlyr')
 devtools::install_github('BoulderCodeHub/CRSSIO')
 ```
 
