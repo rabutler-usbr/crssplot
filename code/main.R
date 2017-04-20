@@ -31,10 +31,10 @@ source('code/plotFirstYearShortCond.R')
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017/Scenario'
+iFolder <- 'M:/Shared/CRSS/2017/Scenario_dev'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Jan2017_2018'
+crssMonth <- 'aprilDev'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario name, and the entry is a 
@@ -44,39 +44,44 @@ crssMonth <- 'Jan2017_2018'
 # averaged/combined together. the name of the entries in the list are used for 
 # the scenario name
 
-#scens <- list(
-#  'Jan2018' = 'Jan2017_2018,DNF,2007Dems,IG,1981','Jan2017_2018,DNF,2007Dems,IG,1982'
-#  'Jan2017_SingleRun' = 'Aug2016_2017_v25,DNF,CT,IG,DCP',
-#  'Aug2017' = 'Aug2016_2017_v25,DNF,CT,IG,USMXDCP'
-#)
-scens <- list('Jan2018' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-                'Aug2017' = 'Aug2016_2017,DNF,2007Dems,IG'
-              )              
+scens <- list(
+  'AprDev1' = 'Jan2017_2018_dev9000,DNF,2007Dems,IG,MTOM_Most',
+  'AprDevLTEMP' = 'Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
+  'AprDevLTEMP-NA' = 'Jan2017_2018_dev2,DNF,2007Dems,NA_2.3.9000,MTOM_Most'
+)
+
+#scens <- list('Jan2018' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
+#                'Aug2017' = 'Aug2016_2017,DNF,2007Dems,IG'
+#              )              
+
 # for each group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  'Jan2018' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
-  'Aug2017' = c(3605.83, 1078.93)
+  #'Jan2018' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
+  'AprDev1' = c(3576.12, 1072.98),
+  'AprDevLTEMP' = c(3576.12, 1072.98),
+  'AprDevLTEMP-NA' = c(3576.12, 1072.98)
 )
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'Jan2018'
-mainScenGroup.name <- 'January Official'
+mainScenGroup <- 'AprDevLTEMP'
+mainScenGroup.name <- 'AprDevLTEMP'
 
 # IC for each run
-icMonth <- c('Jan2018' = '17-Dec', 'Aug2017' = '16-Dec') 
+icMonth <- c('AprDev1' = '17-Dec', 'AprDevLTEMP' = '17-Dec', 'AprDevLTEMP-NA' = '17-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
 # this should use the folder name, no the shortened name from icMonth, or icList
-startMonthMap <- c('Jan2017_2018' = 'Jan 2017 Official',
-                   'Aug2016_2017' = 'Aug 2016 Official')
+startMonthMap <- c('Jan2017_2018_dev9000' = 'April Dev 1',
+                   'Jan2017_2018_dev' = 'April Dev LTEMP',
+                   'Jan2017_2018_dev2' = 'April Dev LTEMP w/NA rules')
 
-yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2016:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2018:2060 # years to show the crit stats figures
+peYrs <- 2016:2060 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
@@ -86,7 +91,7 @@ peScatterYear <- 2017
 # then likely set to CRSS
 peScatterData <- 'MTOM'
 
-annText <- 'Results from January 2017 CRSS Run' # text that will be added to figures
+annText <- 'Results from April 2017 Dev CRSS Run' # text that will be added to figures
 
 # -------------------------------
 # Conditions leading to shortage from MTOM
@@ -103,7 +108,7 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table, so list the newest run second
-ss5 <- c('Aug2017' = 'Aug 2016 Official', 'Jan2018' = 'Jan 2017 Official')
+ss5 <- c('AprDev1' = 'April dev 1', 'AprDevLTEMP' = 'April dev LTEMP')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- ''
   
@@ -111,15 +116,15 @@ tableFootnote <- ''
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
-getCSData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
+getCSData <- TRUE
 createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
-createShortConditions <- TRUE
+createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
-createSimple5yrTable <- TRUE
-addPEScatterFig <- TRUE
+createSimple5yrTable <- FALSE
+addPEScatterFig <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
