@@ -31,10 +31,10 @@ source('code/plotFirstYearShortCond.R')
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017/Scenario_dev'
+iFolder <- 'M:/Shared/CRSS/2017'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'aprilDev'
+crssMonth <- 'April24MSIC'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario name, and the entry is a 
@@ -45,9 +45,9 @@ crssMonth <- 'aprilDev'
 # the scenario name
 
 scens <- list(
-  'AprDev1' = 'Jan2017_2018_dev9000,DNF,2007Dems,IG,MTOM_Most',
-  'AprDevLTEMP' = 'Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
-  'AprDevLTEMP-NA' = 'Jan2017_2018_dev2,DNF,2007Dems,NA_2.3.9000,MTOM_Most'
+  'Jan_MTOMMostLTEMP' = 'Scenario_dev/Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
+  'Jan_MTOMMost' = 'Scenario/Jan2017_2018,DNF,2007Dems,IG,MTOM_Most',
+  'Apr_24MS' = 'Scenario/Apr2017_2018,DNF,2007Dems,IG,Most'
 )
 
 #scens <- list('Jan2018' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
@@ -58,27 +58,27 @@ scens <- list(
 # powell, then mead.
 icList <- list(
   #'Jan2018' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
-  'AprDev1' = c(3576.12, 1072.98),
-  'AprDevLTEMP' = c(3576.12, 1072.98),
-  'AprDevLTEMP-NA' = c(3576.12, 1072.98)
+  'Jan_MTOMMostLTEMP' = c(3576.12, 1072.98),
+  'Jan_MTOMMost' = c(3576.12, 1072.98),
+  'Apr_24MS' = c(3638.27, 1079.83)
 )
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'AprDevLTEMP'
-mainScenGroup.name <- 'AprDevLTEMP'
+mainScenGroup <- 'Apr_24MS'
+mainScenGroup.name <- 'April 2017 24-MS I.C.'
 
 # IC for each run
-icMonth <- c('AprDev1' = '17-Dec', 'AprDevLTEMP' = '17-Dec', 'AprDevLTEMP-NA' = '17-Dec') 
+icMonth <- c('Jan_MTOMMostLTEMP' = '17-Dec', 'Jan_MTOMMost' = '17-Dec', 'Apr_24MS' = '17-Dec') 
 
 # startMonthMap includes a map for the model name (from folder names), to a string that 
 # will show up on plots;
-# this should use the folder name, no the shortened name from icMonth, or icList
-startMonthMap <- c('Jan2017_2018_dev9000' = 'April Dev 1',
-                   'Jan2017_2018_dev' = 'April Dev LTEMP',
-                   'Jan2017_2018_dev2' = 'April Dev LTEMP w/NA rules')
+# this should use the folder name, not the shortened name from icMonth, or icList
+startMonthMap <- c('Scenario_dev/Jan2017_2018_dev' = 'April Dev LTEMP',
+                   'Scenario/Jan2017_2018' = 'Jan MTOM Most',
+                   'Scenario/Apr2017_2018' = 'April 24-MS Most')
 
 yrs2show <- 2018:2060 # years to show the crit stats figures
 peYrs <- 2016:2060 # years to show the Mead/Powell 10/50/90 figures for
@@ -108,7 +108,8 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
 # the values are the Scenario Group variable names that will be filtered from the
 # critStats file
 # this is the order they will show up in the table, so list the newest run second
-ss5 <- c('AprDev1' = 'April dev 1', 'AprDevLTEMP' = 'April dev LTEMP')
+ss5 <- c('Jan_MTOMMostLTEMP' = 'April dev LTEMP', 'Apr_24MS' = 'April 24-MS I.C.',
+         'Jan_MTOMMost' = 'Jan MTOM Most')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- ''
   
