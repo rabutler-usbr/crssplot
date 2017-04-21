@@ -1,5 +1,6 @@
 library(RWDataPlyr)
-library(dplyr)
+library(tidyverse)
+library(readxl)
 # prep data for 10/50/90 figures for April Run compare to January Run
 # mmm = min/most/max
 
@@ -91,3 +92,81 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec
   write_feather(res, oFile)
 }
 
+get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
+  # convert icName to a trace number
+
+  icTrace <- traceMap %>% 
+    filter(ic == icName)
+  icTrace <- paste0("Trace", icTrace$trace)
+  
+  # then read the provided file and get powell and mead PE for the provided month
+  # and return it
+  read_excel(icFile, sheet = icTrace) %>%
+    filter(as.Date(X__1, format = "%Y-%b-%d") == as.Date(paste0(icMonth,"-01"), format = "%y-%b-%d")) %>%
+    select(`Powell.Pool Elevation`, `Mead.Pool Elevation`)
+}
+
+#' @param traceMap: named list of matrices. Null, unless the icList is an excel 
+#' file, then provide a traceMap that maps the trace numbers found in the excel 
+#' file to the initial conditions dimension label
+#' @param icDimNumber: numeric dimension number for the initial condition label within
+#' the full scenario name
+getAndAppendIC2 <- function(scens, fileToAppend, oFile, icList, icMonth = '15-Dec', 
+                           addAggAttribute = TRUE, aggFunction, traceMap, icDimNumber = 5)
+{
+  
+  icSave <- data.frame()
+  
+  for(j in 1:length(scens)){
+    groupName <- names(scens)[j]
+    icData <- icList[[groupName]]
+    
+    # if icData is a string, then need to read the IC in; otherwise it's numeric
+    # and use just those IC
+    
+    if(is.numeric(icData)){
+      # then use the IC from icData
+      if(length(scens[[groupName]]) > 1){
+        stop('Consider using csv file to input the initial conditions for the ',
+             groupName, ' group.')
+      }
+      mp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[2])
+      pp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[1])
+    } else{
+      
+      # apply function over all i.c. dimension for the current groupName
+      # get the ic dimensions
+      icDim <- stringr::str_split(scens[[groupName]], pattern = ',', simplify = TRUE)
+      icDim <- icDim[,icDimNumber] # get only the i.c. dimension
+      icVals <- do.call(rbind, lapply(icDim, get1TraceIc, icData, icMonth[[groupName]], traceMap))
+      mp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icVals$`Mead.Pool Elevation`)
+      pp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icVals$`Powell.Pool Elevation`)
+    }
+    
+    # add other attributes to data frame
+    pp$Variable <- 'Powell.Pool Elevation'
+    mp$Variable <- 'Mead.Pool Elevation'
+    ic <- rbind(pp,mp)
+    ic$Trace <- 0
+    ic$Year <- as.numeric(paste0('20',simplify2array(strsplit(icMonth,'-'))[1,j])) #2015
+    # order ic
+    ic <- select(ic, one_of(c('Scenario','Trace','Year','Variable','Value')))
+    
+    # add same agg attribute
+    if(addAggAttribute){      
+      if(aggFunction == 'aggFromScenList'){
+        ic <- dplyr::mutate(ic, Agg = eval(call(aggFunction, Scenario, scens)))
+      } else{
+        ic <- dplyr::mutate(ic, Agg = eval(call(aggFunction, Scenario)))
+      }
+    }
+    
+    icSave <- rbind(icSave, ic)
+    
+  }
+  
+  res <- read_feather(fileToAppend)
+  # append I.C. on to rest of April results
+  res <- rbind(icSave, res)
+  write_feather(res, oFile)
+}
