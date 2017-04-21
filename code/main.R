@@ -51,25 +51,24 @@ crssMonth <- 'test'
 #  'Scenario/Jan2017_2018,DNF,2007Dems,IG,MTOM_Most'),
 #  'Apr_24MS' = 'Scenario/Apr2017_2018,DNF,2007Dems,IG,Most'
 #)
+icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
-scens <- list(#'January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-              'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG',
+scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:1985)),
               'April 2017' = 'Apr2017_2018,DNF,2007Dems,IG,Most'
               )
 
 # for each scenario group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
+
+# **** to do: replace the fully specified path with a relative path, or one using
+# either CRSSDIR or iFolder
 icList <- list(
-  #'January 2017' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
-  #'Jan_MTOMMostLTEMP' = c(3576.12, 1072.98),
-  #'Jan_MTOMMost' = c(3576.12, 1072.98),
-  'August 2016' = c(3638.27, 1079.83),
+  'January 2017' = "C:/alan/CRSS/CRSS.Offc_Dev/dmi/InitialConditions/jan_2017/MTOM2CRSS_Monthly.xlsx",
   'April 2017' = c(3638.27, 1079.83)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c(#'January 2017' = '17-Dec', 
-  'August 2016' = '16-Dec', 'April 2017' = '17-Dec')
+icMonth <- c('January 2017' = '17-Dec', 'April 2017' = '17-Dec')
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -77,7 +76,7 @@ icMonth <- c(#'January 2017' = '17-Dec',
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('August 2016' = 'January 2017 blah', 'April 2017' = 'April 2017 blah*')
+ss5 <- c('January 2017' = 'January 2017 blah', 'April 2017' = 'April 2017 blah*')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- 'Something special about the April 24-MS scenario'
 
@@ -118,7 +117,7 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
+getSysCondData <- FALSE
 getPeData <- FALSE
 getCSData <- FALSE
 makeFiguresAndTables <- FALSE
@@ -201,6 +200,8 @@ shortCondFig <- 'shortConditionsFig.pdf'
 
 simple5YrFile <- '5yrSimple.pdf'
 
+traceMap <- read.csv('data/Trace2IcMap.csv')
+
 # -----------------------------------------------------------------------------
 #       Process results
 # -----------------------------------------------------------------------------
@@ -220,7 +221,7 @@ if(getPeData){
   ## append initial conditions onto May data
   getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
                  file.path(resFolder,curMonthPEFile), icList, icMonth, 
-                 TRUE, 'aggFromScenList')
+                 TRUE, 'aggFromScenList', traceMap, icDimNumber = icDimNumber)
 }
 
 ## Get Crit Stats Data
