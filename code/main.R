@@ -120,7 +120,6 @@ yy5 <- 2018:2022
 getSysCondData <- TRUE
 getPeData <- TRUE
 getCSData <- TRUE
-createKeySlotsCsv <- FALSE
 makeFiguresAndTables <- TRUE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
@@ -218,15 +217,6 @@ if(getCSData){
   message('finished getCritStats')
 }
 
-## Create the KeySlots csv file, but only want to include data for the 30 Ensemble and not
-## the Most or MTOM_Most
-if(createKeySlotsCsv){
-  message('Creating KeySlots csv file')
-  RWDataPlyr::getDataForAllScens(scens, scens,
-                                 RWDataPlyr::createSlotAggList('data/KeySlotsProcess.csv'), 
-                                 iFolder, paste0(oFigs,'/KeySlots.csv'), FALSE)
-  message('Done creating KeySlots csv file')
-}
 
 if(makeFiguresAndTables){
   message("starting to create figures and tables")
