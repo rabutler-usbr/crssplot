@@ -52,15 +52,15 @@ crssMonth <- 'test'
 #  'Apr_24MS' = 'Scenario/Apr2017_2018,DNF,2007Dems,IG,Most'
 #)
 
-scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-                'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG',
+scens <- list(#'January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
+              'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG',
               'April 2017' = 'Apr2017_2018,DNF,2007Dems,IG,Most'
               )
 
 # for each scenario group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  'January 2017' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
+  #'January 2017' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
   #'Jan_MTOMMostLTEMP' = c(3576.12, 1072.98),
   #'Jan_MTOMMost' = c(3576.12, 1072.98),
   'August 2016' = c(3638.27, 1079.83),
@@ -68,7 +68,8 @@ icList <- list(
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'April 2017' = '17-Dec')
+icMonth <- c(#'January 2017' = '17-Dec', 
+  'August 2016' = '16-Dec', 'April 2017' = '17-Dec')
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -76,7 +77,7 @@ icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'April 2017' =
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('January 2017' = 'January 2017 blah', 'April 2017' = 'April 2017 blah*')
+ss5 <- c('August 2016' = 'January 2017 blah', 'April 2017' = 'April 2017 blah*')
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- 'Something special about the April 24-MS scenario'
 
@@ -84,7 +85,7 @@ tableFootnote <- 'Something special about the April 24-MS scenario'
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'January 2017'
+mainScenGroup <- 'April 2017'
 mainScenGroup.name <- 'January 2017 MTOM/CRSS Combined'
 
 # how to label the color scale on the plots
@@ -117,9 +118,9 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
+getSysCondData <- TRUE
 getPeData <- FALSE
-getCSData <- TRUE
+getCSData <- FALSE
 makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
@@ -314,14 +315,27 @@ if(makeFiguresAndTables){
   
   # shortage surplus figure
   # defaults ok for legendTitle, nC, and legLoc
-  ssPlot <- plotShortageSurplus(dplyr::filter(sysCond, Variable %in% c('lbShortage', 'lbSurplus'),
-                                              Agg == mainScenGroup), 
-                                yrs2show, mainScenGroup.name)
+  ssPlot <- plotShortageSurplus(
+    dplyr::filter(
+      sysCond, 
+      Variable %in% c('lbShortage', 'lbSurplus'),
+      Agg == mainScenGroup
+      ), 
+    yrs2show, 
+    mainScenGroup.name
+  )
     
   # stacked barplot of different shortage tiers
   # default for annSize is ok
-  shortStack <- plotShortStackedBar(dplyr::filter(sysCond, Variable %in% c('lbShortageStep1',
-                                    'lbShortageStep2','lbShortageStep3')), yrs2show, annText)
+  shortStack <- plotShortStackedBar(
+    dplyr::filter(
+      sysCond, 
+      Variable %in% c('lbShortageStep1','lbShortageStep2','lbShortageStep3'),
+      Agg == mainScenGroup
+    ), 
+    yrs2show, 
+    annText
+  )
 
 # save figures and table
   pdf(file.path(oFigs,critFigs),width = 8, height = 6)
