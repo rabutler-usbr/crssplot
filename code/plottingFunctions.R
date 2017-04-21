@@ -6,7 +6,7 @@ library(grid)
 library(gridExtra)
 library(scales)
 
-plotEOCYElev <- function(zz, yrs, var, myTitle)
+plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle)
 {
   zz <- dplyr::filter(zz, Year %in% yrs, Variable == var)
   
@@ -40,7 +40,7 @@ plotEOCYElev <- function(zz, yrs, var, myTitle)
           panel.grid.major = element_line(color = 'white', size = .6)) +
     labs(y = '[feet]', title = myTitle) +
     theme(legend.key.height = unit(2,'line'), legend.key.width = grid::unit(2, 'line')) +
-    scale_color_discrete(guide = guide_legend(title = 'Start Month')) +
+    scale_color_discrete(guide = guide_legend(title = legendTitle)) +
     scale_linetype_manual(values = qLt)
 }
 

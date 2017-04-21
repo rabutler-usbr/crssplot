@@ -73,6 +73,9 @@ icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'Apr_24MS' = '
 mainScenGroup <- 'January 2017'
 mainScenGroup.name <- 'January 2017 MTOM/CRSS Combined'
 
+# how to label the color scale on the plots
+colorLabel <- 'Scenario'
+
 yrs2show <- 2018:2060 # years to show the crit stats figures
 peYrs <- 2016:2060 # years to show the Mead/Powell 10/50/90 figures for
 
@@ -237,9 +240,9 @@ if(makeFiguresAndTables){
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
-                           'Powell End-of-December Elevation')
+                           'Powell End-of-December Elevation', colorLabel)
   meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
-                           'Mead End-of-December Elevation')
+                           'Mead End-of-December Elevation', colorLabel)
   
   # save figures
   pdf(file.path(oFigs,eocyFigs), width = 8, height = 6)
@@ -259,12 +262,12 @@ if(makeFiguresAndTables){
   cs <- critStats %>%
     mutate(AggName = ss5[Agg])
   ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
-  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, 'Scenario')
+  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel)
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
-  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 'Scenario')
+  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, colorLabel)
   
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
-  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, 'Scenario')
+  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, colorLabel)
   
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # drop Mead LT 1025 from one plot and Mead LT 1020 from 
