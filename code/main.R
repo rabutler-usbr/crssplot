@@ -44,6 +44,8 @@ crssMonth <- 'test'
 # averaged/combined together. The names in the scens list (scenario Groups) will
 # be the Scenario names that show up on plots.
 
+# *** the names of scens, icList, and icMonth should all match.
+
 #scens <- list(
 #  'Jan_MTOMMostLTEMP' = c('Scenario_dev/Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
 #  'Scenario/Jan2017_2018,DNF,2007Dems,IG,MTOM_Most'),
@@ -69,7 +71,7 @@ icList <- list(
 icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'April 2017' = '17-Dec')
 
 # for the 5-year simple table
-# value are the scenario group variable names (same as above)
+# value are the scenario group variable names (should be same as above)
 # the names are the new names that should show up in the table incase you need to 
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
@@ -136,6 +138,19 @@ if(!(mainScenGroup %in% names(scens)))
   stop(mainScenGroup, ' is not found in scens.')
 if(!(mainScenGroup %in% names(icList)))
   stop(mainScenGroup, ' is not found in icList')
+
+# check that the names of scens, icList, and icMonth are all the same; they
+# don't necessarily need to be in the same order, just all exist in one another
+if(!all(names(scens) %in% names(icList), names(icList) %in% names(scens), 
+        names(scens) %in% names(icMonth), names(icMonth) %in% names(scens),
+        names(icList) %in% names(icMonth), names(icMonth) %in% names(icList)))
+  stop("scenario group names do not match.",
+       "\nthe names() of scens, icList, and icMonth should all be the same")
+
+# if we made it here, we know names() of scens, icList, and icMonth all match, 
+# so just check to make sure that ss5 is withing scens
+if(!all(names(ss5) %in% names(scens)))
+  stop("scenario goup names of ss5 must match the names found in scens")
 
 message('Scenario data will be read in from: ', iFolder)
 if(!file.exists(iFolder))
