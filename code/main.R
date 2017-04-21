@@ -31,54 +31,47 @@ source('code/plotFirstYearShortCond.R')
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017'
+iFolder <- 'M:/Shared/CRSS/2017/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'April24MSIC'
+crssMonth <- 'test'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
-# scens should be a list, each entry is a scenario name, and the entry is a 
-# character vector of length 1 to n. 
+# scens should be a list, each entry is a scenario group name, and the entry is a 
+# character vector of length 1 to n of individual scenarios. 
 # all of the values in each entry of the list are combined together and processed
-# as one scenario. So for a run that has 30 initial conditions, all 30 runs are 
-# averaged/combined together. the name of the entries in the list are used for 
-# the scenario name
+# as one scenario group. So for a run that has 30 initial conditions, all 30 runs are 
+# averaged/combined together. The names in the scens list (scenario Groups) will
+# be the Scenario names that show up on plots.
 
-scens <- list(
-  'Jan_MTOMMostLTEMP' = 'Scenario_dev/Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
-  'Jan_MTOMMost' = 'Scenario/Jan2017_2018,DNF,2007Dems,IG,MTOM_Most',
-  'Apr_24MS' = 'Scenario/Apr2017_2018,DNF,2007Dems,IG,Most'
-)
+#scens <- list(
+#  'Jan_MTOMMostLTEMP' = c('Scenario_dev/Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
+#  'Scenario/Jan2017_2018,DNF,2007Dems,IG,MTOM_Most'),
+#  'Apr_24MS' = 'Scenario/Apr2017_2018,DNF,2007Dems,IG,Most'
+#)
 
-#scens <- list('Jan2018' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-#                'Aug2017' = 'Aug2016_2017,DNF,2007Dems,IG'
-#              )              
+scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
+                'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG'
+              )
 
-# for each group name, it should be either 2 number or 2 file paths, both ordered
+# for each scenario group name, it should be either 2 number or 2 file paths, both ordered
 # powell, then mead.
 icList <- list(
-  #'Jan2018' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
-  'Jan_MTOMMostLTEMP' = c(3576.12, 1072.98),
-  'Jan_MTOMMost' = c(3576.12, 1072.98),
-  'Apr_24MS' = c(3638.27, 1079.83)
+  'January 2017' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
+  #'Jan_MTOMMostLTEMP' = c(3576.12, 1072.98),
+  #'Jan_MTOMMost' = c(3576.12, 1072.98),
+  'August 2016' = c(3638.27, 1079.83)
 )
+
+# The month in YY-Mmm format of the intitial condtions for each scenario group
+icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'Apr_24MS' = '17-Dec') 
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'Apr_24MS'
-mainScenGroup.name <- 'April 2017 24-MS I.C.'
-
-# IC for each run
-icMonth <- c('Jan_MTOMMostLTEMP' = '17-Dec', 'Jan_MTOMMost' = '17-Dec', 'Apr_24MS' = '17-Dec') 
-
-# startMonthMap includes a map for the model name (from folder names), to a string that 
-# will show up on plots;
-# this should use the folder name, not the shortened name from icMonth, or icList
-startMonthMap <- c('Scenario_dev/Jan2017_2018_dev' = 'April Dev LTEMP',
-                   'Scenario/Jan2017_2018' = 'Jan MTOM Most',
-                   'Scenario/Apr2017_2018' = 'April 24-MS Most')
+mainScenGroup <- 'January 2017'
+mainScenGroup.name <- 'January 2017 MTOM/CRSS Combined'
 
 yrs2show <- 2018:2060 # years to show the crit stats figures
 peYrs <- 2016:2060 # years to show the Mead/Powell 10/50/90 figures for
@@ -117,10 +110,10 @@ tableFootnote <- ''
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
+getSysCondData <- FALSE
 getPeData <- TRUE
-getCSData <- TRUE
-makeFiguresAndTables <- TRUE
+getCSData <- FALSE
+makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- FALSE
@@ -236,8 +229,11 @@ if(makeFiguresAndTables){
   message("EOCY elevation figures")
   pe <- read_feather(file.path(resFolder,curMonthPEFile))
   
-  # add start month attributes to both months' data
-  pe <- dplyr::mutate(pe, StartMonth = addAttByScenName(Scenario, 1, startMonthMap))
+  # The StartMonth column is used as the color variable in plotEOCYElev, and the
+  # names that should show up in the legend/differentiate scenario groups are 
+  # stored in the Agg Varaible. So easiest to just copy it from Agg to StartMonth
+  # for now
+  pe <- dplyr::mutate(pe, StartMonth = Agg)
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
