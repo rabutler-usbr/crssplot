@@ -51,7 +51,8 @@ crssMonth <- 'test'
 #)
 
 scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-                'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG'
+                'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG',
+              'April 2017' = 'Apr2017_2018,DNF,2007Dems,IG,Most'
               )
 
 # for each scenario group name, it should be either 2 number or 2 file paths, both ordered
@@ -60,11 +61,22 @@ icList <- list(
   'January 2017' = c(paste0(CRSSDIR,'/MTOM/MTOM_JAN17_PowellPE.csv'), paste0(CRSSDIR,'/MTOM/MTOM_JAN17_MeadPE.csv')),
   #'Jan_MTOMMostLTEMP' = c(3576.12, 1072.98),
   #'Jan_MTOMMost' = c(3576.12, 1072.98),
-  'August 2016' = c(3638.27, 1079.83)
+  'August 2016' = c(3638.27, 1079.83),
+  'April 2017' = c(3638.27, 1079.83)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'Apr_24MS' = '17-Dec') 
+icMonth <- c('January 2017' = '17-Dec', 'August 2016' = '16-Dec', 'April 2017' = '17-Dec')
+
+# for the 5-year simple table
+# value are the scenario group variable names (same as above)
+# the names are the new names that should show up in the table incase you need to 
+# add a footnote or longer name
+# this is the order they will show up in the table, so list the newest run second
+# there should only be 2 scenarios
+ss5 <- c('January 2017' = 'January 2017 blah', 'April 2017' = 'April 2017 blah*')
+# this should either be a footnote corresponding to one of the ss5 names or NA
+tableFootnote <- 'Something special about the April 24-MS scenario'
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
@@ -98,24 +110,14 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #cha
 yearToAnalyze <- 2017
 shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2018'
 shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
-
-# for the 5-year simple table
-# names are the names that will show up in the 5-year simple table
-# the values are the Scenario Group variable names that will be filtered from the
-# critStats file
-# this is the order they will show up in the table, so list the newest run second
-ss5 <- c('Jan_MTOMMostLTEMP' = 'April dev LTEMP', 'Apr_24MS' = 'April 24-MS I.C.',
-         'Jan_MTOMMost' = 'Jan MTOM Most')
-# this should either be a footnote corresponding to one of the ss5 names or NA
-tableFootnote <- ''
   
 # years to use for the simple 5-year table
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
 getSysCondData <- FALSE
-getPeData <- TRUE
-getCSData <- FALSE
+getPeData <- FALSE
+getCSData <- TRUE
 makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
@@ -260,7 +262,7 @@ if(makeFiguresAndTables){
   
   # compare crit stats; call once each for powell LT 3490, shortage, and surplus
   cs <- critStats %>%
-    mutate(AggName = ss5[Agg])
+    mutate(AggName = Agg)
   ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
   p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel)
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
