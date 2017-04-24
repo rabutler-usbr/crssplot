@@ -117,7 +117,7 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
+getSysCondData <- TRUE
 getPeData <- FALSE
 getCSData <- FALSE
 makeFiguresAndTables <- FALSE
@@ -209,8 +209,14 @@ traceMap <- read.csv('data/Trace2IcMap.csv')
 ## System Conditions Table Data
 if(getSysCondData){
   message('starting getSysCondData')
-  getScenarioData(scens, iFolder, file.path(resFolder,sysCondFile),TRUE, 
-                  'aggFromScenList', 'data/SysCond.csv')
+  getScenarioData(
+    scens, 
+    iFolder, 
+    file.path(resFolder,sysCondFile),
+    TRUE,
+    'aggFromScenList', 
+    CRSSIO::sysCondSALMatrix()
+  )
   message('finished getSysCondData')
 }
 
