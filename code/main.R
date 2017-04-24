@@ -222,7 +222,7 @@ if(getSysCondData){
 if(getPeData){
   ## get the Mead and Powel EOCY Data
   getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
-                  'aggFromScenList', 'data/MPPE_EOCY.csv')
+                  'aggFromScenList', 'data/MPPEStats_sam.csv')
   ## append initial conditions onto May data
   getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
                  file.path(resFolder,curMonthPEFile), icList, icMonth, 
