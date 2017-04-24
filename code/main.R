@@ -284,6 +284,10 @@ if(makeFiguresAndTables){
   cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
     mutate(AggName = Agg) %>%
     filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
+    # these variables are values between 0 and 1 from sys cond and the variables
+    # in the existing cs data frame are between 0 and 100, so need these to be
+    # on the same scale
+    mutate(Value = Value * 100) %>%
     mutate(AggName = Agg) %>%
     rbind(cs)
   
