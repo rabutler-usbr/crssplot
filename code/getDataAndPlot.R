@@ -3,14 +3,14 @@ source('code/generalPlotting.R')
 
 library(reshape2)
 library(plyr)
-library(RWDataPlot)
+library(RWDataPlyr)
 
 getDataAndPlot <- function(resPath, scenFolders, scenNames, resFile, dataPath,figPath,
 	pdfName,slotAggList, yy, newScenNum = 1, forceColors = FALSE)
 {
 	# get data 
-	srA <- RWDataPlot::createSlotAggList(slotAggList)
-	RWDataPlot::getDataForAllScens(scenFolders, scenNames, srA, resPath, paste(dataPath,resFile,sep = ''))
+	srA <- RWDataPlyr::createSlotAggList(slotAggList)
+	RWDataPlyr::getDataForAllScens(scenFolders, scenNames, srA, resPath, paste(dataPath,resFile,sep = ''))
 	
 	# plot data
 	gridSize <- .4

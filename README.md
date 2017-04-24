@@ -12,6 +12,7 @@ Code relies on [RWDataPlyr](https://github.com/BoulderCodeHub/RWDataPlyr) and
 * scales
 * feather
 * tidyr
+* stringr
 
 Ensure the above packages are installed on the computer. RWDataPlyr and CRSSIO can be installed as follows:
 ```
