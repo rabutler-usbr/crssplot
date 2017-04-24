@@ -119,7 +119,6 @@ yy5 <- 2018:2022
 # "switches" to create/not create different figures
 getSysCondData <- TRUE
 getPeData <- FALSE
-getCSData <- FALSE
 makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
@@ -229,15 +228,6 @@ if(getPeData){
                  file.path(resFolder,curMonthPEFile), icList, icMonth, 
                  TRUE, 'aggFromScenList', traceMap, icDimNumber = icDimNumber)
 }
-
-## Get Crit Stats Data
-if(getCSData){
-  message('starting getCritStats')
-  getScenarioData(scens, iFolder, file.path(resFolder,critStatsFile),TRUE, 
-                  'aggFromScenList', 'data/CritStatsList.csv')
-  message('finished getCritStats')
-}
-
 
 if(makeFiguresAndTables){
   message("starting to create figures and tables")
