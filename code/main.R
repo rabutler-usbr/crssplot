@@ -117,9 +117,9 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
 yy5 <- 2018:2022
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
+getSysCondData <- FALSE
 getPeData <- FALSE
-makeFiguresAndTables <- FALSE
+makeFiguresAndTables <- TRUE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 createSimple5yrTable <- FALSE
@@ -185,7 +185,6 @@ sysCondFile <- 'SysCond.feather' # file name of system conditions data
 tmpPEFile <- 'tempPE.feather'
 curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
 
-critStatsFile <- 'CritStats.feather' # file name for critical stats data
 # file name for the system conditions procssed file
 sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
 
@@ -234,9 +233,9 @@ if(makeFiguresAndTables){
   message("creating system conditions table")
   ## Create tables, figures, and data behind figures
   # 1) system conditions table
-  sysCond <- read_feather(file.path(resFolder,sysCondFile))
-  # trim to specified years and the current main scenario group 
-  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == mainScenGroup)
+  sysCond <- read_feather(file.path(resFolder,sysCondFile)) %>%
+    # trim to specified years and the current main scenario group 
+    dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
   # create the system cond. table
   sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   # save the sys cond table
@@ -245,13 +244,12 @@ if(makeFiguresAndTables){
   # 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
   # read in current month data
   message("EOCY elevation figures")
-  pe <- read_feather(file.path(resFolder,curMonthPEFile))
-  
-  # The StartMonth column is used as the color variable in plotEOCYElev, and the
-  # names that should show up in the legend/differentiate scenario groups are 
-  # stored in the Agg Varaible. So easiest to just copy it from Agg to StartMonth
-  # for now
-  pe <- dplyr::mutate(pe, StartMonth = Agg)
+  pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
+    # The StartMonth column is used as the color variable in plotEOCYElev, and the
+    # names that should show up in the legend/differentiate scenario groups are 
+    # stored in the Agg Varaible. So easiest to just copy it from Agg to StartMonth
+    # for now
+    dplyr::mutate(StartMonth = Agg)
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
@@ -265,36 +263,50 @@ if(makeFiguresAndTables){
   print(meadPE)
   dev.off()
   
-  rm(pe, powellPE, meadPE)
+  rm(powellPE, meadPE)
   
   
   # 3) Critical elevation thresholds; figures and data table
   # have sysCond for some, and read in crit stats for others
   message("starting critical stats")
-  critStats <- read_feather(file.path(resFolder,critStatsFile))
   
-  # compare crit stats; call once each for powell LT 3490, shortage, and surplus
-  cs <- critStats %>%
-    mutate(AggName = Agg)
+  # compare crit stats for all scenarios
+  # call once each for powell LT 3490, shortage, and surplus
+  # get the necessary variables by filtering from the pe and syscond data files
+  cs <- pe %>%
+    filter(
+      Variable %in% c('meadLt1000', 'meadLt1020', 'powellLt3490', 'powellLt3525', 'meadLt1025')
+    ) %>%
+    mutate(AggName = Agg) %>%
+    select(-StartMonth)
+  rm(pe) # don't need pe any longer
+  
+  cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
+    mutate(AggName = Agg) %>%
+    filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
+    mutate(AggName = Agg) %>%
+    rbind(cs)
+  
   ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
   p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel)
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
   shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, colorLabel)
-  
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
   surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, colorLabel)
   
+  # now create figures only for the current "main scenario"
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
-  critStatsFig1 <- plotCritStats(dplyr::filter(critStats, Agg == mainScenGroup, 
+ 
+  critStatsFig1 <- plotCritStats(dplyr::filter(cs, Agg == mainScenGroup, 
                                                !(Variable %in% c('meadLt1020','lbSurplus'))), 
                                  yrs2show, annText)
-  critStatsFig2 <- plotCritStats(dplyr::filter(critStats, Agg == mainScenGroup, 
+  critStatsFig2 <- plotCritStats(dplyr::filter(cs, Agg == mainScenGroup, 
                                                !(Variable %in% c('meadLt1025','lbSurplus'))), 
                                  yrs2show, annText)
   # create data table to save crit stats
-  cs <- dplyr::filter(critStats, Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus')
+  cs <- dplyr::filter(cs, Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus')
   
   # rename the variables to strings
   cs$vName <- 'LB Shortage'
