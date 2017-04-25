@@ -34,7 +34,7 @@ CRSSDIR <- Sys.getenv("CRSS_DIR")
 iFolder <- 'M:/Shared/CRSS/2017/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'test'
+crssMonth <- 'Apr2017'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -46,25 +46,18 @@ crssMonth <- 'test'
 
 # *** the names of scens, icList, and icMonth should all match.
 
-#scens <- list(
-#  'Jan_MTOMMostLTEMP' = c('Scenario_dev/Jan2017_2018_dev,DNF,2007Dems,IG_2.3.9000,MTOM_Most',
-#  'Scenario/Jan2017_2018,DNF,2007Dems,IG,MTOM_Most'),
-#  'Apr_24MS' = 'Scenario/Apr2017_2018,DNF,2007Dems,IG,Most'
-#)
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
-scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:1985)),
-              'April 2017' = 'Apr2017_2018,DNF,2007Dems,IG,Most'
+scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
+              'April 2017' = makeAllScenNames('Apr2017_2018', 'DNF', '2007Dems', 'IG', c(1981:2015))
               )
 
-# for each scenario group name, it should be either 2 number or 2 file paths, both ordered
-# powell, then mead.
+# for each scenario group name, it should be either 2 numbers or 2 file paths, 
+# both ordered powell, then mead.
 
-# **** to do: replace the fully specified path with a relative path, or one using
-# either CRSSDIR or iFolder
 icList <- list(
-  'January 2017' = "C:/alan/CRSS/CRSS.Offc_Dev/dmi/InitialConditions/jan_2017/MTOM2CRSS_Monthly.xlsx",
-  'April 2017' = c(3638.27, 1079.83)
+  'January 2017' = file.path(CRSSDIR, "dmi/InitialConditions/jan_2017/MTOM2CRSS_Monthly.xlsx"),
+  'April 2017' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx")
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
@@ -76,22 +69,22 @@ icMonth <- c('January 2017' = '17-Dec', 'April 2017' = '17-Dec')
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('January 2017' = 'January 2017 blah', 'April 2017' = 'April 2017 blah*')
+ss5 <- c('January 2017' = 'January 2017', 'April 2017' = 'April 2017')
 # this should either be a footnote corresponding to one of the ss5 names or NA
-tableFootnote <- 'Something special about the April 24-MS scenario'
+tableFootnote <- NA
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
 mainScenGroup <- 'April 2017'
-mainScenGroup.name <- 'January 2017 MTOM/CRSS Combined'
+mainScenGroup.name <- 'April 2017 MTOM/CRSS Combined'
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2060 # years to show the crit stats figures
-peYrs <- 2016:2060 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2018:2026 # years to show the crit stats figures
+peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
@@ -101,7 +94,7 @@ peScatterYear <- 2017
 # then likely set to CRSS
 peScatterData <- 'MTOM'
 
-annText <- 'Results from April 2017 Dev CRSS Run' # text that will be added to figures
+annText <- 'Results from April 2017 CRSS Run' # text that will be added to figures
 
 # -------------------------------
 # Conditions leading to shortage from MTOM
@@ -119,10 +112,10 @@ yy5 <- 2018:2022
 # "switches" to create/not create different figures
 getSysCondData <- FALSE
 getPeData <- FALSE
-makeFiguresAndTables <- TRUE
+makeFiguresAndTables <- FALSE
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
-createSimple5yrTable <- FALSE
+createSimple5yrTable <- TRUE
 addPEScatterFig <- FALSE
 
 #                               END USER INPUT
@@ -426,11 +419,16 @@ if(createShortConditions){
 
 if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
-  simple5Yr <- creat5YrSimpleTable(ss5, file.path(resFolder,critStatsFile), yy5,
-                                   tableFootnote)
+  message("creating 5-year simple table")
+  zz <- read_feather(file.path(resFolder, sysCondFile)) %>%
+    rbind(read_feather(file.path(resFolder,curMonthPEFile))) %>% 
+    # have to scale shortage to be 0 or 100
+    mutate(Value = if_else(Variable == 'lbShortage', Value * 100, Value))
+  simple5Yr <- creat5YrSimpleTable(zz, ss5, yy5, tableFootnote)
   pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
   dev.off()
+  rm(zz)
 }
 
 if(addPEScatterFig){
