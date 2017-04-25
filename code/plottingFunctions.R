@@ -244,20 +244,24 @@ formatSimpleTable <- function(zz, scenNames, yrs)
   zzRound
 }
 
+#' @param iData data frame that contains shortage and powell < 3490 variables
 #' @param scenNames a named character vector; names are the names that will show up in
 #'            the finished table and the entries are the Scenario Group variable
 #'            names that will be used to filter the scenarios
-#' @param iFile character vector with path to the critStatsData
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-creat5YrSimpleTable <- function(scenNames, iFile, yrs, addFootnote = NA)
+creat5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
 {
   if(length(scenNames) != 2){
     stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
-               'Please ensure scenNames and iFiles have two scenarios each.'))
+               'Please ensure scenNames have only two scenarios.'))
   }
- 
-  i1 <- read_feather(iFile) %>% filter(Year %in% yrs) %>%
+
+  if(!(all(c('lbShortage','powellLt3490') %in% levels(as.factor(iData$Variable)))))
+    stop("shortage and powell < 3490 variables are not found in iData")
+  
+  i1 <- iData %>%
+    filter(Year %in% yrs) %>%
     filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
     mutate(ScenName = scenNames[Agg]) %>%
     group_by(Year, Variable, ScenName) %>%
