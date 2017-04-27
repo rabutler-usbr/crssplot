@@ -30,7 +30,7 @@ fRename_noComma <- function(fNames, fPath = '', repWith = '-')
 #' @param batchDir The folder to create the batch text file in
 createCombinerBatchTxt <- function(fNames, rdf, oFile, batchDir)
 {
-  combineFiles <- paste0(fNames,', ',rdf)
+  combineFiles <- paste0(fNames,'; ',rdf)
   combineFiles <- matrix(c(paste0('$',oFile), combineFiles), ncol = 1)
   write.table(combineFiles, file.path(batchDir,'RdfCombinerBatchControl.txt'), 
               quote = F, col.names = F, row.names = F)
