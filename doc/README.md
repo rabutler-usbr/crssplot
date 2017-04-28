@@ -71,15 +71,15 @@ Start by editing the User input section of `main.R`:
       'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG'
     )
     ```
-    1. This will create two scenario groups: "April 2016" and "August 2016". "April 2016"" is comprised of 30 individual scenarios, i.e., 30 different scenarios will be combined together before computing statistics on the April 2016 runs. The "August 2016" data contains only one scenario. This setup reflects the current SOP for CRSS runs: the April run is initialized 30 times while the August run starts with only one initial condition. The scenario groups are the variable used to label the scenarios in all of the figures. ***Make sure that each scenario folder only shows up in one entry of the list. The code does not expect to need to group a scenario in multiple groups.***
+    1. This will create two scenario groups: "April 2016" and "August 2016". "April 2016" is comprised of 30 individual scenarios, i.e., 30 different scenarios will be combined together before computing statistics on the April 2016 runs. The "August 2016" data contains only one scenario. This setup reflects the current SOP for CRSS runs: the April run is initialized 30 times while the August run starts with only one initial condition. The scenario groups are the variable used to label the scenarios in all of the figures. ***Make sure that each scenario folder only shows up in one entry of the list. The code does not expect to need to group a scenario in multiple groups.***
     1. Update `icList`. Again, it should have the same names as `scens`. This variable tells the code what to use for the initial conditions for the Powell and Mead EOCY elevation plots. Each name should either contain a file path to an Excel file that contains all of the MTOM results that are read into CRSS, or numeric variable of length 2. For the latter, the first value is Powell's initial elevation and the second value is Mead's initial elevation. Carrying forward the `scens` example, `icList` would be configured as follows:
     
-    ```
-    icList <- list(
-      "April 2016" = file.path(CRSSDIR, "dmi/InitialConditions/apr_2016/MTOM2CRSS_Monthly.xlsx"),
-      "August 2016" = c(3605.83, 1078.93)
-    )
-    ```
+        ```
+        icList <- list(
+          "April 2016" = file.path(CRSSDIR, "dmi/InitialConditions/apr_2016/MTOM2CRSS_Monthly.xlsx"),
+          "August 2016" = c(3605.83, 1078.93)
+        )
+        ```
     1. Because the "April 2016" scenario group contains 30 individual scenarios, it needs 30 different initial conditions while the "August 2016" scenario group only needs one set of initial conditions.
     1. Update `icMonth`. Again, it should have the same names as `scens`. This variable provides the month that will be used for the above initial conditions in YY-mmm format. Ex:
     
@@ -97,13 +97,13 @@ Start by editing the User input section of `main.R`:
 If you are creating the conditions leading to shortage figure, set`createShortConditions` to `TRUE` and follow these steps:
   
 1. Prepare files for the Conditions Leading to a Shortage. This figure Uses MTOM results to develop this figure. See CRSS_DIR/MTOM/FirstYearCondMTOM/[Month]_MTOM.xlsx for example.
-  1. Copy over Shortage.Shortage Flag, Powell.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
-  1. Sum the Oct-Dec Powell.Outflow for current year
-  1. Copy the 1981-2010 columns of the Oct-Dec release, WYRelease, Shortage, and Dec Elevation to the appropriate columns in the DataToExport worksheet.
-    * The LBPrct sheet should not change as long as the LB inflows are using 1981-2010
-  1. Export the DataToExport worksheet to csv file.
-  1. Code to create the figure is called in main.R, but it is in plotFirstYearShortCond.R
-    * **Will likely need to edit the x and y coordinates in the annotation calls in main.R**
+    1. Copy over Shortage.Shortage Flag, Powell.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
+    1. Sum the Oct-Dec Powell.Outflow for current year
+    1. Copy the 1981-2010 columns of the Oct-Dec release, WYRelease, Shortage, and Dec Elevation to the appropriate columns in the DataToExport worksheet.
+        * The LBPrct sheet should not change as long as the LB inflows are using 1981-2010
+    1. Export the DataToExport worksheet to csv file.
+    1. Code to create the figure is called in main.R, but it is in plotFirstYearShortCond.R
+        * **Will likely need to edit the x and y coordinates in the annotation calls in main.R**
 	
 ### Processing Files to Post to Stakeholder Modeling Team
 
