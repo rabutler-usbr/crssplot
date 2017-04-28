@@ -28,6 +28,16 @@ source('code/plotFirstYearShortCond.R')
 # it could be the same as CRSSDIR, but is allowed to be different so that you
 # can read model output from the server, but save figures locally.
 
+# "switches" to create/not create different figures
+getSysCondData <- FALSE
+getPeData <- FALSE
+makeFiguresAndTables <- FALSE
+createSimple5yrTable <- TRUE
+
+createShortConditions <- FALSE
+computeConditionalProbs <- FALSE
+addPEScatterFig <- FALSE
+
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
@@ -46,6 +56,8 @@ crssMonth <- 'Apr2017'
 
 # *** the names of scens, icList, and icMonth should all match.
 
+# in the comma seperated scenario folder names, currently the 5th entry is the initial conditions
+# entry
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
@@ -108,15 +120,6 @@ shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the Januar
   
 # years to use for the simple 5-year table
 yy5 <- 2018:2022
-
-# "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
-makeFiguresAndTables <- FALSE
-createShortConditions <- FALSE
-computeConditionalProbs <- FALSE
-createSimple5yrTable <- TRUE
-addPEScatterFig <- FALSE
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
