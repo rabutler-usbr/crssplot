@@ -81,7 +81,8 @@ Start by editing the User input section of `main.R`:
   )
   ```
     1. Because the "April 2016" scenario group contains 30 individual scenarios, it needs 30 different initial conditions while the "August 2016" scenario group only needs one set of initial conditions.
-  1. Update `icMonth`. Again, it should have the same names as `scens`. This variable provides the month that will be used for the above initial conditions in YY-mmm format. Ex:
+    1. Update `icMonth`. Again, it should have the same names as `scens`. This variable provides the month that will be used for the above initial conditions in YY-mmm format. Ex:
+    
   ```
   icMonth <- c('April 2016' = '16-Dec', 'August 2016' = '16-Dec')
   ```
@@ -89,7 +90,7 @@ Start by editing the User input section of `main.R`:
 1. Update `mainScenGroup` and `mainScenGroup.name`. The `mainScenGroup` is the  scenario group (from `scens`) that will be used for the figures that only show one scenario group while `mainScenGroup.name` is the text that these figures are annotated with.
 1. Update `yrs2show` and `peYrs`. These determine the x-axis time frame for the figures. Typically, `peYrs` will include the year of the initial conditions, while `yrs2show` does not need to.
 1. Run `main.R`: `source('code/main.R')`
-  - Note that additional steps may be necessary before running `main.R`, if you are creating the conditions leading to shortage, conditional probabilities, or Mead elevation scatter plots. See the following sections.
+    1. Note that additional steps may be necessary before running `main.R`, if you are creating the conditions leading to shortage, conditional probabilities, or Mead elevation scatter plots. See the following sections.
 
 #### Additional Configuration for Special Figures
 
