@@ -6,9 +6,9 @@ The following attempts to document the process used to process any CRSS runs.
 
 ## Overall Process  
 
-1. Aggregate necessary data, this months and any previous months data, and apply attributes
+1. Aggregate necessary data, data for this month and any previous month, and apply attributes
 1. Create figures/tables
-  1. provide numbers behind figures, where necessary 
+    1. Provide numbers behind figures, where necessary 
 1. Convert May_SysTableFull2016_2026.csv to excel file
 1. create results PPT
 
@@ -16,7 +16,7 @@ The following attempts to document the process used to process any CRSS runs.
 
 ### Setting up Your Computer
 
-- Fork a copy of this repository, or update your local branch of an already forked version. This code is setup so that it does not need to be in the folder as the CRSS results you are processing. After you complete the processing for the current run, issue a pull request into BoulderCodeHub, and then create a release tag, e.g., "January 2016 Official".
+- Fork a copy of this repository, or update your local branch of an already forked version. This code is setup so that it does not need to be in the same folder as the CRSS results you are processing. After you complete the processing for the current run, issue a pull request into BoulderCodeHub, and then create a release tag, e.g., "January 2016 Official".
   - You should not have to change the R working directory for any reason
 - Before opening R or R-Studio, ensure that the CRSS_DIR environment variable is set correctly. It should point to the CRSS folder that you want the results to be created in. The CRSS folder does not need to contain all of the scenario results, i.e., you can save these results to your local computer while the scenario results are stored on the server.
 
@@ -32,7 +32,7 @@ If you find any issues when running the code, please submit [issues on Github](h
 
 #### Tables and Figures
 
-The following tables and figures are created by running `main.R`. The steps necessary to update `main.R` are included in the following section. The boolean variable that controls whether each set of figures are created are included in parentheses. 
+The following tables and figures are created by running `main.R`. The steps necessary to update `main.R` are included in the following section. The boolean variable that controls whether each set of figures is created are included in parentheses. 
   
 * System conditions table (`makeFiguresAndTables`)
   * Trim to 5-years for PPT (not handled in this code)
@@ -44,7 +44,7 @@ The following tables and figures are created by running `main.R`. The steps nece
   * Percent of traces < 1020 and 1000 at Mead
   * Percent traces in Shortage and Surplus
   * Distribution of LB shortage by tier
-* Conditions leading to Shortage figure (`createShortDonditions`)
+* Conditions leading to Shortage figure (`createShortConditions`)
   * uses data from MTOM
 * A figure showing Mead's end-of-calendar year elevations for its initial conditions (from MTOM) (`addPEScatterFig`)
 * Conditional probabilities (`computeConditionalProbs`)
@@ -59,20 +59,20 @@ The following tables and figures are created by running `main.R`. The steps nece
 
 Start by editing the User input section of `main.R`:
 
-1. Update the boolean "switches" to create the figures and data you desire. `getSyscondData` and `getPeData` get the data used to create the figures in the following switches, so the code must be run with them set to `TRUE` once before creating any of the other figures. The figures that are created in each of the other sections are described in the previous section. The most common configuration would be to set `getSysCondData`, `getPeData`, `makeFiguresAndTables`, and `createSimple5yrTable` to `TRUE`, and the remaining three variables to `FALSE`. The get data portion can be turned to `FALSE` if they are successfully run once, but the plotting needs to be re-run for some reason.
+1. Update the boolean "switches" to create the figures and data you desire. `getSyscondData` and `getPeData` get the data used to create the figures in the following switches, so the code must be run with them set to `TRUE` once before (or at the same time) creating any of the other figures. The figures that are created in each of the other sections are described in the previous section. The most common configuration would be to set `getSysCondData`, `getPeData`, `makeFiguresAndTables`, and `createSimple5yrTable` to `TRUE`, and the remaining three variables to `FALSE`. The get data portion can be turned to `FALSE` if they are successfully run once, but the plotting needs to be re-run for some reason.
 1. Update `iFolder` to point to the folder that contains all of the scenario results.
 1. Update `crssMonth` to a unique folder name. The results created by this code will be saved to `CRSSDIR/crssMonth`.
 1. Update the `scens`, `icList`, and `icMonth` variables. These variables should all contain the same names, as they are meant to work together. 
-  1. Edit the `scens` variable. This is where you group individual scenarios together, e.g., runs with many different initial conditions. Each entry in the list should be a group of scenarios and the name of the list entry will be used to create "Scenario Groups" referred to as `Agg` in the data frame. For example:
-  ```
-  scens <- list(
-    'April 2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
-    'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG'
-  )
-  ```
-  This will create two scenario groups: "April 2016" and "August 2016". "April 2016"" is comprised of 30 individual scenarios, i.e., 30 different scenarios will be combined together before computing statistics on the April 2016 runs. The "August 2016" data contains only one scenario. This setup reflects the current SOP for CRSS runs: the April run is initialized 30 times while the August run starts with only one initial condition. The scenario groups are the variable used to label the scenarios in all of the figures.
+    1. Edit the `scens` variable. This is where you group individual scenarios together, e.g., runs with many different initial conditions. Each entry in the list should be a group of scenarios and the name of the list entry will be used to create "Scenario Groups" referred to as `Agg` in the data frame. For example:
+    ```
+    scens <- list(
+      'April 2016' = makeAllScenNames('Apr2016_2017','DNF','2007Dems','IG',1981:2010),
+      'August 2016' = 'Aug2016_2017,DNF,2007Dems,IG'
+    )
+    ```
+    This will create two scenario groups: "April 2016" and "August 2016". "April 2016"" is comprised of 30 individual scenarios, i.e., 30 different scenarios will be combined together before computing statistics on the April 2016 runs. The "August 2016" data contains only one scenario. This setup reflects the current SOP for CRSS runs: the April run is initialized 30 times while the August run starts with only one initial condition. The scenario groups are the variable used to label the scenarios in all of the figures.
   *** Make sure that each scenario folder only shows up in one entry of the list. The code does not expect to need to group a scenario in multiple groups. ***
-  1. Update `icList`. Again, it should have the same names as `scens`. This variable tells the code what to use for the initial conditions for the Powell and Mead EOCY elevation plots. Each name should either contain a file path to an Excel file that contains all of the MTOM results that are read into CRSS, or numeric variable of length 2. For the latter, the first value is Powell's initial elevation and the second value is Mead's initial elevation. Carrying forward the `scens` example, `icList` would be configured as follows:
+    1. Update `icList`. Again, it should have the same names as `scens`. This variable tells the code what to use for the initial conditions for the Powell and Mead EOCY elevation plots. Each name should either contain a file path to an Excel file that contains all of the MTOM results that are read into CRSS, or numeric variable of length 2. For the latter, the first value is Powell's initial elevation and the second value is Mead's initial elevation. Carrying forward the `scens` example, `icList` would be configured as follows:
   ```
   icList <- list(
     "April 2016" = file.path(CRSSDIR, "dmi/InitialConditions/apr_2016/MTOM2CRSS_Monthly.xlsx"),
