@@ -2,6 +2,11 @@ library(dplyr)
 library(reshape2)
 library(zoo)
 
+# **** need to add in a call before this to getDataForAllScens
+# **** can use the LBEnergy.rdf file (all slots)
+# **** and probably better to save as .feather instead of .txt; then the rest
+# **** should be the same
+
 zz <- read.table('results/ParkerDavisEnergy.txt', header = T)
 
 zz <- filter(zz, Year %in% 2016:2026)
