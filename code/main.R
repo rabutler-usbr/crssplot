@@ -29,8 +29,8 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
-getPeData <- TRUE
+getSysCondData <- FALSE
+getPeData <- FALSE
 makeFiguresAndTables <- TRUE
 createSimple5yrTable <- FALSE
 
@@ -44,7 +44,7 @@ CRSSDIR <- Sys.getenv("CRSS_DIR")
 iFolder <- 'M:/Shared/CRSS/2017/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Apr2017_24ms2full'
+crssMonth <- 'Apr2017_otherHydrology'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -61,20 +61,23 @@ crssMonth <- 'Apr2017_24ms2full'
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list(
-  'April 2017 (full)' = makeAllScenNames('Apr2017_2018', 'DNF', '2007Dems', 'IG', c(1981:2015)),
-  "April 2017 (24-MS)" = "Apr2017_2018,DNF,2007Dems,IG,Most"
+  "April 2017 - DNF" = "Apr2017_2018,DNF,2007Dems,IG,Most",
+  "April 2017 - Stress Test" = "Apr2017_2018_2.5.1,ST,2007Dems,IG,Most",
+  "April 2017 - CMIP3" = "Apr2017_2018_2.5.1,VIC,2007Dems,IG,Most"
 )
 
 # for each scenario group name, it should be either 2 numbers or 2 file paths, 
 # both ordered powell, then mead.
 
 icList <- list(
-  'April 2017 (full)' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
-  "April 2017 (24-MS)" = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx")
+  'April 2017 - DNF' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "April 2017 - Stress Test" = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "April 2017 - CMIP3"  = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx")
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('April 2017 (full)' = '17-Dec', "April 2017 (24-MS)" = "17-Dec")
+icMonth <- c('April 2017 - DNF' = '17-Dec', "April 2017 - Stress Test" = "17-Dec",
+             "April 2017 - CMIP3" = "17-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -83,6 +86,8 @@ icMonth <- c('April 2017 (full)' = '17-Dec', "April 2017 (24-MS)" = "17-Dec")
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
 ss5 <- c('April 2017 (full)' = 'April 2017 (full)', "April 2017 (24-MS)" = "April 2017 (24-MS)")
+ss5 <- names(icMonth)
+names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
 
@@ -90,14 +95,14 @@ tableFootnote <- NA
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'April 2017 (full)'
-mainScenGroup.name <- 'April 2017 MTOM/CRSS Combined'
+mainScenGroup <- 'April 2017 - DNF'
+mainScenGroup.name <- 'April 2017 DNF Hydrology'
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2018:2060 # years to show the crit stats figures
+peYrs <- 2017:2060 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
