@@ -87,22 +87,31 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
 {
 
   yL <- c(0,100)
-  gg <- zz %>%
+  
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
+  
+  zz %>%
     filter(Year %in% yrs, Variable == variable) %>%
     group_by(Year, AggName) %>%
     summarise(Value = mean(Value)) %>%
     ggplot(aes(Year, Value, color = AggName)) +
     geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
     scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = legLoc, 
+      legend.key.size = unit(2, "line")
+    ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc, axis.text.x = element_text(angle = 90,vjust=.5)) +
     annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
     labs(y = 'Percent of Traces [%]', title = plotTitle)
-  gg
 }
 
 # annText is text that's added to annotation
@@ -129,17 +138,24 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
   
   yL <- c(0,100)
   
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
+  
   gg <- ggplot(zz, aes(Year, Value, color = vName))
   gg <- gg + geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
     scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = legLoc, 
+      legend.key.size = unit(2, "line")
+    ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc, 
-          legend.key.size = unit(2, "line"),
-          axis.text.x = element_text(angle = 90,vjust=.5)) +
     annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
     labs(y = 'Percent of Traces [%]')
   gg
@@ -163,18 +179,26 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
   gg <- ggplot(zz, aes(Year, prob, color = vName))
   
   yL <- c(0,100)
+  
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
  
   myTitle <- paste('Percent of Traces with Lower Basin Surplus or Shortage\nResults from the',
                     monthRun, 'CRSS Run*')
   
   gg <- gg + geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
     scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = legLoc
+    ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc) +
     labs(x = 'Year', y = '[%]', title = myTitle)
   
   gg
@@ -196,16 +220,24 @@ plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
   
   yL <- c(0,100)
   
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
+  
   gg <- ggplot(zz,aes(Year,prob,fill = VName))
   
   gg <- gg + geom_bar(stat = 'identity') + 
     coord_cartesian(ylim = yL) + 
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
     scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = "bottom"
+    ) +
     scale_fill_discrete(guide = guide_legend(title = '')) + 
-    theme(legend.position = 'bottom') +
     labs(x = 'Year', y = '[%]', title = 'Lower Basin Shortages by Tier') +
     annotate('text', x = min(zz$Year), y = 95, label = annText, vjust=0, hjust=0,size = annSize)
   gg
