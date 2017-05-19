@@ -5,8 +5,9 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 library(scales)
+library(stringr)
 
-plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle)
+plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
 {
   zz <- dplyr::filter(zz, Year %in% yrs, Variable == var)
   
@@ -29,6 +30,11 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle)
     myLabs <- 1990:3000
   } else{
     myLabs <- seq(1990,3000,5)
+  }
+  
+  if(!is.null(legendWrap)) {
+    zz <- zz %>%
+      mutate(StartMonth = stringr::str_wrap(StartMonth, width = legendWrap))
   }
   
   # plot
@@ -83,7 +89,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
 }
 
 compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle = '', 
-                             legLoc = 'right', nC = 1, annSize = 3)
+                             legLoc = 'right', nC = 1, annSize = 3, legendWrap = NULL)
 {
 
   yL <- c(0,100)
@@ -92,6 +98,11 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
     myLabs <- 1990:3000
   } else{
     myLabs <- seq(1990,3000,5)
+  }
+  
+  if(!is.null(legendWrap)) {
+    zz <- zz %>%
+      mutate(AggName = stringr::str_wrap(AggName, width = legendWrap))
   }
   
   zz %>%
