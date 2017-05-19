@@ -61,22 +61,24 @@ crssMonth <- 'Apr2017_otherHydrology'
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list(
-  "April 2017 - DNF" = "Apr2017_2018,DNF,2007Dems,IG,Most",
-  "April 2017 - Stress Test" = "Apr2017_2018_2.5.1,ST,2007Dems,IG,Most",
+  "April 2017 - 1906-2014 resampled" = "Apr2017_2018,DNF,2007Dems,IG,Most",
+  "April 2017 - 1988-2014 resampled" = "Apr2017_2018_2.5.1,ST,2007Dems,IG,Most",
   "April 2017 - CMIP3" = "Apr2017_2018_2.5.1,VIC,2007Dems,IG,Most"
 )
+
+legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 
 # for each scenario group name, it should be either 2 numbers or 2 file paths, 
 # both ordered powell, then mead.
 
 icList <- list(
-  'April 2017 - DNF' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
-  "April 2017 - Stress Test" = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  'April 2017 - 1906-2014 resampled' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "April 2017 - 1988-2014 resampled" = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
   "April 2017 - CMIP3"  = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx")
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('April 2017 - DNF' = '17-Dec', "April 2017 - Stress Test" = "17-Dec",
+icMonth <- c('April 2017 - 1906-2014 resampled' = '17-Dec', "April 2017 - 1988-2014 resampled" = "17-Dec",
              "April 2017 - CMIP3" = "17-Dec")
 
 # for the 5-year simple table
@@ -85,7 +87,8 @@ icMonth <- c('April 2017 - DNF' = '17-Dec', "April 2017 - Stress Test" = "17-Dec
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('April 2017 (full)' = 'April 2017 (full)', "April 2017 (24-MS)" = "April 2017 (24-MS)")
+ss5 <- c('April 2017 - 1906-2014 resampled' = 'April 2017 - 1906-2014 resampled', 
+         "April 2017 - 1988-2014 resampled" = "April 2017 - 1988-2014 resampled")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
@@ -95,8 +98,8 @@ tableFootnote <- NA
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'April 2017 - DNF'
-mainScenGroup.name <- 'April 2017 DNF Hydrology'
+mainScenGroup <- 'April 2017 - 1906-2014 resampled'
+mainScenGroup.name <- 'April 2017 - 1906-2014 resampled'
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
@@ -255,9 +258,11 @@ if(makeFiguresAndTables){
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
-                           'Powell End-of-December Elevation', colorLabel)
+                           'Powell End-of-December Elevation', colorLabel,
+                           legendWrap = legendWrap)
   meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
-                           'Mead End-of-December Elevation', colorLabel)
+                           'Mead End-of-December Elevation', colorLabel, 
+                         legendWrap = legendWrap)
   
   # save figures
   pdf(file.path(oFigs,eocyFigs), width = 8, height = 6)
@@ -294,23 +299,38 @@ if(makeFiguresAndTables){
     rbind(cs)
   
   ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
-  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel)
+  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel, 
+                               legendWrap = legendWrap)
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
-  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, colorLabel)
+  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 
+                               colorLabel, legendWrap = legendWrap)
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
-  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, colorLabel)
+  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, 
+                              colorLabel, legendWrap = legendWrap)
   
   # now create figures only for the current "main scenario"
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
  
-  critStatsFig1 <- plotCritStats(dplyr::filter(cs, Agg == mainScenGroup, 
-                                               !(Variable %in% c('meadLt1020','lbSurplus'))), 
-                                 yrs2show, annText)
-  critStatsFig2 <- plotCritStats(dplyr::filter(cs, Agg == mainScenGroup, 
-                                               !(Variable %in% c('meadLt1025','lbSurplus'))), 
-                                 yrs2show, annText)
+  critStatsFig1 <- plotCritStats(dplyr::filter(
+      cs, 
+      Agg == mainScenGroup, 
+      !(Variable %in% c('meadLt1020','lbSurplus'))
+    ), 
+    yrs2show, 
+    annText
+  )
+  
+  critStatsFig2 <- plotCritStats(dplyr::filter(
+      cs, 
+      Agg == mainScenGroup, 
+      !(Variable %in% c('meadLt1025','lbSurplus'))
+    ), 
+    yrs2show, 
+    annText
+  )
+  
   # create data table to save crit stats
   cs <- dplyr::filter(cs, Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus')
   
