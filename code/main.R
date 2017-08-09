@@ -324,16 +324,18 @@ if(makeFiguresAndTables){
     annText
   )
   
+  csVarName <- c(
+    "lbShortage" = "LB Shortage",
+    "meadLt1000" = "Mead < 1,000' in Any Month",
+    "meadLt1020" = "Mead < 1,020' in Any Month",
+    "powellLt3490" = "Mead < 1,025' in Any Month",
+    "powellLt3525" = "Powell < 3,490' in Any Month",
+    "powellLt3525" = "Powell < 3,525' in Any Month"
+  )
   # create data table to save crit stats
-  cs <- dplyr::filter(cs, Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus')
-  
-  # rename the variables to strings
-  cs$vName <- 'LB Shortage'
-  cs$vName[cs$Variable == 'meadLt1000'] <- 'Mead < 1,000\' in Any Month'
-  cs$vName[cs$Variable == 'meadLt1020'] <- 'Mead < 1,020\' in Any Month'
-  cs$vName[cs$Variable == 'meadLt1025'] <- 'Mead < 1,025\' in Any Month'
-  cs$vName[cs$Variable == 'powellLt3490'] <- 'Powell < 3,490\' in Any Month'
-  cs$vName[cs$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
+  cs <- cs %>%
+    dplyr::filter(Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus') %>%
+    dplyr::mutate(vName = csVarName[Variable])
   
   # compute the percent of traces by averaging values 
   cs <- cs %>% 
