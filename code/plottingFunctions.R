@@ -175,15 +175,16 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
 # nC is number of columns in legend
 plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, legLoc = 'bottom')
 {
-  zz <- dplyr::filter(zz, Year %in% yrs)
-  
-  # compute the chances of shortage/surplus
-  # averaging accross the traces results in total % of traces
+  varName <- c("lbShortage" = 'Shortage of Any Amount',
+               "lbSurplus" = 'Surplus of Any Amount')
   zz <- zz %>%
+    dplyr::filter(Year %in% yrs) %>%
+    # compute the chances of shortage/surplus
+    # averaging accross the traces results in total % of traces
     dplyr::group_by(Year, Variable) %>%
-    dplyr::summarise(prob = mean(Value)*100)
-  zz$vName <- 'Shortage of Any Amount'
-  zz$vName[zz$Variable == 'lbSurplus'] <- 'Surplus of Any Amount'
+    dplyr::summarise(prob = mean(Value)*100) %>%
+    dplyr::mutate(vName = varName[Variable])
+  
   # plot:
   gg <- ggplot(zz, aes(Year, prob, color = vName))
   
