@@ -1,6 +1,7 @@
 library(dplyr)
 library(reshape2)
 library(zoo)
+library(data.table)
 
 # **** need to add in a call before this to getDataForAllScens
 # **** can use the LBEnergy.rdf file (all slots)
@@ -26,4 +27,4 @@ zz2$MonthNum <- NULL
 zz3 <- dcast(zz2, YearMon ~ Variable, value.var = 'Avg')
 zz3$YearMon <- as.yearmon(zz3$YearMon)
 
-write.csv(zz3, 'results/ParkerDavisEnergyAvg.csv',row.names = F)
+data.table::fwrite(zz3, 'results/ParkerDavisEnergyAvg.csv',row.names = F)

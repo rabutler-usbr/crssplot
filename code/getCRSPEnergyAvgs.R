@@ -1,6 +1,7 @@
 library(dplyr)
 library(reshape2)
 library(zoo)
+library(data.table)
 
 zz <- read.table('results/CRSPEnergyData.txt', header = T)
 
@@ -26,4 +27,4 @@ zz2$MonthNum <- NULL
 zz3 <- dcast(zz2, YearMon ~ Variable, value.var = 'Med')
 zz3$YearMon <- as.yearmon(zz3$YearMon)
 
-write.csv(zz3, 'results/CRSPEnergyMedian.csv',row.names = F)
+data.table::fwrite(zz3, 'results/CRSPEnergyMedian.csv',row.names = F)
