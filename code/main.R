@@ -2,11 +2,9 @@
 rm(list=ls())
 
 library(CRSSIO)
-library(dplyr)
-library(reshape2)
+library(tidyverse)
 library(grid)
 library(feather)
-library(tidyr)
 library(stringr)
 library(RWDataPlyr)
 if(packageVersion("RWDataPlyr") < "0.5.0"){
@@ -342,10 +340,13 @@ if(makeFiguresAndTables){
   cs$vName[cs$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
   
   # compute the percent of traces by averaging values 
-  cs <- cs %>% group_by(Year,Variable,vName) %>%
-    summarise(Value = mean(Value))
-  # reshape to be easier to print out
-  cs <- reshape2::dcast(cs, Year ~ vName, value.var = 'Value')
+  cs <- cs %>% 
+    group_by(Year,Variable,vName) %>%
+    summarise(Value = mean(Value)) %>%
+    # reshape to be easier to print out
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::spread(vName, Value)
   
   # shortage surplus figure
   # defaults ok for legendTitle, nC, and legLoc
