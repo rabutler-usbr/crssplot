@@ -9,8 +9,11 @@ library(feather)
 library(tidyr)
 library(stringr)
 library(RWDataPlyr)
+if(packageVersion("RWDataPlyr") < "0.5.0"){
+  # need 0.5.0 or higher for makeAllScenNames
+  devtools::install_github("BoulderCodeHub/RWDataPlyr")
+}
 library(data.table)
-source('code/makeScenNames.R')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getICPEData.R')
