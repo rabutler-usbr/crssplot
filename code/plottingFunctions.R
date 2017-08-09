@@ -1,7 +1,6 @@
 # new plotting functions
-library(dplyr)
+library(tidyverse) # dplyr, ggplot
 library(reshape2)
-library(ggplot2)
 library(grid)
 library(gridExtra)
 library(scales)
@@ -9,18 +8,15 @@ library(stringr)
 
 plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
 {
-  zz <- dplyr::filter(zz, Year %in% yrs, Variable == var)
-  
-  # compute the 10/50/90 and aggregate by start month
   zz <- zz %>%
+    dplyr::filter(Year %in% yrs, Variable == var) %>%
+    # compute the 10/50/90 and aggregate by start month
     dplyr::group_by(StartMonth, Year, Variable) %>%
     dplyr::summarise('50th' = median(Value), '10th' = quantile(Value,.1), 
-                     '90th' = quantile(Value,.9))
-  
-  # reshape in format to easily plot
-  #zz <- dplyr::select(zz, StartMonth, '10th', '50th', '90th')
-  zz <- reshape2::melt(zz, value.name = 'Value', measure.vars = c('10th','50th','90th'), 
-                       id.vars = c('StartMonth','Year'), variable.name = 'Percentile')
+                     '90th' = quantile(Value,.9)) %>%
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::gather(Percentile, Value, -StartMonth, -Year)
   
   # ploting values
   qLt <- c(3,1,2)
@@ -48,6 +44,7 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
     theme(legend.key.height = unit(2,'line'), legend.key.width = grid::unit(2, 'line')) +
     scale_color_discrete(guide = guide_legend(title = legendTitle)) +
     scale_linetype_manual(values = qLt)
+  gg
 }
 
 singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
