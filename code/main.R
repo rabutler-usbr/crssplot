@@ -31,8 +31,8 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
-getPeData <- TRUE
+getSysCondData <- FALSE
+getPeData <- FALSE
 makeFiguresAndTables <- TRUE
 createSimple5yrTable <- FALSE
 
@@ -288,13 +288,9 @@ if(makeFiguresAndTables){
   cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
     mutate(AggName = Agg) %>%
     filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
-    # these variables are values between 0 and 1 from sys cond and the variables
-    # in the existing cs data frame are between 0 and 100, so need these to be
-    # on the same scale
-    mutate(Value = Value * 100) %>%
     mutate(AggName = Agg) %>%
     rbind(cs)
-  
+
   ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
   p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel, 
                                legendWrap = legendWrap)
@@ -450,9 +446,7 @@ if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
   message("creating 5-year simple table")
   zz <- read_feather(file.path(resFolder, sysCondFile)) %>%
-    rbind(read_feather(file.path(resFolder,curMonthPEFile))) %>% 
-    # have to scale shortage to be 0 or 100
-    mutate(Value = if_else(Variable == 'lbShortage', Value * 100, Value))
+    rbind(read_feather(file.path(resFolder,curMonthPEFile))) 
   simple5Yr <- create5YrSimpleTable(zz, ss5, yy5, tableFootnote)
   pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
