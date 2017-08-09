@@ -293,7 +293,7 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 #'            names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-creat5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
+create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
 {
   if(length(scenNames) != 2){
     stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',

@@ -453,7 +453,7 @@ if(createSimple5yrTable){
     rbind(read_feather(file.path(resFolder,curMonthPEFile))) %>% 
     # have to scale shortage to be 0 or 100
     mutate(Value = if_else(Variable == 'lbShortage', Value * 100, Value))
-  simple5Yr <- creat5YrSimpleTable(zz, ss5, yy5, tableFootnote)
+  simple5Yr <- create5YrSimpleTable(zz, ss5, yy5, tableFootnote)
   pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
   dev.off()
