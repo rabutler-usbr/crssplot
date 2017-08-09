@@ -12,6 +12,7 @@ if(packageVersion("RWDataPlyr") < "0.5.0"){
   devtools::install_github("BoulderCodeHub/RWDataPlyr")
 }
 library(data.table)
+source("code/plot_nameFunctions.r")
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getICPEData.R')
@@ -305,7 +306,7 @@ if(makeFiguresAndTables){
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
- 
+
   critStatsFig1 <- plotCritStats(dplyr::filter(
       cs, 
       Agg == mainScenGroup, 
@@ -323,24 +324,15 @@ if(makeFiguresAndTables){
     yrs2show, 
     annText
   )
-  
-  csVarName <- c(
-    "lbShortage" = "LB Shortage",
-    "meadLt1000" = "Mead < 1,000' in Any Month",
-    "meadLt1020" = "Mead < 1,020' in Any Month",
-    "powellLt3490" = "Mead < 1,025' in Any Month",
-    "powellLt3525" = "Powell < 3,490' in Any Month",
-    "powellLt3525" = "Powell < 3,525' in Any Month"
-  )
+
+  csVars <- csVarNames()
   # create data table to save crit stats
   cs <- cs %>%
     dplyr::filter(Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus') %>%
-    dplyr::mutate(vName = csVarName[Variable])
-  
-  # compute the percent of traces by averaging values 
-  cs <- cs %>% 
-    group_by(Year,Variable,vName) %>%
+    # compute the percent of traces by averaging values 
+    group_by(Year,Variable) %>%
     summarise(Value = mean(Value)) %>%
+    dplyr::mutate(vName = csVars[Variable]) %>%
     # reshape to be easier to print out
     ungroup() %>%
     select(-Variable) %>%
@@ -371,6 +363,7 @@ if(makeFiguresAndTables){
   )
 
 # save figures and table
+  message("creating critFigs pdf")
   pdf(file.path(oFigs,critFigs),width = 8, height = 6)
   print(p3490Fig)
   print(shortFig)
