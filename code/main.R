@@ -9,6 +9,7 @@ library(feather)
 library(tidyr)
 library(stringr)
 library(RWDataPlyr)
+library(data.table)
 source('code/makeScenNames.R')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
@@ -29,8 +30,8 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
 makeFiguresAndTables <- TRUE
 createSimple5yrTable <- FALSE
 
@@ -41,7 +42,7 @@ addPEScatterFig <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017/Scenario'
+iFolder <- 'C:/alan/CRSS/CRSS.2016/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
 crssMonth <- 'Apr2017_otherHydrology'
@@ -61,9 +62,7 @@ crssMonth <- 'Apr2017_otherHydrology'
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list(
-  "April 2017 - 1906-2014 resampled" = "Apr2017_2018,DNF,2007Dems,IG,Most",
-  "April 2017 - 1988-2014 resampled" = "Apr2017_2018_2.5.1,ST,2007Dems,IG,Most",
-  "April 2017 - CMIP3" = "Apr2017_2018_2.5.1,VIC,2007Dems,IG,Most"
+  "April 2017" = "Apr2016_2017,DNF,2007Dems,IG"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -72,14 +71,12 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  'April 2017 - 1906-2014 resampled' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
-  "April 2017 - 1988-2014 resampled" = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
-  "April 2017 - CMIP3"  = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx")
+  #'April 2017 - 1906-2014 resampled' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "April 2017" = c(3700, 1085)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('April 2017 - 1906-2014 resampled' = '17-Dec', "April 2017 - 1988-2014 resampled" = "17-Dec",
-             "April 2017 - CMIP3" = "17-Dec")
+icMonth <- c('April 2017' = '17-Dec')
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -87,8 +84,7 @@ icMonth <- c('April 2017 - 1906-2014 resampled' = '17-Dec', "April 2017 - 1988-2
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('April 2017 - 1906-2014 resampled' = 'April 2017 - 1906-2014 resampled', 
-         "April 2017 - 1988-2014 resampled" = "April 2017 - 1988-2014 resampled")
+ss5 <- c('April 2017' = 'April 2017')
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
@@ -98,8 +94,8 @@ tableFootnote <- NA
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'April 2017 - 1906-2014 resampled'
-mainScenGroup.name <- 'April 2017 - 1906-2014 resampled'
+mainScenGroup <- 'April 2017'
+mainScenGroup.name <- 'April 2017'
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
@@ -244,7 +240,7 @@ if(makeFiguresAndTables){
   # create the system cond. table
   sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   # save the sys cond table
-  write.csv(sysTable[['fullTable']], file.path(oFigs,sysCondTable))
+  data.table::fwrite(as.data.frame(sysTable[['fullTable']]), file.path(oFigs,sysCondTable), row.names = TRUE)
   
   # 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
   # read in current month data
@@ -382,7 +378,7 @@ if(makeFiguresAndTables){
   print(ssPlot)
   print(shortStack)
   dev.off()
-  write.csv(cs,file.path(oFigs,critStatsProc),row.names = F)
+  data.table::fwrite(cs,file.path(oFigs,critStatsProc),row.names = F)
 }
 
 if(computeConditionalProbs){
@@ -426,7 +422,7 @@ if(computeConditionalProbs){
   # rearrange columns
   cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
   cpt1$PrctChance <- cpt1$PrctChance*100
-  write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
+  data.table::fwrite(cpt1,paste0(oFigs,condProbFile),row.names = F)
 }
 
 # pulled annotation out of generic function
