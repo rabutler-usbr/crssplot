@@ -96,16 +96,20 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
     myLabs <- seq(1990,3000,5)
   }
   
-  if(!is.null(legendWrap)) {
-    zz <- zz %>%
-      mutate(AggName = stringr::str_wrap(AggName, width = legendWrap))
-  }
-  
-  zz %>%
+  zz <- zz %>%
     filter(Year %in% yrs, Variable == variable) %>%
     group_by(Year, AggName) %>%
-    summarise(Value = mean(Value)) %>%
-    ggplot(aes(Year, Value, color = AggName)) +
+    summarise(Value = mean(Value))
+  
+  if(!is.null(legendWrap)) {
+    aggsN <- as.character(as.factor(zz$AggName))
+    aggs <- stringr::str_wrap(aggsN, width = legendWrap)
+    names(aggs) <- aggsN
+    zz <- zz %>%
+      mutate(AggName = aggs[AggName])
+  }
+  
+  ggplot(zz, aes(Year, Value, color = AggName)) +
     geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
