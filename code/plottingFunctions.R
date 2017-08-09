@@ -126,7 +126,7 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
     ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
     annotate('text', x = min(yrs), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize) + 
-    labs(y = 'Percent of Traces [%]', title = plotTitle)
+    labs(y = 'Percent of Traces', title = plotTitle)
 }
 
 # annText is text that's added to annotation
@@ -137,20 +137,16 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
 plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4,
                           annSize = 3)
 {
-  varName <- c("lbShortage" = "LB Shortage",
-               "meadLt1000" = "Mead < 1,000' in Any Month",
-               "meadLt1020" = "Mead < 1,020' in Any Month",
-               "meadLt1025" = "Mead < 1,025' in Any Month",
-               "powellLt3490" = "Powell < 3,490' in Any Month",
-               "powellLt3525" = "Powell < 3,525' in Any Month")
-  
+  varName <- stringr::str_wrap(csVarNames(), 14)
+  names(varName) <- names(csVarNames())
+
   zz <- zz %>% 
     dplyr::filter(Year %in% yrs) %>%
-    # rename the variables to strings
-    mutate(vName = varName[Variable]) %>%
     # compute the percent of traces by averaging values 
-    dplyr::group_by(Year,Variable,vName) %>%
-    dplyr::summarise(Value = mean(Value))
+    dplyr::group_by(Year,Variable) %>%
+    dplyr::summarise(Value = mean(Value)) %>%
+    # rename the variables to strings
+    mutate(vName = varName[Variable])
   
   yL <- c(0,1)
   
@@ -160,8 +156,8 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
     myLabs <- seq(1990,3000,5)
   }
   
-  gg <- ggplot(zz, aes(Year, Value, color = vName))
-  gg <- gg + geom_line(size = 1) + 
+  gg <- ggplot(zz, aes(Year, Value, color = vName)) +
+    geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
     scale_y_continuous(
@@ -177,7 +173,7 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
     ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
     annotate('text', x = min(yrs), y = .95, label = annText, vjust=0, hjust=0,size = annSize) + 
-    labs(y = 'Percent of Traces [%]')
+    labs(y = 'Percent of Traces')
   gg
 }
 
@@ -224,7 +220,7 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
       legend.position = legLoc
     ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    labs(x = 'Year', y = '', title = myTitle)
+    labs(x = 'Year', y = 'Percent of Traces', title = myTitle)
   
   gg
 }
@@ -266,7 +262,7 @@ plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
       legend.position = "bottom"
     ) +
     scale_fill_discrete(guide = guide_legend(title = '')) + 
-    labs(x = 'Year', y = '', title = 'Lower Basin Shortages by Tier') +
+    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier') +
     annotate('text', x = min(zz$Year), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize)
   gg
 }
