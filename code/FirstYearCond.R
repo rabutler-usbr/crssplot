@@ -5,8 +5,8 @@
 library(RWDataPlyr)
 library(ggplot2)
 library(scales)
-library(reshape2)
 library(grid)
+library(data.table)
 source('C:/alan/CRSS/code/get5YrTable.R')
 
 # iYear is an index to the year of concern, e.g., if it is 1, then will look at conditions
@@ -54,7 +54,7 @@ formatData <- function(iFolder, iYear, oFile)
 		'WYRelease' = wyRel, 'OND Release' = pOut, 'LBSideIn' = lbIn, 
 		'LBRank' = lbRank, 'LBPrct' = lbPrctAvg)
 	
-	write.csv(oo, oFile, row.names = F)
+	data.table::fwrite(oo, oFile, row.names = F)
 }
 
 plotCondForShortage <- function(iFile, oFile)
@@ -102,7 +102,8 @@ get5YrStats <- function(X,oFile, nYrs = 5)
 	yr <- min(zz2$Year)
 	yr <- yr:(yr+(nYrs-1)) # 5 year window from the first year
 	zz2 <- zz2[zz2$Year %in% yr,]
-	zz <- dcast(zz2, Year~Variable, value.var = 'mean')
+	stop("need to convert dcast to tidyr::spread")
+	zz <- reshape2::dcast(zz2, Year~Variable, value.var = 'mean')
 	
 	# change names and arange in the correct order
 	rr <- names(zz)[2:ncol(zz)]
@@ -131,7 +132,7 @@ get5YrStats <- function(X,oFile, nYrs = 5)
 	zzLimit <- t(zzLimit)
 	colnames(zzLimit) <- yrs
 	
-	write.csv(zz, oFile, row.names = T)
+	data.table::fwrite(zz, oFile, row.names = T)
 }
 
 getCond5YrData <- function(scen, scenPath, oPath, getData = TRUE)

@@ -2,7 +2,6 @@
 library(dplyr)
 library(ggplot2)
 library(scales)
-library(reshape2)
 library(grid)
 
 # filterOn: valid choices are 'shortage', 'pe'

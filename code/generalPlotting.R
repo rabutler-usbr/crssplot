@@ -1,7 +1,6 @@
 #source(paste(Sys.getenv('GEN_CODE'),'/aggregations.R',sep = ''))
 #source(paste(Sys.getenv('GEN_CODE'),'/read.rdf.R',sep = ''))
 #source(paste(Sys.getenv('GEN_CODE'),'/helperFunctions.R',sep = ''))
-library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 library(grid)
@@ -170,13 +169,15 @@ computeTag105090 <- function(alt, X)
 	yr = range(X$Year)
 	yr = seq(yr[1],yr[2],1)
 	xx = subset(xx, select = c('Trace','Year','Value'))
-	# transfor matrix bax to Year x Trace to easily compute percentiles w/time
-	xx <- dcast(xx, Year ~ Trace, value.var = 'Value')
+	# transfor matrix back to Year x Trace to easily compute percentiles w/time
+	stop("need to convert dcast and melt to tidyr::spread in code. Please re-run")
+	xx <- reshape2::dcast(xx, Year ~ Trace, value.var = 'Value')
 	xx <- apply(xx, 1, quantile, c(.1,.5,.9))
 	xx <- t(xx)
 	colnames(xx) <- c('10th','50th','90th')
 	rownames(xx) <- yr
-	xx <- melt(xx, value.name = 'Value', varnames = c('Year','Percentile'))
+	
+	xx <- reshape2::melt(xx, value.name = 'Value', varnames = c('Year','Percentile'))
 	xx$Scenario = rep(alt, nrow(xx))
 	xx
 }

@@ -12,8 +12,14 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
 
   icTrace <- traceMap %>% 
     filter(ic == icName)
-  icTrace <- paste0("Trace", icTrace$trace)
   
+  # paste Trace[N] unless it is the min/most/max
+  if(as.character(icTrace$trace) %in% c("Min", "Most", "Max")) {
+    icTrace <- as.character(icTrace$trace)
+  } else {
+    icTrace <- paste0("Trace", icTrace$trace)
+  }
+ 
   # then read the provided file and get powell and mead PE for the provided month
   # and return it
   read_excel(icFile, sheet = icTrace) %>%

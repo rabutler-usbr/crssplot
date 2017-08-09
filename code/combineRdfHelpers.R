@@ -3,6 +3,7 @@
 # names functions
 
 library(stringr)
+library(data.table)
 
 #' Change folder names to have no commas
 #' 
@@ -32,7 +33,7 @@ createCombinerBatchTxt <- function(fNames, rdf, oFile, batchDir)
 {
   combineFiles <- paste0(fNames,'; ',rdf)
   combineFiles <- matrix(c(paste0('$',oFile), combineFiles), ncol = 1)
-  write.table(combineFiles, file.path(batchDir,'RdfCombinerBatchControl.txt'), 
+  data.table::fwrite(as.data.frame(combineFiles), file.path(batchDir,'RdfCombinerBatchControl.txt'), 
               quote = F, col.names = F, row.names = F)
 }
 

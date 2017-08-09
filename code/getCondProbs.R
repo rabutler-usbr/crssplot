@@ -1,7 +1,6 @@
 # get conditional probabilities
 
 library(dplyr)
-library(reshape2)
 
 # res - results data frame from systemConditions.txt
 # Prob( yr1 cond1 | yr2 cond2) 
@@ -23,6 +22,7 @@ getConditionalProbs <- function(res, yr1, yr2, cond1, cond2)
   zz <- zz %>% select(Value, Variable, Trace, Scenario) %>%
     mutate(lName = paste(Scenario,Trace,sep = '_')) %>% # create unique run, trace combination
     select(Value,Variable,lName)
+  stop("need to convert dcast to tidyr::spread")
   zz <- reshape2::dcast(zz, lName ~ Variable, value.var = 'Value')
 
   # can this be replaced using dplyr::filter?

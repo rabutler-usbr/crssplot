@@ -2,14 +2,17 @@
 rm(list=ls())
 
 library(CRSSIO)
-library(dplyr)
-library(reshape2)
+library(tidyverse)
 library(grid)
 library(feather)
-library(tidyr)
 library(stringr)
 library(RWDataPlyr)
-source('code/makeScenNames.R')
+if(packageVersion("RWDataPlyr") < "0.5.0"){
+  # need 0.5.0 or higher for makeAllScenNames
+  devtools::install_github("BoulderCodeHub/RWDataPlyr")
+}
+library(data.table)
+source("code/plot_nameFunctions.r")
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getICPEData.R')
@@ -31,8 +34,8 @@ source('code/plotFirstYearShortCond.R')
 # "switches" to create/not create different figures
 getSysCondData <- FALSE
 getPeData <- FALSE
-makeFiguresAndTables <- FALSE
-createSimple5yrTable <- TRUE
+makeFiguresAndTables <- TRUE
+createSimple5yrTable <- FALSE
 
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
@@ -41,10 +44,10 @@ addPEScatterFig <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017/Scenario'
+iFolder <- 'C:/alan/CRSS/CRSS.2016/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Apr2017'
+crssMonth <- 'Apr2017_otherHydrology'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -60,20 +63,22 @@ crssMonth <- 'Apr2017'
 # entry
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
-scens <- list('January 2017' = makeAllScenNames('Jan2017_2018','DNF','2007Dems','IG',c(1981:2015)),
-              'April 2017' = makeAllScenNames('Apr2017_2018', 'DNF', '2007Dems', 'IG', c(1981:2015))
-              )
+scens <- list(
+  "April 2017" = "Apr2016_2017,DNF,2007Dems,IG"
+)
+
+legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 
 # for each scenario group name, it should be either 2 numbers or 2 file paths, 
 # both ordered powell, then mead.
 
 icList <- list(
-  'January 2017' = file.path(CRSSDIR, "dmi/InitialConditions/jan_2017/MTOM2CRSS_Monthly.xlsx"),
-  'April 2017' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx")
+  #'April 2017 - 1906-2014 resampled' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "April 2017" = c(3700, 1085)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('January 2017' = '17-Dec', 'April 2017' = '17-Dec')
+icMonth <- c('April 2017' = '17-Dec')
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -81,7 +86,9 @@ icMonth <- c('January 2017' = '17-Dec', 'April 2017' = '17-Dec')
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('January 2017' = 'January 2017', 'April 2017' = 'April 2017')
+ss5 <- c('April 2017' = 'April 2017')
+ss5 <- names(icMonth)
+names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
 
@@ -90,13 +97,13 @@ tableFootnote <- NA
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
 mainScenGroup <- 'April 2017'
-mainScenGroup.name <- 'April 2017 MTOM/CRSS Combined'
+mainScenGroup.name <- 'April 2017'
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2018:2060 # years to show the crit stats figures
+peYrs <- 2017:2060 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
@@ -235,7 +242,7 @@ if(makeFiguresAndTables){
   # create the system cond. table
   sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   # save the sys cond table
-  write.csv(sysTable[['fullTable']], file.path(oFigs,sysCondTable))
+  data.table::fwrite(as.data.frame(sysTable[['fullTable']]), file.path(oFigs,sysCondTable), row.names = TRUE)
   
   # 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
   # read in current month data
@@ -249,9 +256,11 @@ if(makeFiguresAndTables){
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
-                           'Powell End-of-December Elevation', colorLabel)
+                           'Powell End-of-December Elevation', colorLabel,
+                           legendWrap = legendWrap)
   meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
-                           'Mead End-of-December Elevation', colorLabel)
+                           'Mead End-of-December Elevation', colorLabel, 
+                         legendWrap = legendWrap)
   
   # save figures
   pdf(file.path(oFigs,eocyFigs), width = 8, height = 6)
@@ -280,47 +289,54 @@ if(makeFiguresAndTables){
   cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
     mutate(AggName = Agg) %>%
     filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
-    # these variables are values between 0 and 1 from sys cond and the variables
-    # in the existing cs data frame are between 0 and 100, so need these to be
-    # on the same scale
-    mutate(Value = Value * 100) %>%
     mutate(AggName = Agg) %>%
     rbind(cs)
-  
+
   ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
-  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel)
+  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel, 
+                               legendWrap = legendWrap)
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
-  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, colorLabel)
+  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 
+                               colorLabel, legendWrap = legendWrap)
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
-  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, colorLabel)
+  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, 
+                              colorLabel, legendWrap = legendWrap)
   
   # now create figures only for the current "main scenario"
   # defaults are ok for legendTitle, legLoc, nC, and annSize
   # drop Mead LT 1025 from one plot and Mead LT 1020 from 
   # the other plot
- 
-  critStatsFig1 <- plotCritStats(dplyr::filter(cs, Agg == mainScenGroup, 
-                                               !(Variable %in% c('meadLt1020','lbSurplus'))), 
-                                 yrs2show, annText)
-  critStatsFig2 <- plotCritStats(dplyr::filter(cs, Agg == mainScenGroup, 
-                                               !(Variable %in% c('meadLt1025','lbSurplus'))), 
-                                 yrs2show, annText)
+
+  critStatsFig1 <- plotCritStats(dplyr::filter(
+      cs, 
+      Agg == mainScenGroup, 
+      !(Variable %in% c('meadLt1020','lbSurplus'))
+    ), 
+    yrs2show, 
+    annText
+  )
+  
+  critStatsFig2 <- plotCritStats(dplyr::filter(
+      cs, 
+      Agg == mainScenGroup, 
+      !(Variable %in% c('meadLt1025','lbSurplus'))
+    ), 
+    yrs2show, 
+    annText
+  )
+
+  csVars <- csVarNames()
   # create data table to save crit stats
-  cs <- dplyr::filter(cs, Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus')
-  
-  # rename the variables to strings
-  cs$vName <- 'LB Shortage'
-  cs$vName[cs$Variable == 'meadLt1000'] <- 'Mead < 1,000\' in Any Month'
-  cs$vName[cs$Variable == 'meadLt1020'] <- 'Mead < 1,020\' in Any Month'
-  cs$vName[cs$Variable == 'meadLt1025'] <- 'Mead < 1,025\' in Any Month'
-  cs$vName[cs$Variable == 'powellLt3490'] <- 'Powell < 3,490\' in Any Month'
-  cs$vName[cs$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
-  
-  # compute the percent of traces by averaging values 
-  cs <- cs %>% group_by(Year,Variable,vName) %>%
-    summarise(Value = mean(Value))
-  # reshape to be easier to print out
-  cs <- reshape2::dcast(cs, Year ~ vName, value.var = 'Value')
+  cs <- cs %>%
+    dplyr::filter(Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus') %>%
+    # compute the percent of traces by averaging values 
+    group_by(Year,Variable) %>%
+    summarise(Value = mean(Value)) %>%
+    dplyr::mutate(vName = csVars[Variable]) %>%
+    # reshape to be easier to print out
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::spread(vName, Value)
   
   # shortage surplus figure
   # defaults ok for legendTitle, nC, and legLoc
@@ -347,6 +363,7 @@ if(makeFiguresAndTables){
   )
 
 # save figures and table
+  message("creating critFigs pdf")
   pdf(file.path(oFigs,critFigs),width = 8, height = 6)
   print(p3490Fig)
   print(shortFig)
@@ -356,7 +373,7 @@ if(makeFiguresAndTables){
   print(ssPlot)
   print(shortStack)
   dev.off()
-  write.csv(cs,file.path(oFigs,critStatsProc),row.names = F)
+  data.table::fwrite(cs,file.path(oFigs,critStatsProc),row.names = F)
 }
 
 if(computeConditionalProbs){
@@ -400,7 +417,7 @@ if(computeConditionalProbs){
   # rearrange columns
   cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
   cpt1$PrctChance <- cpt1$PrctChance*100
-  write.csv(cpt1,paste0(oFigs,condProbFile),row.names = F)
+  data.table::fwrite(cpt1,paste0(oFigs,condProbFile),row.names = F)
 }
 
 # pulled annotation out of generic function
@@ -424,10 +441,8 @@ if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
   message("creating 5-year simple table")
   zz <- read_feather(file.path(resFolder, sysCondFile)) %>%
-    rbind(read_feather(file.path(resFolder,curMonthPEFile))) %>% 
-    # have to scale shortage to be 0 or 100
-    mutate(Value = if_else(Variable == 'lbShortage', Value * 100, Value))
-  simple5Yr <- creat5YrSimpleTable(zz, ss5, yy5, tableFootnote)
+    rbind(read_feather(file.path(resFolder,curMonthPEFile))) 
+  simple5Yr <- create5YrSimpleTable(zz, ss5, yy5, tableFootnote)
   pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
   print(simple5Yr)
   dev.off()

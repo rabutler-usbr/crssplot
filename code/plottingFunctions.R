@@ -1,25 +1,21 @@
 # new plotting functions
-library(dplyr)
-library(reshape2)
-library(ggplot2)
+library(tidyverse) # dplyr, ggplot
 library(grid)
 library(gridExtra)
 library(scales)
+library(stringr)
 
-plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle)
+plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
 {
-  zz <- dplyr::filter(zz, Year %in% yrs, Variable == var)
-  
-  # compute the 10/50/90 and aggregate by start month
   zz <- zz %>%
+    dplyr::filter(Year %in% yrs, Variable == var) %>%
+    # compute the 10/50/90 and aggregate by start month
     dplyr::group_by(StartMonth, Year, Variable) %>%
     dplyr::summarise('50th' = median(Value), '10th' = quantile(Value,.1), 
-                     '90th' = quantile(Value,.9))
-  
-  # reshape in format to easily plot
-  #zz <- dplyr::select(zz, StartMonth, '10th', '50th', '90th')
-  zz <- reshape2::melt(zz, value.name = 'Value', measure.vars = c('10th','50th','90th'), 
-                       id.vars = c('StartMonth','Year'), variable.name = 'Percentile')
+                     '90th' = quantile(Value,.9)) %>%
+    ungroup() %>%
+    select(-Variable) %>%
+    tidyr::gather(Percentile, Value, -StartMonth, -Year)
   
   # ploting values
   qLt <- c(3,1,2)
@@ -29,6 +25,11 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle)
     myLabs <- 1990:3000
   } else{
     myLabs <- seq(1990,3000,5)
+  }
+  
+  if(!is.null(legendWrap)) {
+    zz <- zz %>%
+      mutate(StartMonth = stringr::str_wrap(StartMonth, width = legendWrap))
   }
   
   # plot
@@ -42,6 +43,7 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle)
     theme(legend.key.height = unit(2,'line'), legend.key.width = grid::unit(2, 'line')) +
     scale_color_discrete(guide = guide_legend(title = legendTitle)) +
     scale_linetype_manual(values = qLt)
+  gg
 }
 
 singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
@@ -83,26 +85,48 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
 }
 
 compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle = '', 
-                             legLoc = 'right', nC = 1, annSize = 3)
+                             legLoc = 'right', nC = 1, annSize = 3, legendWrap = NULL)
 {
 
-  yL <- c(0,100)
-  gg <- zz %>%
+  yL <- c(0,1)
+  
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
+  
+  zz <- zz %>%
     filter(Year %in% yrs, Variable == variable) %>%
     group_by(Year, AggName) %>%
-    summarise(Value = mean(Value)) %>%
-    ggplot(aes(Year, Value, color = AggName)) +
+    summarise(Value = mean(Value))
+  
+  if(!is.null(legendWrap)) {
+    aggsN <- as.character(as.factor(zz$AggName))
+    aggs <- stringr::str_wrap(aggsN, width = legendWrap)
+    names(aggs) <- aggsN
+    zz <- zz %>%
+      mutate(AggName = aggs[AggName])
+  }
+  
+  ggplot(zz, aes(Year, Value, color = AggName)) +
     geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
-    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_y_continuous(
+      minor_breaks = seq(yL[1],yL[2],0.05), 
+      breaks = seq(yL[1],yL[2],0.10),
+      labels = scales::percent
+    ) + 
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = legLoc, 
+      legend.key.size = unit(2, "line")
+    ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc, axis.text.x = element_text(angle = 90,vjust=.5)) +
-    annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
-    labs(y = 'Percent of Traces [%]', title = plotTitle)
-  gg
+    annotate('text', x = min(yrs), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    labs(y = 'Percent of Traces', title = plotTitle)
 }
 
 # annText is text that's added to annotation
@@ -113,35 +137,43 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
 plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4,
                           annSize = 3)
 {
-  zz <- dplyr::filter(zz, Year %in% yrs)
+  varName <- stringr::str_wrap(csVarNames(), 14)
+  names(varName) <- names(csVarNames())
+
+  zz <- zz %>% 
+    dplyr::filter(Year %in% yrs) %>%
+    # compute the percent of traces by averaging values 
+    dplyr::group_by(Year,Variable) %>%
+    dplyr::summarise(Value = mean(Value)) %>%
+    # rename the variables to strings
+    mutate(vName = varName[Variable])
   
-  # rename the variables to strings
-  zz$vName <- 'LB Shortage'
-  zz$vName[zz$Variable == 'meadLt1000'] <- 'Mead < 1,000\'\nin Any Month'
-  zz$vName[zz$Variable == 'meadLt1020'] <- 'Mead < 1,020\'\nin Any Month'
-  zz$vName[zz$Variable == 'meadLt1025'] <- 'Mead < 1,025\'\nin Any Month'
-  zz$vName[zz$Variable == 'powellLt3490'] <- 'Powell < 3,490\'\nin Any Month'
-  zz$vName[zz$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
+  yL <- c(0,1)
   
-  # compute the percent of traces by averaging values 
-  zz <- zz %>% dplyr::group_by(Year,Variable,vName) %>%
-    dplyr::summarise(Value = mean(Value))
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
   
-  yL <- c(0,100)
-  
-  gg <- ggplot(zz, aes(Year, Value, color = vName))
-  gg <- gg + geom_line(size = 1) + 
+  gg <- ggplot(zz, aes(Year, Value, color = vName)) +
+    geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
-    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_y_continuous(
+      minor_breaks = seq(yL[1],yL[2],0.05), 
+      breaks = seq(yL[1],yL[2],0.10),
+      labels = scales::percent
+    ) + 
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = legLoc, 
+      legend.key.size = unit(2, "line")
+    ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc, 
-          legend.key.size = unit(2, "line"),
-          axis.text.x = element_text(angle = 90,vjust=.5)) +
-    annotate('text', x = min(yrs), y = 95, label = annText, vjust=0, hjust=0,size = annSize) + 
-    labs(y = 'Percent of Traces [%]')
+    annotate('text', x = min(yrs), y = .95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    labs(y = 'Percent of Traces')
   gg
 }
 
@@ -150,32 +182,45 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
 # nC is number of columns in legend
 plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, legLoc = 'bottom')
 {
-  zz <- dplyr::filter(zz, Year %in% yrs)
-  
-  # compute the chances of shortage/surplus
-  # averaging accross the traces results in total % of traces
+  varName <- c("lbShortage" = 'Shortage of Any Amount',
+               "lbSurplus" = 'Surplus of Any Amount')
   zz <- zz %>%
+    dplyr::filter(Year %in% yrs) %>%
+    # compute the chances of shortage/surplus
+    # averaging accross the traces results in total % of traces
     dplyr::group_by(Year, Variable) %>%
-    dplyr::summarise(prob = mean(Value)*100)
-  zz$vName <- 'Shortage of Any Amount'
-  zz$vName[zz$Variable == 'lbSurplus'] <- 'Surplus of Any Amount'
-  # plot:
-  gg <- ggplot(zz, aes(Year, prob, color = vName))
+    dplyr::summarise(Value = mean(Value)) %>%
+    dplyr::mutate(vName = varName[Variable])
   
-  yL <- c(0,100)
+  # plot:
+  gg <- ggplot(zz, aes(Year, Value, color = vName))
+  
+  yL <- c(0,1)
+  
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
  
   myTitle <- paste('Percent of Traces with Lower Basin Surplus or Shortage\nResults from the',
                     monthRun, 'CRSS Run*')
   
   gg <- gg + geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
-    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_y_continuous(
+      minor_breaks = seq(yL[1],yL[2],0.05), 
+      breaks = seq(yL[1],yL[2],0.10),
+      labels = scales::percent
+    ) + 
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = legLoc
+    ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    theme(legend.position = legLoc) +
-    labs(x = 'Year', y = '[%]', title = myTitle)
+    labs(x = 'Year', y = 'Percent of Traces', title = myTitle)
   
   gg
 }
@@ -183,31 +228,42 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
 
 plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
 {
-
-  zz <- dplyr::filter(zz, Year %in% yrs)
+  varName <- c("lbShortageStep1" = "Step 1 Shortage",
+             "lbShortageStep2" = "Step 2 Shortage",
+             "lbShortageStep3" = "Step 3 Shortage")
+    
   zz <- zz %>% 
+    dplyr::filter(Year %in% yrs) %>%
     dplyr::group_by(Year,Variable) %>%
-    dplyr::summarize(prob = mean(Value)*100)
+    dplyr::summarise(Value = mean(Value)) %>%
+    dplyr::mutate(VName = varName[Variable])
+ 
+  yL <- c(0,1)
   
-  # rename variables for plotting
-  zz$VName<- 'Step 1 Shortage'
-  zz$VName[zz$Variable == 'lbShortageStep2'] <- 'Step 2 Shortage'
-  zz$VName[zz$Variable == 'lbShortageStep3'] <- 'Step 3 Shortage'
+  if(length(yrs) < 15){
+    myLabs <- 1990:3000
+  } else{
+    myLabs <- seq(1990,3000,5)
+  }
   
-  yL <- c(0,100)
-  
-  gg <- ggplot(zz,aes(Year,prob,fill = VName))
+  gg <- ggplot(zz,aes(Year,Value,fill = VName))
   
   gg <- gg + geom_bar(stat = 'identity') + 
     coord_cartesian(ylim = yL) + 
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = seq(1990,3000,1)) + 
-    scale_y_continuous(minor_breaks = seq(yL[1],yL[2],5), breaks = seq(yL[1],yL[2],10)) + 
-    theme(panel.grid.minor = element_line(color = 'white', size = .4),
-          panel.grid.major = element_line(color = 'white', size = .6)) +
+    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_y_continuous(
+      minor_breaks = seq(yL[1],yL[2],0.05), 
+      breaks = seq(yL[1],yL[2],0.1),
+      labels = scales::percent
+    ) + 
+    theme(
+      panel.grid.minor = element_line(color = 'white', size = .4),
+      panel.grid.major = element_line(color = 'white', size = .6),
+      legend.position = "bottom"
+    ) +
     scale_fill_discrete(guide = guide_legend(title = '')) + 
-    theme(legend.position = 'bottom') +
-    labs(x = 'Year', y = '[%]', title = 'Lower Basin Shortages by Tier') +
-    annotate('text', x = min(zz$Year), y = 95, label = annText, vjust=0, hjust=0,size = annSize)
+    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier') +
+    annotate('text', x = min(zz$Year), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize)
   gg
 }
 
@@ -250,7 +306,7 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 #'            names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-creat5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
+create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
 {
   if(length(scenNames) != 2){
     stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
