@@ -1,5 +1,5 @@
+
 library(dplyr)
-library(reshape2)
 library(zoo)
 library(data.table)
 
@@ -24,6 +24,7 @@ zz2$Year <- NULL
 zz2$MonthNum <- NULL
 
 # change to a tabular format with variables as columns
+stop("convert dcast to tidyr::spread")
 zz3 <- dcast(zz2, YearMon ~ Variable, value.var = 'Med')
 zz3$YearMon <- as.yearmon(zz3$YearMon)
 

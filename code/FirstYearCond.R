@@ -5,7 +5,6 @@
 library(RWDataPlyr)
 library(ggplot2)
 library(scales)
-library(reshape2)
 library(grid)
 library(data.table)
 source('C:/alan/CRSS/code/get5YrTable.R')
@@ -103,7 +102,8 @@ get5YrStats <- function(X,oFile, nYrs = 5)
 	yr <- min(zz2$Year)
 	yr <- yr:(yr+(nYrs-1)) # 5 year window from the first year
 	zz2 <- zz2[zz2$Year %in% yr,]
-	zz <- dcast(zz2, Year~Variable, value.var = 'mean')
+	stop("need to convert dcast to tidyr::spread")
+	zz <- reshape2::dcast(zz2, Year~Variable, value.var = 'mean')
 	
 	# change names and arange in the correct order
 	rr <- names(zz)[2:ncol(zz)]
