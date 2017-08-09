@@ -130,18 +130,19 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
 plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4,
                           annSize = 3)
 {
-  zz <- dplyr::filter(zz, Year %in% yrs)
+  varName <- c("lbShortage" = "LB Shortage",
+               "meadLt1000" = "Mead < 1,000' in Any Month",
+               "meadLt1020" = "Mead < 1,020' in Any Month",
+               "meadLt1025" = "Mead < 1,025' in Any Month",
+               "powellLt3490" = "Powell < 3,490' in Any Month",
+               "powellLt3525" = "Powell < 3,525' in Any Month")
   
-  # rename the variables to strings
-  zz$vName <- 'LB Shortage'
-  zz$vName[zz$Variable == 'meadLt1000'] <- 'Mead < 1,000\'\nin Any Month'
-  zz$vName[zz$Variable == 'meadLt1020'] <- 'Mead < 1,020\'\nin Any Month'
-  zz$vName[zz$Variable == 'meadLt1025'] <- 'Mead < 1,025\'\nin Any Month'
-  zz$vName[zz$Variable == 'powellLt3490'] <- 'Powell < 3,490\'\nin Any Month'
-  zz$vName[zz$Variable == 'powellLt3525'] <- 'Powell < 3,525\' in Any Month'
-  
-  # compute the percent of traces by averaging values 
-  zz <- zz %>% dplyr::group_by(Year,Variable,vName) %>%
+  zz <- zz %>% 
+    dplyr::filter(Year %in% yrs) %>%
+    # rename the variables to strings
+    mutate(vName = varName[Variable]) %>%
+    # compute the percent of traces by averaging values 
+    dplyr::group_by(Year,Variable,vName) %>%
     dplyr::summarise(Value = mean(Value))
   
   yL <- c(0,100)
