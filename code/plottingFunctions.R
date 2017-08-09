@@ -1,6 +1,5 @@
 # new plotting functions
 library(tidyverse) # dplyr, ggplot
-library(reshape2)
 library(grid)
 library(gridExtra)
 library(scales)
