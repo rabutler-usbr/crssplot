@@ -218,16 +218,15 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
 
 plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
 {
-
-  zz <- dplyr::filter(zz, Year %in% yrs)
+  varName <- c("lbShortage1" = "Step 1 Shortage",
+             "lbShortage2" = "Step 2 Shortage",
+             "lbShortage3" = "Step 3 Shortage")
+    
   zz <- zz %>% 
+    dplyr::filter(Year %in% yrs) %>%
     dplyr::group_by(Year,Variable) %>%
-    dplyr::summarize(prob = mean(Value)*100)
-  
-  # rename variables for plotting
-  zz$VName<- 'Step 1 Shortage'
-  zz$VName[zz$Variable == 'lbShortageStep2'] <- 'Step 2 Shortage'
-  zz$VName[zz$Variable == 'lbShortageStep3'] <- 'Step 3 Shortage'
+    dplyr::summarize(prob = mean(Value)*100) %>%
+    mutate(vName = varName[Variable])
   
   yL <- c(0,100)
   
