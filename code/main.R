@@ -33,16 +33,16 @@ source('code/plotFirstYearShortCond.R')
 
 # "switches" to create/not create different figures
 # get/don't get the data
-getSysCondData <- TRUE
-getPeData <- TRUE
+getSysCondData <- FALSE
+getPeData <- FALSE
 # typical figures
-makeFiguresAndTables <- TRUE
-createSimple5yrTable <- TRUE
+makeFiguresAndTables <- FALSE
+createSimple5yrTable <- FALSE
 
 # optional figures/tables
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
-addPEScatterFig <- FALSE
+addPEScatterFig <- TRUE
 
 # ** make sure CRSS_DIR is set correctly before running
 
@@ -114,21 +114,32 @@ peYrs <- 2017:2060 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
-peScatterYear <- 2017
+peScatterYear <- 2018
 # peScatterData should be set to either MTOM or CRSS
 # if relying on combined run, then this is likely MTOM; if using a CRSS only run,
 # then likely set to CRSS
-peScatterData <- 'MTOM'
+peScatterData <- 'CRSS'
 
 # -------------------------------
-# Conditions leading to shortage from MTOM
+# Conditions leading to shortage from  CRSS or MTOM
 # mtom results file for creating conditions leading to shortage in 2016
-mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #changed to may b/c jun results file DNE
+
+conditionsFrom <- "CRSS" # string should be either CRSS or MTOM
+# either set res file to a path to a csv file if using MTOM or to the scenario path if using CRSS
+#resFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #changed to may b/c jun results file DNE
+resFile <- iFolder
+# set scenario to NA if using MTOM or to the main scenario folder if using CRSS
+scenario <- scens[[mainScenGroup]]
+
 # yearToAnalyze is used in the plot labeling. This is typically the first year
 # of the MTOM run, e.g., 2017 for a January 2017 MTOM run
-yearToAnalyze <- 2017
-shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2018'
-shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
+yearToAnalyze <- 2018
+shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2019'
+#shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
+shortCondSubTitle <- "Results from the August 2017 CRSS run, based on initial conditions from the August 2017 24-Month Study"
+# the label for the percent of average; comment one of the following two out
+lbLabel <- 'LB total side inflow percent\nof average (1981-2015)' # for MTOM
+lbLabel <- "Total LB nataural inflow percent\nof average (1906-2015)" # for CRSS
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -424,11 +435,13 @@ if(computeConditionalProbs){
 
 # pulled annotation out of generic function
 if(createShortConditions){
-  lbLabel <- 'LB total side inflow percent\nof average (1981-2015)'
-  message('Using hard coded values for the arror in the shortage conditions figure.\n',
+  if(length(resFile) > 1)
+    stop("conditions leading to shortage is only designed to work with 1 scenario of data, at this point")
+  
+  message('Using hard coded values for the arrow in the shortage conditions figure.\n',
           'You may need to update the values and re-run main.R')
   # filterOn being set to pe shows results for traces that are <= 1077
-  shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe', yearToAnalyze)
+  shortCond <- plotFirstYearShortCond(conditionsFrom, resFile, scenario, filterOn = 'pe', yearToAnalyze)
   shortCond <- shortCond + annotate('segment', x = 7.2, xend = 6.4, y = 1070.4, yend = 1070.7, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
     annotate('text', x = 7.3, y = 1070.3,label = lbLabel, size = 4, hjust = 0) +
