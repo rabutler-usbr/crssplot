@@ -321,7 +321,8 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
     filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
     mutate(ScenName = scenNames[Agg]) %>%
     group_by(Year, Variable, ScenName) %>%
-    dplyr::summarise(PrctTraces = mean(Value))
+    dplyr::summarise(PrctTraces = mean(Value)*100) # multiply by 100 to display as
+  # percent instead of decimal
   
   shortTable <- i1 %>%
     filter(Variable == 'lbShortage') %>%
