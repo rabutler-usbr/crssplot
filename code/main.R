@@ -32,11 +32,14 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
+# get/don't get the data
 getSysCondData <- TRUE
 getPeData <- TRUE
+# typical figures
 makeFiguresAndTables <- TRUE
-createSimple5yrTable <- FALSE
+createSimple5yrTable <- TRUE
 
+# optional figures/tables
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 addPEScatterFig <- FALSE
@@ -44,10 +47,10 @@ addPEScatterFig <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017'
+iFolder <- 'M:/Shared/CRSS/2017/Scenario'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'NatFlow2015Compare'
+crssMonth <- 'Aug2017'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -64,8 +67,8 @@ crssMonth <- 'NatFlow2015Compare'
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list(
-  "April 2017 DNF 2014" = "Scenario/Apr2017_2018,DNF,2007Dems,IG,Most",
-  "April 2017 DNF 2015" = "Scenario_dev/Apr2017_2018_2.5.2,DNF,2007Dems,IG,Most"
+  "April 2017" = makeAllScenNames("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
+  "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -74,32 +77,34 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  #'April 2017 - 1906-2014 resampled' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
-  "April 2017 DNF 2014" = c(3638.27, 1079.83),
-  "April 2017 DNF 2015" = c(3638.27, 1079.83)
+  'April 2017' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "August 2017" = c(3627.34, 1083.46)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('April 2017 DNF 2014' = '17-Dec', "April 2017 DNF 2015" = "17-Dec")
+icMonth <- c('April 2017' = '17-Dec', "August 2017" = "17-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
-# the names are the new names that should show up in the table incase you need to 
+# the names are the new names that should show up in the table in case you need to 
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('April 2017 DNF 2014' = 'April 2017 DNF 2014')
+ss5 <- c('April 2017' = 'April 2017', "August 2017" = "August 2017")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
+# years to use for the simple 5-year table
+yy5 <- 2018:2022
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'April 2017 DNF 2014'
-mainScenGroup.name <- 'April 2017 DNF 2014'
+mainScenGroup <- 'August 2017'
+mainScenGroup.name <- 'April 2017 DNF 2015'
+annText <- 'Results from April 2017 CRSS Run' # text that will be added to figures
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
@@ -115,8 +120,6 @@ peScatterYear <- 2017
 # then likely set to CRSS
 peScatterData <- 'MTOM'
 
-annText <- 'Results from April 2017 CRSS Run' # text that will be added to figures
-
 # -------------------------------
 # Conditions leading to shortage from MTOM
 # mtom results file for creating conditions leading to shortage in 2016
@@ -126,9 +129,6 @@ mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #cha
 yearToAnalyze <- 2017
 shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2018'
 shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
-  
-# years to use for the simple 5-year table
-yy5 <- 2018:2022
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
