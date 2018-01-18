@@ -35,7 +35,9 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
     c("KeySlots.rdf", "Mead.Pool Elevation", "EOCY", NA, "DecElev",
     "KeySlots.rdf", "PowellOperation.PowellWYRelease", "EOCY", .000001, "WYRelease",
     "Check.rdf", "TotVal.Mead", "AnnualSum", NA, "nfAbvMead",
-    "Check.rdf", "TotVal.BelowMead", "AnnualSum", NA, "nfBelowMead"),
+    "Check.rdf", "TotVal.BelowMead", "AnnualSum", NA, "nfBelowMead",
+    "BankAnn.rdf", "Mead Bank.California Take Schedule", "AnnualRaw", .001, "mwdTake",
+    "BankAnn.rdf", "Mead Bank.California Put Schedule", "AnnualRaw", .001, "mwdPut"),
     byrow = TRUE,
     ncol = 5
   ))
@@ -53,8 +55,9 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
     filter(Year == dataYear) %>%
     group_by(Scenario, Year, Trace) %>%
     spread(Variable, Value) %>%
-    mutate(lbGains = nfAbvMead + nfBelowMead) %>%
-    select(-nfAbvMead, -nfBelowMead)
+    mutate(lbGains = nfAbvMead + nfBelowMead,
+           mwdIcs = mwdPut/.95 - mwdTake) %>%
+    select(-nfAbvMead, -nfBelowMead, -mwdTake, -mwdPut)
   lbAvg <- mean(zz$lbGains)
   
   zzMon <- zzMon %>%
@@ -73,7 +76,8 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
     mutate(lbGains = paste0(round(lbGains/lbAvg*100,0), "%"),
            Trace = as.factor(Trace + 1905),
            powellOut = as.factor(powellOut),
-           WYRelease = round(WYRelease,2)) %>%
+           WYRelease = round(WYRelease,2),
+           mwdIcs = as.factor(mwdIcs)) %>%
     rename(LBPrct = lbGains, OND.Release = powellOut, HydrologyYear = Trace)
     
   
@@ -85,7 +89,7 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
   } else {
     stop('invalid filterOn passed to plotFirstYearShortCond')
   }
-  on.exit()
+
   zz
 }
 
@@ -106,13 +110,13 @@ plotFirstYearShortCond <- function(model, iFile, scenario, filterOn = 'shortage'
   gradLabs <- round(seq(gradLabs[1],gradLabs[2],length = 5),1)
 
   # label points with LB prct of avg.
-  gg <- ggplot(zz, aes(HydrologyYear, DecElev, shape = OND.Release, color = WYRelease,
+  gg <- ggplot(zz, aes(HydrologyYear, DecElev, shape = OND.Release, color = mwdIcs,
                        label = LBPrct))
   gg <- gg + geom_point(size = 4) + 
     geom_hline(aes(yintercept = 1075),linetype = 2) + 
-    scale_color_gradient(paste0('Powell WY ',dataYear,'\nRelease [MAF]'), low = 'red', 
-                         high = 'blue', breaks = gradLabs) + 
-    geom_text(hjust = .4, vjust = -.6,size = 3.5) + 
+    #scale_color_gradient(paste0('Powell WY ',dataYear,'\nRelease [MAF]'), low = 'red', 
+                         #high = 'blue', breaks = gradLabs) + 
+    geom_text(hjust = .4, vjust = -.8,size = 3.5) + 
     labs(shape = paste0('Powell Oct-Dec\n',dataYear,' Release [MAF]'), x = paste0(dataYear,' Hydrology from Year'),
          y = paste0('Mead End-of-December ',dataYear,' elevation [ft]')) +
     scale_y_continuous(minor_breaks = 900:1200, breaks = seq(900,1200,1), label = comma) +

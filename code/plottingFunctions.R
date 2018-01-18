@@ -134,8 +134,7 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
 # legLoc is the location of the legend
 # nC is number of columns in legend
 # annSize is the size of the annotation
-plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4,
-                          annSize = 3)
+plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4)
 {
   varName <- stringr::str_wrap(csVarNames(), 14)
   names(varName) <- names(csVarNames())
@@ -172,8 +171,8 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
       legend.key.size = unit(2, "line")
     ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    annotate('text', x = min(yrs), y = .95, label = annText, vjust=0, hjust=0,size = annSize) + 
-    labs(y = 'Percent of Traces')
+    #annotate('text', x = min(yrs), y = .95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    labs(y = 'Percent of Traces', caption = annText)
   gg
 }
 
@@ -226,7 +225,7 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
 }
 
 
-plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
+plotShortStackedBar <- function(zz, yrs, annText)
 {
   varName <- c("lbShortageStep1" = "Step 1 Shortage",
              "lbShortageStep2" = "Step 2 Shortage",
@@ -262,8 +261,8 @@ plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
       legend.position = "bottom"
     ) +
     scale_fill_discrete(guide = guide_legend(title = '')) + 
-    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier') +
-    annotate('text', x = min(zz$Year), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize)
+    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier',
+         caption = annText)
   gg
 }
 
@@ -279,6 +278,7 @@ getSingleVarData <- function(zz, yrs, var)
 formatSimpleTable <- function(zz, scenNames, yrs)
 {
   zzRound <- round(zz,0)
+  zzRound[3,] <- zzRound[2,] - zzRound[1,]
 
   zzRound <- matrix(paste0(zzRound,'%'),nrow = nrow(zz), byrow = F)
 
