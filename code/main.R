@@ -33,24 +33,24 @@ source('code/plotFirstYearShortCond.R')
 
 # "switches" to create/not create different figures
 # get/don't get the data
-getSysCondData <- FALSE
-getPeData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
 # typical figures
-makeFiguresAndTables <- FALSE
+makeFiguresAndTables <- TRUE
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
-addPEScatterFig <- TRUE
+addPEScatterFig <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'M:/Shared/CRSS/2017/Scenario'
+iFolder <- "M:/Shared/CRSS/2018/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Aug2017'
+crssMonth <- "Jan2018PowerRun"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -67,7 +67,8 @@ crssMonth <- 'Aug2017'
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list(
-  "April 2017" = makeAllScenNames("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
+  #"April 2017" = makeAllScenNames("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
+  "January 2018" = "Jan2018_2018,DNF,2007Dems,IG,Most",
   "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
 )
 
@@ -77,12 +78,13 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  'April 2017' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  #'April 2017' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
+  "January 2018" = c(3622.85, 1082.52),
   "August 2017" = c(3627.34, 1083.46)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('April 2017' = '17-Dec', "August 2017" = "17-Dec")
+icMonth <- c('January 2018' = '17-Dec', "August 2017" = "17-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -90,7 +92,7 @@ icMonth <- c('April 2017' = '17-Dec', "August 2017" = "17-Dec")
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('April 2017' = 'April 2017', "August 2017" = "August 2017")
+ss5 <- c('January 2018' = 'January 2018', "August 2017" = "August 2017")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
@@ -102,15 +104,15 @@ yy5 <- 2018:2022
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'August 2017'
-mainScenGroup.name <- 'April 2017 DNF 2015'
-annText <- 'Results from April 2017 CRSS Run' # text that will be added to figures
+mainScenGroup <- 'January 2018'
+mainScenGroup.name <- 'January 2018'
+annText <- 'Results from January 2018 CRSS Run' # text that will be added to figures
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2060 # years to show the crit stats figures
-peYrs <- 2017:2060 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2018:2026 # years to show the crit stats figures
+peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
@@ -136,10 +138,10 @@ scenario <- scens[[mainScenGroup]]
 yearToAnalyze <- 2018
 shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2019'
 #shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
-shortCondSubTitle <- "Results from the August 2017 CRSS run, based on initial conditions from the August 2017 24-Month Study"
+shortCondSubTitle <- "Results from the January 2018 CRSS run, based on observed December 31, 2017 conditions."
 # the label for the percent of average; comment one of the following two out
 lbLabel <- 'LB total side inflow percent\nof average (1981-2015)' # for MTOM
-lbLabel <- "Total LB nataural inflow percent\nof average (1906-2015)" # for CRSS
+lbLabel <- "Total LB natural inflow percent\nof average (1906-2015)" # for CRSS
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -167,9 +169,12 @@ if(!all(names(scens) %in% names(icList), names(icList) %in% names(scens),
 if(!all(names(ss5) %in% names(scens)))
   stop("scenario goup names of ss5 must match the names found in scens")
 
-message('Scenario data will be read in from: ', iFolder)
-if(!file.exists(iFolder))
-  stop(iFolder, ' does not exist. Please ensure iFolder is set correctly.')
+# onlyl check if reading in data if you have to getData
+if(getPeData | getSysCondData){
+  message('Scenario data will be read in from: ', iFolder)
+  if(!file.exists(iFolder))
+    stop(iFolder, ' does not exist. Please ensure iFolder is set correctly.')
+}
 
 # folder location to save figures and fully procssed tables
 if(!file.exists(CRSSDIR))
@@ -229,7 +234,7 @@ if(getSysCondData){
     file.path(resFolder,sysCondFile),
     TRUE,
     'aggFromScenList', 
-    CRSSIO::sysCondSALMatrix()
+    CRSSIO::sys_cond_matrix()
   )
   message('finished getSysCondData')
 }
@@ -253,7 +258,7 @@ if(makeFiguresAndTables){
     # trim to specified years and the current main scenario group 
     dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
   # create the system cond. table
-  sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
+  sysTable <- CRSSIO::crsso_get_sys_cond_table(sysCond, yrs2show)
   # save the sys cond table
   data.table::fwrite(as.data.frame(sysTable[['fullTable']]), file.path(oFigs,sysCondTable), row.names = TRUE)
   
@@ -442,9 +447,9 @@ if(createShortConditions){
           'You may need to update the values and re-run main.R')
   # filterOn being set to pe shows results for traces that are <= 1077
   shortCond <- plotFirstYearShortCond(conditionsFrom, resFile, scenario, filterOn = 'pe', yearToAnalyze)
-  shortCond <- shortCond + annotate('segment', x = 7.2, xend = 6.4, y = 1070.4, yend = 1070.7, 
+  shortCond <- shortCond + annotate('segment', x = 5.45, xend = 3.9, y = 1071.6, yend = 1072.1, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
-    annotate('text', x = 7.3, y = 1070.3,label = lbLabel, size = 4, hjust = 0) +
+    annotate('text', x = 5.5, y = 1071.3,label = lbLabel, size = 4, hjust = 0) +
     ggtitle(shortCondTitle, subtitle = shortCondSubTitle)
   
   pdf(file.path(oFigs,shortCondFig),width = 9, height = 6)
