@@ -99,28 +99,44 @@ plotFirstYearShortCond <- function(model, iFile, scenario, filterOn = 'shortage'
 {
   if(model == "MTOM"){
     zz <- getMTOMConditionsData(iFile, filterOn)
+    colorVar <- "WYRelease"
   } else if(model == "CRSS"){
     zz <- getCRSSConditionsData(iFile, scenario, filterOn, dataYear)
+    colorVar <- "mwdIcs"
   } else {
     stop("invalid model passed to plotFirstYearShortCond")
   }
   
-
   gradLabs <- round(range(zz$WYRelease),1)
   gradLabs <- round(seq(gradLabs[1],gradLabs[2],length = 5),1)
 
   # label points with LB prct of avg.
-  gg <- ggplot(zz, aes(HydrologyYear, DecElev, shape = OND.Release, color = mwdIcs,
-                       label = LBPrct))
-  gg <- gg + geom_point(size = 4) + 
+  gg <- ggplot(zz, aes_string(
+    "HydrologyYear", 
+    "DecElev", 
+    shape = "OND.Release", 
+    color = colorVar,
+    label = "LBPrct"
+  ))
+  gg <- gg + 
+    geom_point(size = 4) + 
     geom_hline(aes(yintercept = 1075),linetype = 2) + 
-    #scale_color_gradient(paste0('Powell WY ',dataYear,'\nRelease [MAF]'), low = 'red', 
-                         #high = 'blue', breaks = gradLabs) + 
-    geom_text(hjust = .4, vjust = -.8,size = 3.5) + 
-    labs(shape = paste0('Powell Oct-Dec\n',dataYear,' Release [MAF]'), x = paste0(dataYear,' Hydrology from Year'),
-         y = paste0('Mead End-of-December ',dataYear,' elevation [ft]')) +
+    geom_text(hjust = .4, vjust = -0.8,size = 3.5) + 
+    labs(
+      shape = paste0('Powell Oct-Dec\n',dataYear,' Release (maf)'), 
+      x = paste0(dataYear,' Hydrology from Year'),
+      y = paste0('Mead End-of-December ',dataYear,' elevation (feet)')
+    ) +
     scale_y_continuous(minor_breaks = 900:1200, breaks = seq(900,1200,1), label = comma) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    coord_cartesian(ylim = c(round(min(zz$DecElev),0)-1.2,max(c(1075,zz$DecElev))+.5))
+    coord_cartesian(
+      ylim = c(round(min(zz$DecElev), 0) - 1.2, max(c(1075, zz$DecElev))+ 0.5))
+  
+  if (model == "MTOM") {
+    legName <- paste0('Powell WY ',dataYear,'\nRelease (maf)')
+    gg <- gg + 
+      scale_color_gradient(legName, low = 'red', high = 'blue')#, breaks = gradLabs,
+                           #labels = paste(gradLabs, "maf"))
+  }
   gg
 }
