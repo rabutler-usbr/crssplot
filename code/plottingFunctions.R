@@ -301,9 +301,9 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 }
 
 #' @param iData data frame that contains shortage and powell < 3490 variables
-#' @param scenNames a named character vector; names are the names that will show up in
-#'            the finished table and the entries are the Scenario Group variable
-#'            names that will be used to filter the scenarios
+#' @param scenNames a named character vector; names are the names that will show 
+#'   up in the finished table and the entries are the Scenario Group variable
+#'   names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
 create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
@@ -318,11 +318,12 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   
   i1 <- iData %>%
     filter(Year %in% yrs) %>%
-    filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
+    filter(Variable %in% c('lbShortage','powellLt3490'), 
+           Agg %in% names(scenNames)) %>%
     mutate(ScenName = scenNames[Agg]) %>%
     group_by(Year, Variable, ScenName) %>%
-    dplyr::summarise(PrctTraces = mean(Value)*100) # multiply by 100 to display as
-  # percent instead of decimal
+    # multiply by 100 to display as percent instead of decimal
+    dplyr::summarise(PrctTraces = mean(Value)*100) 
   
   shortTable <- i1 %>%
     filter(Variable == 'lbShortage') %>%
@@ -366,9 +367,31 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   gg <- qplot(1:7,1:7,geom = 'blank') + theme_bw() +
     theme(line = element_blank(), text = element_blank()) +
     annotation_custom(grob = pGrob, xmin = 0, ymin = 2,xmax = 7, ymax = 6) + 
-    annotation_custom(grob = shortGrob, xmin = 0, ymin = 4,xmax = 6, ymax = 7.2) +
-    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 4, fontface = 'bold') +
-    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 4, fontface = 'bold')
+    annotation_custom(
+      grob = shortGrob, 
+      xmin = 0, 
+      ymin = 4,
+      xmax = 6, 
+      ymax = 7.2
+    ) +
+    annotate(
+      "text", 
+      x = 1.5, 
+      y = 4.65, 
+      label = pLabel, 
+      hjust = 0, 
+      size = 4, 
+      fontface = "bold"
+    ) +
+    annotate(
+      "text", 
+      x = 1.5, 
+      y = 6.25, 
+      label = shortLabel, 
+      hjust = 0, 
+      size = 4, 
+      fontface = "bold"
+    )
   
   if(!is.na(addFootnote)){
     gg <- gg +
