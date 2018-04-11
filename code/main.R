@@ -12,7 +12,7 @@ if(packageVersion("RWDataPlyr") < "0.5.0"){
   devtools::install_github("BoulderCodeHub/RWDataPlyr")
 }
 library(data.table)
-source("code/plot_nameFunctions.r")
+source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
 source('code/getICPEData.R')
@@ -32,22 +32,22 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
 makeFiguresAndTables <- TRUE
-createSimple5yrTable <- FALSE
+createSimple5yrTable <- TRUE
 
-createShortConditions <- FALSE
-computeConditionalProbs <- FALSE
-addPEScatterFig <- FALSE
+createShortConditions <- TRUE
+computeConditionalProbs <- TRUE
+addPEScatterFig <- TRUE
 
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'C:/alan/CRSS/CRSS.2016/Scenario'
+iFolder <- 'Z:/Shared/CRSS/2018/Scenario_dev'
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Apr2017_otherHydrology'
+crssMonth <- 'Jan2018_Official'
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -63,9 +63,9 @@ crssMonth <- 'Apr2017_otherHydrology'
 # entry
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
-scens <- list(
-  "April 2017" = "Apr2016_2017,DNF,2007Dems,IG"
-)
+scens <- list('January 2018' = makeAllScenNames('Jan2018_2019','DNF','2007Dems','IG',c(1981:2015)),
+             'August 2017' = makeAllScenNames('Aug2017_2018', 'DNF', '2007Dems', 'IG', 'Most')
+            )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 
@@ -73,12 +73,12 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  #'April 2017 - 1906-2014 resampled' = file.path(CRSSDIR, "dmi/InitialConditions/april_2017/MTOM2CRSS_Monthly.xlsx"),
-  "April 2017" = c(3700, 1085)
+  "January 2018" = file.path(CRSSDIR, "dmi/InitialConditions/jan_2019Start/MtomToCrss_Monthly.xlsx"),
+  "August 2017" = c(3627.34, 1083.46)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('April 2017' = '17-Dec')
+icMonth <- c('August 2017'='17-Dec','January 2018' = '18-Dec')
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -86,7 +86,7 @@ icMonth <- c('April 2017' = '17-Dec')
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('April 2017' = 'April 2017')
+ss5 <- c('August 2017' = 'August 2017','January 2018'='January 2018')
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
@@ -96,24 +96,24 @@ tableFootnote <- NA
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'April 2017'
-mainScenGroup.name <- 'April 2017'
+mainScenGroup <- 'January 2018'
+mainScenGroup.name <- 'January 2018'
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2060 # years to show the crit stats figures
-peYrs <- 2017:2060 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2018:2026 # years to show the crit stats figures
+peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # -------------------------------
 # plot a single year of Mead PE
-peScatterYear <- 2017
+peScatterYear <- 2018
 # peScatterData should be set to either MTOM or CRSS
 # if relying on combined run, then this is likely MTOM; if using a CRSS only run,
 # then likely set to CRSS
 peScatterData <- 'MTOM'
 
-annText <- 'Results from April 2017 CRSS Run' # text that will be added to figures
+annText <- 'Results from January 2018 CRSS Run' # text that will be added to figures
 
 # -------------------------------
 # Conditions leading to shortage from MTOM
@@ -121,12 +121,12 @@ annText <- 'Results from April 2017 CRSS Run' # text that will be added to figur
 mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #changed to may b/c jun results file DNE
 # yearToAnalyze is used in the plot labeling. This is typically the first year
 # of the MTOM run, e.g., 2017 for a January 2017 MTOM run
-yearToAnalyze <- 2017
-shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2018'
-shortCondSubTitle <- 'Results from the January 2017 MTOM run based on the January 17, 2017 CBRFC forecast' 
+yearToAnalyze <- 2018
+shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2019'
+shortCondSubTitle <- 'Results from the January 2018 MTOM run based on the January 2, 2018 CBRFC forecast' 
   
 # years to use for the simple 5-year table
-yy5 <- 2018:2022
+yy5 <- 2019:2023
 
 #                               END USER INPUT
 # -----------------------------------------------------------------------------
@@ -201,7 +201,7 @@ shortCondFig <- 'shortConditionsFig.pdf'
 
 simple5YrFile <- '5yrSimple.pdf'
 
-traceMap <- read.csv('data/Trace2IcMap.csv')
+traceMap <- read.csv('C:/RCodes/Official_Run/Process-CRSS-Res-master/data/Trace2IcMap.csv')
 
 # -----------------------------------------------------------------------------
 #       Process results
@@ -224,7 +224,7 @@ if(getSysCondData){
 if(getPeData){
   ## get the Mead and Powel EOCY Data
   getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
-                  'aggFromScenList', 'data/MPPEStats_sam.csv')
+                  'aggFromScenList', 'C:/RCodes/Official_Run/Process-CRSS-Res-master/data/MPPEStats_sam.csv')
   ## append initial conditions onto May data
   getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
                  file.path(resFolder,curMonthPEFile), icList, icMonth, 
@@ -451,7 +451,7 @@ if(createSimple5yrTable){
 
 if(addPEScatterFig){
   message("elevation scatter plot figure")
-  
+  ### This did not properly compile for the January run.
   if(peScatterData == "CRSS"){
     pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
       filter(Agg == mainScenGroup)
