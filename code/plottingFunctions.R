@@ -134,8 +134,7 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle 
 # legLoc is the location of the legend
 # nC is number of columns in legend
 # annSize is the size of the annotation
-plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4,
-                          annSize = 3)
+plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4)
 {
   varName <- stringr::str_wrap(csVarNames(), 14)
   names(varName) <- names(csVarNames())
@@ -172,8 +171,8 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
       legend.key.size = unit(2, "line")
     ) +
     scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    annotate('text', x = min(yrs), y = .95, label = annText, vjust=0, hjust=0,size = annSize) + 
-    labs(y = 'Percent of Traces')
+    #annotate('text', x = min(yrs), y = .95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    labs(y = 'Percent of Traces', caption = annText)
   gg
 }
 
@@ -226,7 +225,7 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
 }
 
 
-plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
+plotShortStackedBar <- function(zz, yrs, annText)
 {
   varName <- c("lbShortageStep1" = "Step 1 Shortage",
              "lbShortageStep2" = "Step 2 Shortage",
@@ -262,8 +261,8 @@ plotShortStackedBar <- function(zz, yrs, annText, annSize = 4)
       legend.position = "bottom"
     ) +
     scale_fill_discrete(guide = guide_legend(title = '')) + 
-    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier') +
-    annotate('text', x = min(zz$Year), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize)
+    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier',
+         caption = annText)
   gg
 }
 
@@ -279,6 +278,7 @@ getSingleVarData <- function(zz, yrs, var)
 formatSimpleTable <- function(zz, scenNames, yrs)
 {
   zzRound <- round(zz,0)
+  zzRound[3,] <- zzRound[2,] - zzRound[1,]
 
   zzRound <- matrix(paste0(zzRound,'%'),nrow = nrow(zz), byrow = F)
 
@@ -301,9 +301,9 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 }
 
 #' @param iData data frame that contains shortage and powell < 3490 variables
-#' @param scenNames a named character vector; names are the names that will show up in
-#'            the finished table and the entries are the Scenario Group variable
-#'            names that will be used to filter the scenarios
+#' @param scenNames a named character vector; names are the names that will show 
+#'   up in the finished table and the entries are the Scenario Group variable
+#'   names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
 create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
@@ -318,10 +318,12 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   
   i1 <- iData %>%
     filter(Year %in% yrs) %>%
-    filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
+    filter(Variable %in% c('lbShortage','powellLt3490'), 
+           Agg %in% names(scenNames)) %>%
     mutate(ScenName = scenNames[Agg]) %>%
     group_by(Year, Variable, ScenName) %>%
-    dplyr::summarise(PrctTraces = mean(Value)*100)
+    # multiply by 100 to display as percent instead of decimal
+    dplyr::summarise(PrctTraces = mean(Value)*100) 
   
   shortTable <- i1 %>%
     filter(Variable == 'lbShortage') %>%
@@ -367,9 +369,31 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   gg <- qplot(1:7,1:7,geom = 'blank') + theme_bw() +
     theme(line = element_blank(), text = element_blank()) +
     annotation_custom(grob = pGrob, xmin = 0, ymin = 2,xmax = 7, ymax = 6) + 
-    annotation_custom(grob = shortGrob, xmin = 0, ymin = 4,xmax = 6, ymax = 7.2) +
-    annotate('text', x = 1.5, y = 4.65, label = pLabel, hjust = 0, size = 4, fontface = 'bold') +
-    annotate('text', x = 1.5, y = 6.25, label = shortLabel, hjust = 0, size = 4, fontface = 'bold')
+    annotation_custom(
+      grob = shortGrob, 
+      xmin = 0, 
+      ymin = 4,
+      xmax = 6, 
+      ymax = 7.2
+    ) +
+    annotate(
+      "text", 
+      x = 1.5, 
+      y = 4.65, 
+      label = pLabel, 
+      hjust = 0, 
+      size = 4, 
+      fontface = "bold"
+    ) +
+    annotate(
+      "text", 
+      x = 1.5, 
+      y = 6.25, 
+      label = shortLabel, 
+      hjust = 0, 
+      size = 4, 
+      fontface = "bold"
+    )
   
   if(!is.na(addFootnote)){
     gg <- gg +
