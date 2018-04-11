@@ -4,3 +4,5 @@ KeySlots.rdf,Shortage.ShortageFlag,EOCY,100
 KeySlots.rdf,Powell.Pool Elevation,WYMinLTE,3490
 KeySlots.rdf,PowellOperation.PowellWYRelease,EOCY,0.000001
 KeySlots.rdf,Surplus.SurplusFlag,EOCY,100
+Res.rdf,Mead.Storage,EOCY,NA
+Res.rdf,Powell.Storage,EOCY,NA

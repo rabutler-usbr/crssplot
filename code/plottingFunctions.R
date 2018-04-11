@@ -321,7 +321,7 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
     filter(Variable %in% c('lbShortage','powellLt3490'), Agg %in% names(scenNames)) %>%
     mutate(ScenName = scenNames[Agg]) %>%
     group_by(Year, Variable, ScenName) %>%
-    dplyr::summarise(PrctTraces = mean(Value))
+    dplyr::summarise(PrctTraces = mean(Value)*100)
   
   shortTable <- i1 %>%
     filter(Variable == 'lbShortage') %>%
@@ -333,6 +333,7 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   rns <- c(shortTable$ScenName)
   
   shortTable <- select(shortTable, -ScenName)
+  shortTable <- round(as.matrix(shortTable),0)
     
   shortTable <- as.matrix(rbind(shortTable, shortTable[2,] - shortTable[1,]))
   shortTable <- formatSimpleTable(shortTable, rns, yrs)
@@ -346,6 +347,7 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   rns <- c(pTable$ScenName)
   
   pTable <- select(pTable, -ScenName)
+  pTable <- round(as.matrix(pTable),0)
   
   pTable <- as.matrix(rbind(pTable, pTable[2,] - pTable[1,]))
   pTable <- formatSimpleTable(pTable, rns, paste('WY',yrs))
