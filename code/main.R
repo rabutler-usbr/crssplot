@@ -2,6 +2,11 @@
 rm(list=ls())
 
 library(CRSSIO)
+if(packageVersion("CRSSIO") < "0.6.0"){
+  detach("package:CRSSIO")
+  devtools::install_github("BoulderCodeHub/CRSSIO")
+  library(CRSSIO)
+}
 library(tidyverse)
 library(grid)
 library(feather)
@@ -9,7 +14,9 @@ library(stringr)
 library(RWDataPlyr)
 if(packageVersion("RWDataPlyr") < "0.5.0"){
   # need 0.5.0 or higher for makeAllScenNames
+  detach("package:RWDataPlyr")
   devtools::install_github("BoulderCodeHub/RWDataPlyr")
+  library(RWDataPlyr)
 }
 library(data.table)
 source('code/plot_nameFunctions.r')
@@ -20,9 +27,9 @@ source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
 
-# -----------------------------------------------------------------------------
-#                                    USER INPUT
-# -----------------------------------------------------------------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    -------------------        USER INPUT        ----------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
@@ -32,22 +39,24 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- TRUE
-getPeData <- TRUE
-makeFiguresAndTables <- TRUE
-createSimple5yrTable <- TRUE
+getSysCondData <- FALSE
+getPeData <- FALSE
+# typical figures
+makeFiguresAndTables <- FALSE
+createSimple5yrTable <- FALSE
 
+# optional figures/tables
 createShortConditions <- TRUE
-computeConditionalProbs <- TRUE
-addPEScatterFig <- TRUE
+computeConditionalProbs <- FALSE
+addPEScatterFig <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- 'Z:/Shared/CRSS/2018/Scenario_dev'
+iFolder <- "M:/Shared/CRSS/2018/Scenario_dev"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- 'Jan2018_Official'
+crssMonth <- "Jan2018"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -63,9 +72,12 @@ crssMonth <- 'Jan2018_Official'
 # entry
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
-scens <- list('January 2018' = makeAllScenNames('Jan2018_2019','DNF','2007Dems','IG',c(1981:2015)),
-             'August 2017' = makeAllScenNames('Aug2017_2018', 'DNF', '2007Dems', 'IG', 'Most')
-            )
+scens <- list(
+  #"April 2017" = makeAllScenNames("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
+  
+  "January 2018" = makeAllScenNames("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
+  "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
+)
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 
@@ -78,26 +90,29 @@ icList <- list(
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c('August 2017'='17-Dec','January 2018' = '18-Dec')
+icMonth <- c("January 2018" = "18-Dec", "August 2017" = "17-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
-# the names are the new names that should show up in the table incase you need to 
+# the names are the new names that should show up in the table in case you need to 
 # add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run second
 # there should only be 2 scenarios
-ss5 <- c('August 2017' = 'August 2017','January 2018'='January 2018')
+ss5 <- c("August 2017" = "August 2017", "January 2018" = "January 2018")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
+# years to use for the simple 5-year table
+yy5 <- 2019:2023
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- 'January 2018'
-mainScenGroup.name <- 'January 2018'
+mainScenGroup <- "January 2018"
+mainScenGroup.name <- "January 2018"
+annText <- 'Results from January 2018 CRSS Run' # text that will be added to figures
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
@@ -105,7 +120,7 @@ colorLabel <- 'Scenario'
 yrs2show <- 2018:2026 # years to show the crit stats figures
 peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
 
-# -------------------------------
+# mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
 peScatterYear <- 2018
 # peScatterData should be set to either MTOM or CRSS
@@ -113,27 +128,40 @@ peScatterYear <- 2018
 # then likely set to CRSS
 peScatterData <- 'MTOM'
 
-annText <- 'Results from January 2018 CRSS Run' # text that will be added to figures
+conditionsFrom <- "MTOM" # string should be either CRSS or MTOM
 
-# -------------------------------
-# Conditions leading to shortage from MTOM
-# mtom results file for creating conditions leading to shortage in 2016
-mtomResFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/JanMTOMResults.csv') #changed to may b/c jun results file DNE
 # yearToAnalyze is used in the plot labeling. This is typically the first year
 # of the MTOM run, e.g., 2017 for a January 2017 MTOM run
 yearToAnalyze <- 2018
-shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2019'
-shortCondSubTitle <- 'Results from the January 2018 MTOM run based on the January 2, 2018 CBRFC forecast' 
+if (conditionsFrom == "CRSS") {
+  resFile <- iFolder
+  # set scenario to NA if using MTOM or to the main scenario folder if using CRSS
+  scenario <- scens[[mainScenGroup]]
   
-# years to use for the simple 5-year table
-yy5 <- 2019:2023
+  # the label for the percent of average
+  lbLabel <- "Total LB natural inflow percent\nof average (1906-2015)"
+  shortCondSubTitle <- "Results from the January 2018 CRSS run, based on observed December 31, 2017 conditions."
+} else if (conditionsFrom == "MTOM") {
+  # see doc/README for instructions for how to create this csv file
+  resFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/Jan2018MTOMResults.csv') 
+  scenario <- NA
+  
+  # the label for the percent of average
+  lbLabel <- 'LB total side inflow percent\nof average (1981-2015)'
+  shortCondSubTitle <- 'Results from the January 2018 MTOM run based on the January 3, 2017 CBRFC forecast' 
+  
+} else {
+  stop("Invalid `conditionsFrom` value.")
+}
+
+shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2019'
 
 #                               END USER INPUT
-# -----------------------------------------------------------------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# -----------------------------------------------------------------------------
-#       SETUP DIRECTORIES AND FILENAMES
-# -----------------------------------------------------------------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    --------------      SETUP DIRECTORIES AND FILENAMES   -----------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # some sanity checks that UI is correct:
 if(!(mainScenGroup %in% names(scens)))
@@ -154,9 +182,12 @@ if(!all(names(scens) %in% names(icList), names(icList) %in% names(scens),
 if(!all(names(ss5) %in% names(scens)))
   stop("scenario goup names of ss5 must match the names found in scens")
 
-message('Scenario data will be read in from: ', iFolder)
-if(!file.exists(iFolder))
-  stop(iFolder, ' does not exist. Please ensure iFolder is set correctly.')
+# onlyl check if reading in data if you have to getData
+if(getPeData | getSysCondData){
+  message('Scenario data will be read in from: ', iFolder)
+  if(!file.exists(iFolder))
+    stop(iFolder, ' does not exist. Please ensure iFolder is set correctly.')
+}
 
 # folder location to save figures and fully procssed tables
 if(!file.exists(CRSSDIR))
@@ -216,7 +247,7 @@ if(getSysCondData){
     file.path(resFolder,sysCondFile),
     TRUE,
     'aggFromScenList', 
-    CRSSIO::sysCondSALMatrix()
+    CRSSIO::sys_cond_matrix()
   )
   message('finished getSysCondData')
 }
@@ -240,7 +271,7 @@ if(makeFiguresAndTables){
     # trim to specified years and the current main scenario group 
     dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
   # create the system cond. table
-  sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
+  sysTable <- CRSSIO::crsso_get_sys_cond_table(sysCond, yrs2show)
   # save the sys cond table
   data.table::fwrite(as.data.frame(sysTable[['fullTable']]), file.path(oFigs,sysCondTable), row.names = TRUE)
   
@@ -420,23 +451,29 @@ if(computeConditionalProbs){
   data.table::fwrite(cpt1,paste0(oFigs,condProbFile),row.names = F)
 }
 
+# conditions leading to shortage ---------------------------------
 # pulled annotation out of generic function
 if(createShortConditions){
-  lbLabel <- 'LB total side inflow percent\nof average (1981-2015)'
-  message('Using hard coded values for the arror in the shortage conditions figure.\n',
+  if(length(resFile) > 1)
+    stop("conditions leading to shortage is only designed to work with 1 scenario of data, at this point")
+  
+  message('Using hard coded values for the arrow in the shortage conditions figure.\n',
           'You may need to update the values and re-run main.R')
   # filterOn being set to pe shows results for traces that are <= 1077
-  shortCond <- plotFirstYearShortCond(mtomResFile, filterOn = 'pe', yearToAnalyze)
-  shortCond <- shortCond + annotate('segment', x = 7.2, xend = 6.4, y = 1070.4, yend = 1070.7, 
+  shortCond <- plotFirstYearShortCond(conditionsFrom, resFile, scenario, filterOn = 'pe', yearToAnalyze)
+  shortCond <- shortCond + 
+    annotate('segment', x = 5.55, xend = 4.3, y = 1069.6, yend = 1068.85, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
-    annotate('text', x = 7.3, y = 1070.3,label = lbLabel, size = 4, hjust = 0) +
-    ggtitle(shortCondTitle, subtitle = shortCondSubTitle)
+    annotate('text', x = 5.65, y = 1069.6,label = lbLabel, size = 4, hjust = 0) +
+    ggtitle(shortCondTitle, subtitle = shortCondSubTitle) +
+    theme(legend.title = element_text(size = 10))
   
   pdf(file.path(oFigs,shortCondFig),width = 9, height = 6)
   print(shortCond)
   dev.off()
 }
 
+# 5 year simple table -------------------------
 if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
   message("creating 5-year simple table")
@@ -449,6 +486,7 @@ if(createSimple5yrTable){
   rm(zz)
 }
 
+# mead pe scatter ------------------
 if(addPEScatterFig){
   message("elevation scatter plot figure")
   ### This did not properly compile for the January run.
@@ -456,13 +494,29 @@ if(addPEScatterFig){
     pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
       filter(Agg == mainScenGroup)
   } else if(peScatterData == "MTOM"){
-    pe <- read.csv(icList[[mainScenGroup]][2]) %>%
-      gather(Trace, Value, -X) %>%
-      mutate(Trace = getMTOMTraceNumber(Trace, t1 = 1981, tLen = 35),
-             Year = as.numeric(paste0('20', stringr::str_split_fixed(X,'-',2)[,1])),
-             Month = stringr::str_split_fixed(X,'-',2)[,2],
-             Variable = 'Mead.Pool Elevation') %>%
-      filter(Month == 'Dec')
+
+    icDim <- 1981:2015
+    tmpIcMonth <- paste(str_replace(peScatterYear, "20", ""), "Dec", sep = "-")
+    decVals <- do.call(
+      rbind, 
+      lapply(icDim, get1TraceIc, icList[[mainScenGroup]], tmpIcMonth, traceMap)
+    )
+    traceNum <- traceMap$trace[match(icDim, traceMap$ic)]
+    
+    pe <- decVals %>%
+      select(`Mead.Pool Elevation`) %>%
+      rename(Value = `Mead.Pool Elevation`) %>%
+      mutate(Trace = as.numeric(traceNum), 
+             Year = peScatterYear,
+             Variable = "Mead.Pool Elevation")
+    
+    # pe <- read.csv(icList[[mainScenGroup]][2]) %>%
+    #   gather(Trace, Value, -X) %>%
+    #   mutate(Trace = getMTOMTraceNumber(Trace, t1 = 1981, tLen = 35),
+    #          Year = as.numeric(paste0('20', stringr::str_split_fixed(X,'-',2)[,1])),
+    #          Month = stringr::str_split_fixed(X,'-',2)[,2],
+    #          Variable = 'Mead.Pool Elevation') %>%
+    #   filter(Month == 'Dec')
   } else{
     stop("Invalid peScatterData variable")
   }
@@ -472,7 +526,8 @@ if(addPEScatterFig){
   gg <- singleYearPEScatter(pe, peScatterYear, 'Mead.Pool Elevation', 
                           scatterTitle, TRUE)
   
-  pdf(file.path(oFigs,paste0('meadScatterFigure_',peScatterYear,'.pdf')), width = 8, height = 6)
+  tpath <- file.path(oFigs,paste0('meadScatterFigure_',peScatterYear,'.pdf'))
+  pdf(tpath, width = 8, height = 6)
   print(gg)
   dev.off()
 }
