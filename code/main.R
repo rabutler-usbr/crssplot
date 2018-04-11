@@ -1,6 +1,4 @@
 
-rm(list=ls())
-
 library(CRSSIO)
 if(packageVersion("CRSSIO") < "0.6.0"){
   detach("package:CRSSIO")
@@ -12,7 +10,7 @@ library(grid)
 library(feather)
 library(stringr)
 library(RWDataPlyr)
-if(packageVersion("RWDataPlyr") < "0.5.0"){
+if(packageVersion("RWDataPlyr") < "0.6.0"){
   # need 0.5.0 or higher for makeAllScenNames
   detach("package:RWDataPlyr")
   devtools::install_github("BoulderCodeHub/RWDataPlyr")
@@ -39,11 +37,11 @@ source('code/plotFirstYearShortCond.R')
 # can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
 # typical figures
-makeFiguresAndTables <- FALSE
-createSimple5yrTable <- FALSE
+makeFiguresAndTables <- TRUE
+createSimple5yrTable <- TRUE
 
 # optional figures/tables
 createShortConditions <- TRUE
@@ -52,11 +50,11 @@ addPEScatterFig <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
-CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- "M:/Shared/CRSS/2018/Scenario_dev"
+CRSSDIR <- "C:/alan/CRSS/CRSS.Offc_dev" #Sys.getenv("CRSS_DIR")
+iFolder <- "M:/Shared/CRSS/2018/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "Jan2018"
+crssMonth <- "Jan2018_check"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
 # scens should be a list, each entry is a scenario group name, and the entry is a 
@@ -73,9 +71,9 @@ crssMonth <- "Jan2018"
 icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
 
 scens <- list(
-  #"April 2017" = makeAllScenNames("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
+  #"April 2017" = rw_scen_gen_names("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
   
-  "January 2018" = makeAllScenNames("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
+  "January 2018" = rw_scen_gen_names("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
   "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
 )
 
@@ -117,8 +115,8 @@ annText <- 'Results from January 2018 CRSS Run' # text that will be added to fig
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2019:2026 # years to show the crit stats figures
+peYrs <- 2018:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
@@ -241,25 +239,46 @@ traceMap <- read.csv('data/Trace2IcMap.csv')
 ## System Conditions Table Data
 if(getSysCondData){
   message('starting getSysCondData')
+  
+  # create rwd_agg from sys_cond_matrix()
+  sys_mat <- CRSSIO::sys_cond_matrix()
+  sys_rwa <- rwd_agg(data.frame(
+    file = sys_mat[,1],
+    slot = sys_mat[,2],
+    period = "asis",
+    summary = NA,
+    eval = NA,
+    t_s = NA,
+    variable = sys_mat[,5],
+    stringsAsFactors = FALSE
+  ))
+  
   getScenarioData(
     scens, 
     iFolder, 
     file.path(resFolder,sysCondFile),
     TRUE,
     'aggFromScenList', 
-    CRSSIO::sys_cond_matrix()
+    sys_rwa
   )
   message('finished getSysCondData')
 }
 
 if(getPeData){
   ## get the Mead and Powel EOCY Data
+  message('starting getPeData')
+  pe_rwa <- rwd_agg(read.csv(
+    "data/MPPEStats_sam.csv", 
+    stringsAsFactors = FALSE
+  ))
   getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
-                  'aggFromScenList', 'data/MPPEStats_sam.csv')
+                  'aggFromScenList', pe_rwa)
   ## append initial conditions onto May data
   getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
                  file.path(resFolder,curMonthPEFile), icList, icMonth, 
                  TRUE, 'aggFromScenList', traceMap, icDimNumber = icDimNumber)
+  
+  message('finished getPeData')
 }
 
 if(makeFiguresAndTables){
