@@ -97,10 +97,10 @@ Start by editing the User input section of `main.R`:
 If you are creating the conditions leading to shortage figure, set`createShortConditions` to `TRUE` and follow these steps:
   
 1. Prepare files for the Conditions Leading to a Shortage. This figure Uses MTOM results to develop this figure. See CRSS_DIR/MTOM/FirstYearCondMTOM/[Month]_MTOM.xlsx for example.
-    1. Copy over Shortage.Shortage Flag, Powell.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
+    1. Copy over Shortage.Shortage Flag, Mead.Pool Elevation, Powell.Outflow, and PowellActualAnnual ReleaseVolume sheets from the MTOM ensemble spreadsheet
     1. Sum the Oct-Dec Powell.Outflow for current year
     1. Copy the 1981-2010 columns of the Oct-Dec release, WYRelease, Shortage, and Dec Elevation to the appropriate columns in the DataToExport worksheet.
-        * The LBPrct sheet should not change as long as the LB inflows are using 1981-2010
+        * The LBPrct sheet should not change as long as the LB inflows are using 1981-2015
     1. Export the DataToExport worksheet to csv file.
     1. Code to create the figure is called in main.R, but it is in plotFirstYearShortCond.R
         * **Will likely need to edit the x and y coordinates in the annotation calls in main.R**
