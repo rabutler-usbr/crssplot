@@ -5,10 +5,10 @@ if(packageVersion("CRSSIO") < "0.6.0"){
   devtools::install_github("BoulderCodeHub/CRSSIO")
   library(CRSSIO)
 }
-library(tidyverse)
-library(grid)
-library(feather)
-library(stringr)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(grid))
+suppressPackageStartupMessages(library(feather))
+suppressPackageStartupMessages(library(stringr))
 library(RWDataPlyr)
 if(packageVersion("RWDataPlyr") < "0.6.0"){
   # need 0.6.0 or higher for makeAllScenNames
@@ -16,7 +16,7 @@ if(packageVersion("RWDataPlyr") < "0.6.0"){
   devtools::install_github("BoulderCodeHub/RWDataPlyr")
   library(RWDataPlyr)
 }
-library(data.table)
+suppressPackageStartupMessages(library(data.table))
 source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
