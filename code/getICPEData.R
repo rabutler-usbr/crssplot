@@ -39,6 +39,8 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
 getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth, 
                            addAggAttribute = TRUE, aggFunction, traceMap, icDimNumber = 5)
 {
+ 
+  res <- read_feather(fileToAppend)
   
   icSave <- data.frame()
   
@@ -55,8 +57,16 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
         stop('Consider using csv file to input the initial conditions for the ',
              groupName, ' group.')
       }
-      mp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[2])
-      pp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icData[1])
+      mp <- data.frame(
+        'Scenario' = scens[[groupName]], 
+        'Value' = icData[2], 
+        stringsAsFactors = FALSE
+      )
+      pp <- data.frame(
+        'Scenario' = scens[[groupName]], 
+        'Value' = icData[1],
+        stringsAsFactors = FALSE
+      )
     } else{
       
       # apply function over all i.c. dimension for the current groupName
@@ -64,18 +74,27 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
       icDim <- stringr::str_split(scens[[groupName]], pattern = ',', simplify = TRUE)
       icDim <- icDim[,icDimNumber] # get only the i.c. dimension
       icVals <- do.call(rbind, lapply(icDim, get1TraceIc, icData, icMonth[[groupName]], traceMap))
-      mp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icVals$`Mead.Pool Elevation`)
-      pp <- data.frame('Scenario' = scens[[groupName]], 'Value' = icVals$`Powell.Pool Elevation`)
+      mp <- data.frame(
+        'Scenario' = scens[[groupName]], 
+        'Value' = icVals$`Mead.Pool Elevation`,
+        stringsAsFactors = FALSE
+      )
+      pp <- data.frame(
+        'Scenario' = scens[[groupName]], 
+        'Value' = icVals$`Powell.Pool Elevation`,
+        stringsAsFactors = FALSE
+      )
     }
     
     # add other attributes to data frame
     pp$Variable <- 'Powell.Pool Elevation'
     mp$Variable <- 'Mead.Pool Elevation'
     ic <- rbind(pp,mp)
-    ic$Trace <- 0
+    ic$TraceNumber <- 0
     ic$Year <- as.numeric(paste0('20',simplify2array(strsplit(icMonth,'-'))[1,j])) #2015
+    ic$Month <- "December"
     # order ic
-    ic <- select(ic, one_of(c('Scenario','Trace','Year','Variable','Value')))
+    ic <- select(ic, one_of(names(res)[names(res) != "Agg"]))
     
     # add same agg attribute
     if(addAggAttribute){      
@@ -90,8 +109,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
     
   }
   
-  res <- read_feather(fileToAppend)
   # append I.C. on to rest of April results
-  res <- rbind(icSave, res)
+  res <- bind_rows(icSave, res)
   write_feather(res, oFile)
 }

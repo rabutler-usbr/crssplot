@@ -1,24 +1,22 @@
 
-rm(list=ls())
-
 library(CRSSIO)
 if(packageVersion("CRSSIO") < "0.6.0"){
   detach("package:CRSSIO")
   devtools::install_github("BoulderCodeHub/CRSSIO")
   library(CRSSIO)
 }
-library(tidyverse)
-library(grid)
-library(feather)
-library(stringr)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(grid))
+suppressPackageStartupMessages(library(feather))
+suppressPackageStartupMessages(library(stringr))
 library(RWDataPlyr)
-if(packageVersion("RWDataPlyr") < "0.5.0"){
-  # need 0.5.0 or higher for makeAllScenNames
+if(packageVersion("RWDataPlyr") < "0.6.0"){
+  # need 0.6.0 or higher for makeAllScenNames
   detach("package:RWDataPlyr")
   devtools::install_github("BoulderCodeHub/RWDataPlyr")
   library(RWDataPlyr)
 }
-library(data.table)
+suppressPackageStartupMessages(library(data.table))
 source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
@@ -34,16 +32,16 @@ source('code/plotFirstYearShortCond.R')
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
 # store the intermediate data and figures/tables created here
-# iFolder is a path to the top level crss directory that contains the model output
-# it could be the same as CRSSDIR, but is allowed to be different so that you
-# can read model output from the server, but save figures locally.
+# iFolder is a path to the top level crss directory that contains the model 
+# output it could be the same as CRSSDIR, but is allowed to be different so that 
+# you can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
 getSysCondData <- FALSE
 getPeData <- FALSE
 # typical figures
-makeFiguresAndTables <- FALSE
-createSimple5yrTable <- FALSE
+makeFiguresAndTables <- TRUE
+createSimple5yrTable <- TRUE
 
 # optional figures/tables
 createShortConditions <- TRUE
@@ -53,29 +51,30 @@ addPEScatterFig <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- "M:/Shared/CRSS/2018/Scenario_dev"
+iFolder <- "M:/Shared/CRSS/2018/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "Jan2018"
+crssMonth <- "Jan2018_check"
 
-# scenarios are orderd model,supply,demand,policy,initial conditions (if initial conditions are used)
-# scens should be a list, each entry is a scenario group name, and the entry is a 
-# character vector of length 1 to n of individual scenarios. 
-# all of the values in each entry of the list are combined together and processed
-# as one scenario group. So for a run that has 30 initial conditions, all 30 runs are 
-# averaged/combined together. The names in the scens list (scenario Groups) will
-# be the Scenario names that show up on plots.
+# scenarios are orderd model,supply,demand,policy,initial conditions 
+# (if initial conditions are used) scens should be a list, each entry is a 
+# scenario group name, and the entry is a character vector of length 1 to n of 
+# individual scenarios. all of the values in each entry of the list are combined 
+# together and processed as one scenario group. So for a run that has 30 initial 
+# conditions, all 30 runs are averaged/combined together. The names in the scens 
+# list (scenario Groups) will be the Scenario names that show up on plots.
 
 # *** the names of scens, icList, and icMonth should all match.
 
-# in the comma seperated scenario folder names, currently the 5th entry is the initial conditions
-# entry
-icDimNumber <- 5 # update if for some reason the scenario naming convention has changed
+# in the comma seperated scenario folder names, currently the 5th entry is the 
+# initial conditions entry
+# update if for some reason the scenario naming convention has changed
+icDimNumber <- 5 
 
 scens <- list(
-  #"April 2017" = makeAllScenNames("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
+  #"April 2017" = rw_scen_gen_names("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
   
-  "January 2018" = makeAllScenNames("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
+  "January 2018" = rw_scen_gen_names("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
   "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
 )
 
@@ -85,7 +84,10 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  "January 2018" = file.path(CRSSDIR, "dmi/InitialConditions/jan_2019Start/MtomToCrss_Monthly.xlsx"),
+  "January 2018" = file.path(
+    CRSSDIR, 
+    "dmi/InitialConditions/jan_2019Start/MtomToCrss_Monthly.xlsx"
+  ),
   "August 2017" = c(3627.34, 1083.46)
 )
 
@@ -94,15 +96,17 @@ icMonth <- c("January 2018" = "18-Dec", "August 2017" = "17-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
-# the names are the new names that should show up in the table in case you need to 
-# add a footnote or longer name
-# this is the order they will show up in the table, so list the newest run second
-# there should only be 2 scenarios
+# the names are the new names that should show up in the table in case you need 
+# to add a footnote or longer name
+# this is the order they will show up in the table, so list the newest run 
+# second there should only be 2 scenarios
 ss5 <- c("August 2017" = "August 2017", "January 2018" = "January 2018")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
+
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
+
 # years to use for the simple 5-year table
 yy5 <- 2019:2023
 
@@ -112,7 +116,9 @@ yy5 <- 2019:2023
 # in scens and icList
 mainScenGroup <- "January 2018"
 mainScenGroup.name <- "January 2018"
-annText <- 'Results from January 2018 CRSS Run' # text that will be added to figures
+
+# text that will be added to figures
+annText <- 'Results from January 2018 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
@@ -124,8 +130,8 @@ peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
 # plot a single year of Mead PE
 peScatterYear <- 2018
 # peScatterData should be set to either MTOM or CRSS
-# if relying on combined run, then this is likely MTOM; if using a CRSS only run,
-# then likely set to CRSS
+# if relying on combined run, then this is likely MTOM; if using a CRSS only 
+# run, then likely set to CRSS
 peScatterData <- 'MTOM'
 
 conditionsFrom <- "MTOM" # string should be either CRSS or MTOM
@@ -190,18 +196,21 @@ if(getPeData | getSysCondData){
 }
 
 # folder location to save figures and fully procssed tables
-if(!file.exists(CRSSDIR))
-  stop(CRSSDIR, 
-       ' does not exist. Please ensure CRSS_DIR environment variable is sest correctly')
+if (!file.exists(CRSSDIR)) {
+  stop(
+    CRSSDIR, 
+    ' does not exist. Please ensure CRSS_DIR environment variable is set correctly'
+  )
+}
 
-if(!file.exists(file.path(CRSSDIR, 'results'))){
+if (!file.exists(file.path(CRSSDIR, 'results'))) {
   message(paste(file.path(CRSSDIR, 'results'),
                 'does not exist. Creating this folder...'))
   dir.create(file.path(CRSSDIR, 'results'))
 }
 
 oFigs <- file.path(CRSSDIR,'results', crssMonth) 
-if(!file.exists(oFigs)){
+if (!file.exists(oFigs)) {
   message(paste('Creating folder:', oFigs))
   dir.create(oFigs)
 }
@@ -209,7 +218,7 @@ message('Figures and tables will be saved to: ', oFigs)
 
 # folder to save procssed text files to (intermediate processed data)
 resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
-if(!file.exists(resFolder)){
+if (!file.exists(resFolder)) {
   message(paste('Creating folder:', resFolder))
   dir.create(resFolder)
 }
@@ -222,7 +231,8 @@ curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
 # file name for the system conditions procssed file
 sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
 
-eocyFigs <- 'MPEOCY.pdf' # file name for figure with Powell and Mead 10/50/90 EOCY elevations
+# file name for figure with Powell and Mead 10/50/90 EOCY elevations
+eocyFigs <- 'MPEOCY.pdf' 
 
 critStatsProc <- 'CritStats.csv'
 critFigs <- 'CritFigs2026.pdf'
@@ -234,32 +244,53 @@ simple5YrFile <- '5yrSimple.pdf'
 
 traceMap <- read.csv('data/Trace2IcMap.csv')
 
-# -----------------------------------------------------------------------------
-#       Process results
-# -----------------------------------------------------------------------------
+# *****************************************************************************
+#       Process results --------------
+# *****************************************************************************
 
-## System Conditions Table Data
-if(getSysCondData){
+# System Conditions Table Data
+if (getSysCondData) {
   message('starting getSysCondData')
+  
+  # create rwd_agg from sys_cond_matrix()
+  sys_mat <- CRSSIO::sys_cond_matrix()
+  sys_rwa <- rwd_agg(data.frame(
+    file = sys_mat[,1],
+    slot = sys_mat[,2],
+    period = "asis",
+    summary = NA,
+    eval = NA,
+    t_s = NA,
+    variable = sys_mat[,5],
+    stringsAsFactors = FALSE
+  ))
+  
   getScenarioData(
     scens, 
     iFolder, 
     file.path(resFolder,sysCondFile),
     TRUE,
     'aggFromScenList', 
-    CRSSIO::sys_cond_matrix()
+    sys_rwa
   )
   message('finished getSysCondData')
 }
 
 if(getPeData){
   ## get the Mead and Powel EOCY Data
+  message('starting getPeData')
+  pe_rwa <- rwd_agg(read.csv(
+    "data/MPPEStats_sam.csv", 
+    stringsAsFactors = FALSE
+  ))
   getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
-                  'aggFromScenList', 'data/MPPEStats_sam.csv')
+                  'aggFromScenList', pe_rwa)
   ## append initial conditions onto May data
   getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
                  file.path(resFolder,curMonthPEFile), icList, icMonth, 
                  TRUE, 'aggFromScenList', traceMap, icDimNumber = icDimNumber)
+  
+  message('finished getPeData')
 }
 
 if(makeFiguresAndTables){
@@ -273,16 +304,20 @@ if(makeFiguresAndTables){
   # create the system cond. table
   sysTable <- CRSSIO::crsso_get_sys_cond_table(sysCond, yrs2show)
   # save the sys cond table
-  data.table::fwrite(as.data.frame(sysTable[['fullTable']]), file.path(oFigs,sysCondTable), row.names = TRUE)
+  data.table::fwrite(
+    as.data.frame(sysTable[['fullTable']]), 
+    file.path(oFigs,sysCondTable), 
+    row.names = TRUE
+  )
   
-  # 2) Plot Mead, Powell EOCY elvations and include previous month's results too.
+  # 2) Plot Mead, Powell EOCY elvations and include previous month's results too
   # read in current month data
   message("EOCY elevation figures")
   pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
-    # The StartMonth column is used as the color variable in plotEOCYElev, and the
-    # names that should show up in the legend/differentiate scenario groups are 
-    # stored in the Agg Varaible. So easiest to just copy it from Agg to StartMonth
-    # for now
+    # The StartMonth column is used as the color variable in plotEOCYElev, and 
+    # the names that should show up in the legend/differentiate scenario groups
+    # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
+    # StartMonth for now
     dplyr::mutate(StartMonth = Agg)
 
   # plot
@@ -311,7 +346,8 @@ if(makeFiguresAndTables){
   # get the necessary variables by filtering from the pe and syscond data files
   cs <- pe %>%
     filter(
-      Variable %in% c('meadLt1000', 'meadLt1020', 'powellLt3490', 'powellLt3525', 'meadLt1025')
+      Variable %in% c('meadLt1000', 'meadLt1020', 'powellLt3490', 
+                      'powellLt3525', 'meadLt1025')
     ) %>%
     mutate(AggName = Agg) %>%
     select(-StartMonth)
@@ -323,9 +359,22 @@ if(makeFiguresAndTables){
     mutate(AggName = Agg) %>%
     rbind(cs)
 
-  ptitle <- 'Powell: Percent of Traces Less than Power Pool\n(elevation 3,490\') in Any Water Year'
-  p3490Fig <- compareCritStats(cs, yrs2show, 'powellLt3490', '', ptitle, colorLabel, 
-                               legendWrap = legendWrap)
+  ptitle <- paste(
+    'Powell: Percent of Traces Less than Power Pool', 
+    "(elevation 3,490\') in Any Water Year",
+    sep = "\n",
+  )
+  
+  p3490Fig <- compareCritStats(
+    cs, 
+    yrs2show, 
+    'powellLt3490', 
+    '', 
+    ptitle, 
+    colorLabel, 
+    legendWrap = legendWrap
+  )
+  
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
   shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 
                                colorLabel, legendWrap = legendWrap)
@@ -359,7 +408,11 @@ if(makeFiguresAndTables){
   csVars <- csVarNames()
   # create data table to save crit stats
   cs <- cs %>%
-    dplyr::filter(Year %in% yrs2show, Agg == mainScenGroup, Variable != 'lbSurplus') %>%
+    dplyr::filter(
+      Year %in% yrs2show, 
+      Agg == mainScenGroup, 
+      Variable != 'lbSurplus'
+    ) %>%
     # compute the percent of traces by averaging values 
     group_by(Year,Variable) %>%
     summarise(Value = mean(Value)) %>%
@@ -415,33 +468,86 @@ if(computeConditionalProbs){
     sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
     sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   }
-  cp1 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','mer748')
-  cp2 <- getConditionalProbs(sysCond, yrs2show[1], yrs2show[1], 'lbShortage','ueb823')
-  cp3 <- getConditionalProbs(sysCond, yrs2show[1],yrs2show[1], 'lbShortage',c('eq','uebGt823'))
-  cp4 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
-                                                 'lbShortageStep3'), 'mer748')
-  cp5 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
-                                                 'lbShortageStep3'), 'ueb823')
-  cp6 <- getConditionalProbs(sysCond, yrs2show[2], yrs2show[1], c('lbShortage','lbShortageStep1','lbShortageStep2',
-                                                 'lbShortageStep3'), c('eq','uebGt823'))
+  cp1 <- getConditionalProbs(
+    sysCond, 
+    yrs2show[1], 
+    yrs2show[1], 
+    'lbShortage',
+    'mer748'
+  )
+  cp2 <- getConditionalProbs(
+    sysCond, 
+    yrs2show[1], 
+    yrs2show[1], 
+    'lbShortage',
+    'ueb823'
+  )
+  cp3 <- getConditionalProbs(
+    sysCond, 
+    yrs2show[1],
+    yrs2show[1], 
+    'lbShortage',
+    c('eq','uebGt823')
+  )
+  cp4 <- getConditionalProbs(
+    sysCond, 
+    yrs2show[2], 
+    yrs2show[1], 
+    c('lbShortage','lbShortageStep1','lbShortageStep2', 'lbShortageStep3'), 
+    'mer748'
+  )
+  cp5 <- getConditionalProbs(
+    sysCond, 
+    yrs2show[2], 
+    yrs2show[1], 
+    c('lbShortage','lbShortageStep1','lbShortageStep2', 'lbShortageStep3'), 
+    'ueb823'
+  )
+  cp6 <- getConditionalProbs(
+    sysCond, 
+    yrs2show[2], 
+    yrs2show[1], 
+    c('lbShortage','lbShortageStep1','lbShortageStep2', 'lbShortageStep3'), 
+    c('eq','uebGt823')
+  )
   
   # create data table from the above values
-  cpt1 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp1)),paste(yrs2show[2],names(cp4))),
-                     'PrctChance' = c(cp1,cp4))
-  rr <- which(rownames(sysTable$fullTable) == 'Mid-Elevation Release Tier - annual release = 7.48 maf')
+  cpt1 <- data.frame(
+    'ChanceOf' = c(paste(yrs2show[1],names(cp1)),paste(yrs2show[2],names(cp4))),
+    'PrctChance' = c(cp1,cp4)
+  )
+  rr <- which(
+    rownames(sysTable$fullTable) == 
+      'Mid-Elevation Release Tier - annual release = 7.48 maf'
+  )
   cc <- which(colnames(sysTable$fullTable) == yrs2show[1])
   cpt1$PowellWYRel <- paste('7.48 MAF;',sysTable$fullTable[rr,cc])
   
-  cpt2 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp2)),paste(yrs2show[2],names(cp5))),
-                     'PrctChance' = c(cp2,cp5))
-  rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release = 8.23 maf")
+  cpt2 <- data.frame(
+    'ChanceOf' = c(paste(yrs2show[1],names(cp2)),paste(yrs2show[2],names(cp5))),
+    'PrctChance' = c(cp2,cp5)
+  )
+  rr <- which(
+    rownames(sysTable$fullTable) == 
+      "Upper Elevation Balancing - annual release = 8.23 maf"
+  )
   cpt2$PowellWYRel <- paste('8.23 MAF;',sysTable$fullTable[rr,cc])
   
-  cpt3 <- data.frame('ChanceOf' = c(paste(yrs2show[1],names(cp3)),paste(yrs2show[2],names(cp6))),
-                     'PrctChance' = c(cp3,cp6))
-  rr <- which(rownames(sysTable$fullTable) == "Upper Elevation Balancing - annual release > 8.23 maf")
-  rr2 <- which(rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf")
-  cpt3$PowellWYRel <- paste('> 8.23 MAF;',sysTable$fullTable[rr,cc] + sysTable$fullTable[rr2,cc])
+  cpt3 <- data.frame(
+    'ChanceOf' = c(paste(yrs2show[1],names(cp3)),paste(yrs2show[2],names(cp6))),
+    'PrctChance' = c(cp3,cp6)
+  )
+  rr <- which(
+    rownames(sysTable$fullTable) == 
+      "Upper Elevation Balancing - annual release > 8.23 maf"
+  )
+  rr2 <- which(
+    rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf"
+  )
+  cpt3$PowellWYRel <- paste(
+    '> 8.23 MAF;',
+    sysTable$fullTable[rr,cc] + sysTable$fullTable[rr2,cc]
+  )
   
   cpt1 <- rbind(cpt1,cpt2,cpt3)
   
@@ -453,14 +559,22 @@ if(computeConditionalProbs){
 
 # conditions leading to shortage ---------------------------------
 # pulled annotation out of generic function
-if(createShortConditions){
-  if(length(resFile) > 1)
+if (createShortConditions) {
+  if (length(resFile) > 1)
     stop("conditions leading to shortage is only designed to work with 1 scenario of data, at this point")
   
-  message('Using hard coded values for the arrow in the shortage conditions figure.\n',
-          'You may need to update the values and re-run main.R')
+  message(
+    'Using hard coded values for the arrow in the shortage conditions figure.\n',
+    'You may need to update the values and re-run main.R'
+  )
   # filterOn being set to pe shows results for traces that are <= 1077
-  shortCond <- plotFirstYearShortCond(conditionsFrom, resFile, scenario, filterOn = 'pe', yearToAnalyze)
+  shortCond <- plotFirstYearShortCond(
+    conditionsFrom, 
+    resFile, 
+    scenario, 
+    filterOn = 'pe', 
+    yearToAnalyze
+  )
   shortCond <- shortCond + 
     annotate('segment', x = 5.55, xend = 4.3, y = 1069.6, yend = 1068.85, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
@@ -487,13 +601,13 @@ if(createSimple5yrTable){
 }
 
 # mead pe scatter ------------------
-if(addPEScatterFig){
+if (addPEScatterFig) {
   message("elevation scatter plot figure")
   ### This did not properly compile for the January run.
-  if(peScatterData == "CRSS"){
+  if (peScatterData == "CRSS") {
     pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
       filter(Agg == mainScenGroup)
-  } else if(peScatterData == "MTOM"){
+  } else if (peScatterData == "MTOM") {
 
     icDim <- 1981:2015
     tmpIcMonth <- paste(str_replace(peScatterYear, "20", ""), "Dec", sep = "-")
@@ -510,14 +624,7 @@ if(addPEScatterFig){
              Year = peScatterYear,
              Variable = "Mead.Pool Elevation")
     
-    # pe <- read.csv(icList[[mainScenGroup]][2]) %>%
-    #   gather(Trace, Value, -X) %>%
-    #   mutate(Trace = getMTOMTraceNumber(Trace, t1 = 1981, tLen = 35),
-    #          Year = as.numeric(paste0('20', stringr::str_split_fixed(X,'-',2)[,1])),
-    #          Month = stringr::str_split_fixed(X,'-',2)[,2],
-    #          Variable = 'Mead.Pool Elevation') %>%
-    #   filter(Month == 'Dec')
-  } else{
+  } else {
     stop("Invalid peScatterData variable")
   }
   scatterTitle <- paste('Lake Mead December', peScatterYear, 'Elevations from',
@@ -526,7 +633,7 @@ if(addPEScatterFig){
   gg <- singleYearPEScatter(pe, peScatterYear, 'Mead.Pool Elevation', 
                           scatterTitle, TRUE)
   
-  tpath <- file.path(oFigs,paste0('meadScatterFigure_',peScatterYear,'.pdf'))
+  tpath <- file.path(oFigs, paste0('meadScatterFigure_', peScatterYear, '.pdf'))
   pdf(tpath, width = 8, height = 6)
   print(gg)
   dev.off()
