@@ -362,7 +362,7 @@ if(makeFiguresAndTables){
   ptitle <- paste(
     'Powell: Percent of Traces Less than Power Pool', 
     "(elevation 3,490\') in Any Water Year",
-    sep = "\n",
+    sep = "\n"
   )
   
   p3490Fig <- compareCritStats(
