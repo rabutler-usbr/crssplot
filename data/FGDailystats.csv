@@ -1,0 +1,24 @@
+file,slot,period,summary,eval,t_s,variable,scenario,notes
+Ubres.rdf,FlmngGrgPlElvtn,cy,NA,NA,NA,FG.Pool Elevation,"UBRes_base_12182017.FlmngGrgPlElvtn;UBRes_LTSP_12142017.FlmngGrgPlElvtn;UBRes_LTSP_SMB_12192017.FlmngGrgPlElvtn;UBRes_LTSP_SMB_BF_12192017.FlmngGrgPlElvtn
+
+
+",Percent exceedance
+dailyflows.rdf,DlyFlwsFlmngGrgDly,asis,NA,NA,NA,FG.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,April-July % exceedance
+dailyflows.rdf,DlyFlwsFlmngGrgDly,asis,NA,NA,NA,FG.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,June % exceedance
+dailyflows.rdf,DlyFlwsFlmngGrgDly,asis,NA,NA,NA,FG.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,August % exceedance
+dailyflows.rdf,DlyFlwsFlmngGrgDly,asis,NA,NA,NA,FG.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,August-September % exceedance
+dailyflows.rdf,DlyFlwsFlmngGrgDly,asis,NA,NA,NA,FG.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,October-December % exceedance
+dailyflows.rdf,DlyFlwsFlmngGrgDly,asis,NA,NA,NA,FG.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,April-July annual maximum release % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,April-July % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,"April-July annual maximum release % exceedance with 18,600 cfs horizontal line"
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,"April-July cumulative 14-day flows or days above >= 8,300 cfs"
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,"April-July cumulative 14-day flows or days above >= 14,000 cfs"
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,"April-July cumulative 14-day flows or days above >= 16,000 cfs"
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,"April-July cumulative 14-day flows or days above >= 18,600 cfs"
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,"April-July cumulative 14-day flows or days above >= 22,700 cfs"
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,January-February % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,March % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,June % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,August % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,August-September % exceedance
+dailyflows.rdf,DlyFlwsJnsnDly,asis,NA,NA,NA,Jensen.DailyRelease,DailyFlows_base_12182017.xlsx;DailyFlows_LTSP_12142017.xlsx;DailyFlows_LTSP_SMB_12292017.xlsx;DailyFlows_LTSP_SMB_BF_12192017.xlsx,October-December % exceedance
