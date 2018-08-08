@@ -49,7 +49,7 @@ plotitle = "FG_Daily_Plots" #objectslot + .pdf will be added when creating plots
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#    ----        CODE - MODIFY AT YOUR OWN RISK        ----------------------
+#    ----        CODE: FG - MODIFY AT YOUR OWN RISK        ----------------------
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 oFigs <- file.path(CRSSDIR,'results', plotfoldertitle) 
@@ -60,32 +60,12 @@ if (!file.exists(oFigs)) {
 message('Figures and tables will be saved to: ', oFigs)
 
 j=i=1
-for (j in 1:length(variables)) {
-  
+# for (j in 1:length(variables)) {
+pdf(file.path(oFigs,paste0(plotitle,".pdf")), width=9, height=6)
+
 objectslot = variables[j]
 title = objectslot
-
-
-####CODE####
-# rwa1 <- rwd_agg(data.frame(
-#   file = file,
-#   slot = objectslot, 
-#   period = "asis", #Use for Daily or Monthly output, other options "cy","wy","eocy","eowy","djf","July"
-#   #see RWDATPlyr Workflow for more information on period, summary, eval, t_s
-#   summary = NA,
-#   eval = NA,
-#   t_s = NA,
-#   variable = objectslot, #could assign short variable name but keep full name
-#   stringsAsFactors = FALSE
-# ))
-# 
-# #rw_scen_aggregate() will aggregate and summarize multiple scenarios, essentially calling rdf_aggregate() for each scenario. Similar to rdf_aggregate() it relies on a user specified rwd_agg object to know how to summarize and process the scenarios.
-# scen_res <- rw_scen_aggregate(
-#   scens,
-#   agg = rwa1,#rwa2 for new run with daily output 
-#   scen_dir = iFolder 
-#   # ,keep_cols = T #keep all cols since need date and keep_cols = F will only give Month, Year
-# )
+print(objectslot)
 
 for (i in 1:length(scens)) {
   #try getting daily another way
@@ -123,15 +103,14 @@ scen_res$MonthNum = as.Date(paste0(scen_res$Year,scen_res$Month,"01"), format = 
 scen_res$MonthNum = as.numeric(format.Date(scen_res$Timestep, format = "%m"))
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#    ----        PLOTS - MODIFY AT YOUR OWN RISK        ----------------------
+#    ----        PLOTS: FG - MODIFY AT YOUR OWN RISK        ----------------------
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## plot 
-pdf(file.path(oFigs,paste0(plotitle,objectslot,".pdf")), width=9, height=6)
+# pdf(file.path(oFigs,paste0(plotitle,objectslot,".pdf")), width=9, height=6)
 
 #    -------------------        All Trace Mean        ----------------------
 scen_res %>%
-  # dplyr::filter(ObjectSlot == objectslot) %>% #don't need to do this since only one var
   dplyr::filter(Year <= filteryrlessorequal) %>% #one run has 2023 so filter that out so axis work
   dplyr::group_by(Scenario, Timestep) %>% #don't need to do this since only one var
   dplyr::summarise(Value = mean(Value)) %>%
@@ -145,12 +124,10 @@ scen_res %>%
 #    -------------------        All Trace Boxplot        ----------------------
 
 scen_res %>%
-  # dplyr::filter(Variable == objectslot) %>%
   dplyr::filter(Year <= filteryrlessorequal) %>% #one run has 2023 so filter that out so axis work
   dplyr::group_by(Scenario, Timestep) %>% #don't need to do this since only one var
   dplyr::group_by(Scenario, MonthNum) %>% #don't need to do this since only one var
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) +
-  # ggplot(aes(x = Timestep, y = Value, color = Scenario)) + #can't use this since must factor to have sperate boxes
   geom_boxplot() +
   # stat_boxplot_custom() +
   scale_x_discrete("Month",labels = month.abb) + #display abb. month names
@@ -159,7 +136,6 @@ scen_res %>%
 #    -------------------        Percent Exceedance of Traces       ----------------------
 
 scen_res %>%
-  # dplyr::filter(Variable == objectslot) %>%
   dplyr::filter(Year <= filteryrlessorequal) %>% #one run has 2023 so filter that out so axis work
   dplyr::group_by(Scenario, Timestep) %>% #don't need to do this since only one var
   ggplot(aes(Value, color = Scenario)) + 
@@ -167,8 +143,112 @@ scen_res %>%
   labs(title = paste(filteryrlessorequal,title,"Trace Exceedance"), y = y_lab, x = "Exceedance") +
   scale_x_continuous(labels = percent)
 
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    ----        CODE: JENSEN - MODIFY AT YOUR OWN RISK        ----------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+j=2
+# for (j in 1:length(variables)) {
+
+objectslot = variables[j]
+title = objectslot
+print(objectslot)
+
+
+for (i in 1:length(scens)) {
+  #try getting daily another way
+  scen_res_x <- file.path(iFolder,scens[i],file) %>% #this means "pipe" the data to the next function 
+    rdf_to_rwtbl2() %>%
+    filter(ObjectSlot == objectslot)
+  
+  # #filter out Most,Min,Max only would do this for MTOM 
+  # filter(TraceNumber >= first_ensemble[1]) 
+  
+  #add on Scenario since rdf_to_rwtbl2 doesn't add it  
+  scen_res_x <- cbind.data.frame(
+    scen_res_x,
+    Scenario = rep(names(scens)[i], Times = length(scen_res_x$Timestep))
+  )
+  
+  #convert Timestep chr to POSIXct
+  scen_res_x$Timestep <- as.POSIXct(strptime(scen_res_x$Timestep,"%Y-%m-%d %H:%M")) 
+  scen_res_x$Timestep <- as.Date(scen_res_x$Timestep)
+  #first entry is 2019-1-31 24:00 which gets converted to 2019-02-01, is that okay????? 
+  
+  if(i == 1){
+    scen_res = scen_res_x
+  } else {
+    scen_res = rbind.data.frame(scen_res,scen_res_x)
+  }
+} #close i Scenario loop 
+
+unique(scen_res$ObjectSlot) #check variable names 
+unique(scen_res$Scenario) #check Scenario names 
+
+
+scen_res$MonthNum = as.Date(paste0(scen_res$Year,scen_res$Month,"01"), format = "%Y%B%d")
+#get a numeric month number
+scen_res$MonthNum = as.numeric(format.Date(scen_res$Timestep, format = "%m"))
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    ----        PLOTS: Jensen - MODIFY AT YOUR OWN RISK        ----------------------
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+## plot 
+# pdf(file.path(oFigs,paste0(plotitle,objectslot,".pdf")), width=9, height=6)
+
+target1 <- data.frame(yintercept=8300) 
+target2 <- data.frame(yintercept=18600) 
+target3 <- data.frame(yintercept=22700) 
+
+#    -------------------        All Trace Mean        ----------------------
+scen_res %>%
+  # dplyr::filter(ObjectSlot == objectslot) %>% #don't need to do this since only one var
+  dplyr::filter(Year <= filteryrlessorequal) %>% #one run has 2023 so filter that out so axis work
+  dplyr::group_by(Scenario, Timestep) %>% #don't need to do this since only one var
+  dplyr::summarise(Value = mean(Value)) %>%
+  ggplot(aes(Timestep, Value, color = Scenario)) + 
+  geom_point() +
+  geom_line() +
+  geom_hline(aes(yintercept=yintercept), data=target1) +
+  geom_hline(aes(yintercept=yintercept), data=target2) +
+  geom_hline(aes(yintercept=yintercept), data=target3) +
+  labs(title = paste("Mean",title,filteryrlessorequal), y = y_lab) +
+  scale_x_date(breaks = date_breaks("months"),
+               labels = date_format("%b"))
+
+#    -------------------        All Trace Boxplot        ----------------------
+
+scen_res %>%
+  dplyr::filter(Year <= filteryrlessorequal) %>% #one run has 2023 so filter that out so axis work
+  dplyr::group_by(Scenario, Timestep) %>% #don't need to do this since only one var
+  dplyr::group_by(Scenario, MonthNum) %>% #don't need to do this since only one var
+  ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) +
+  geom_boxplot() +
+  # stat_boxplot_custom() +
+  geom_hline(aes(yintercept=yintercept), data=target1) +
+  geom_hline(aes(yintercept=yintercept), data=target2) +
+  geom_hline(aes(yintercept=yintercept), data=target3) +
+  scale_x_discrete("Month",labels = month.abb) + #display abb. month names
+  labs(title = paste(title,filteryrlessorequal), y = y_lab) 
+
+#    -------------------        Percent Exceedance of Traces       ----------------------
+
+scen_res %>%
+  dplyr::filter(Year <= filteryrlessorequal) %>% #one run has 2023 so filter that out so axis work
+  dplyr::group_by(Scenario, Timestep) %>% #don't need to do this since only one var
+  ggplot(aes(Value, color = Scenario)) + 
+  stat_eexccrv() + 
+  geom_hline(aes(yintercept=yintercept), data=target1) +
+  geom_hline(aes(yintercept=yintercept), data=target2) +
+  geom_hline(aes(yintercept=yintercept), data=target3) +
+  labs(title = paste(filteryrlessorequal,title,"Trace Exceedance"), y = y_lab, x = "Exceedance") +
+  scale_x_continuous(labels = percent)
+
+
 dev.off()
 
-} #close j variable loop 
+# } #close j variable loop 
 
 
