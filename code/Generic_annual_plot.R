@@ -116,7 +116,7 @@ if (floworpe == "flow"){
     peperiod = "eowy"
   }
 }
-
+figuretypes = c("Mean","Bxplt","Exceedance")
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## 3. Process Results 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -155,7 +155,7 @@ unique(scen_res$TraceNumber) #check trace numbers
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## create a pdf  
-pdf(paste0(file.path(ofigs,figs),"_",variables,".pdf"), width=9, height=6)
+pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".pdf"), width=9, height=6)
 
 variable = variables
 
