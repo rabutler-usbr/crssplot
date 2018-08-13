@@ -2,6 +2,10 @@
 #This script creates monthly boxplots of Outflow and PE to compare two CRSS runs
 ##############################################################################
 
+#plot inputs 
+startyr = 2019 #filter out all years < this year
+endyr = 2026 #filter out all years > this year
+
 
 library(RWDataPlyr)
 if(packageVersion("RWDataPlyr") < "0.6.1"){
@@ -89,7 +93,7 @@ title = paste(variable,"2019-2026")
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
-  dplyr::filter(2019 >= Year && Year <= 2026) %>% #one run has 2023 so filter that out so axis work
+  dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
   dplyr::group_by(Scenario, MonthNum) %>%
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
   geom_boxplot() +
@@ -106,7 +110,7 @@ Aug1PEtarget <- data.frame(yintercept=6505.5)
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
-  dplyr::filter(2019 >= Year && Year <= 2026) %>% #one run has 2023 so filter that out so axis work
+  dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
   dplyr::group_by(Scenario, MonthNum) %>%
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
   geom_boxplot() +
@@ -122,7 +126,7 @@ title = paste(variable,"2019-2026")
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
-  dplyr::filter(2019 >= Year && Year <= 2026) %>% #one run has 2023 so filter that out so axis work
+  dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
   dplyr::group_by(Scenario, MonthNum) %>%
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
   geom_boxplot() +
@@ -137,7 +141,7 @@ MaxPEtarget <- data.frame(yintercept=6039)
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
-  dplyr::filter(2019 >= Year && Year <= 2026) %>% #one run has 2023 so filter that out so axis work
+  dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
   dplyr::group_by(Scenario, MonthNum) %>%
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
   geom_boxplot() +

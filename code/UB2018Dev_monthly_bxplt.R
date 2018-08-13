@@ -66,7 +66,9 @@ scen_res <- rw_scen_aggregate(
   scen_dir = iFolder
 )
 
-unique(scen_res$Variable) #check variable names 
+unique(scen_res$Variable) #check variable names
+unique(scen_res$Scenario) #check Scenario names 
+unique(scen_res$Year) #check Years names 
 
 variable = "Crystal.Outflow"
 y_lab = "Monthly Flow (ac-ft/mo)"
