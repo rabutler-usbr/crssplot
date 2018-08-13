@@ -105,7 +105,7 @@ if (floworpe == "flow"){
 } else {
   y_lab = "End of Month PE (ft)"
 }
-
+figuretypes = c("Mean","Bxplt","Exceedance")
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## 3. Process Results 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -141,7 +141,7 @@ scen_res$MonthNum = as.numeric(format.Date(scen_res$MonthNum, format = "%m"))
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## create a pdf  
-pdf(paste0(file.path(ofigs,figs),"_",variables,".pdf"), width=9, height=6)
+pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".pdf"), width=9, height=6)
 
 variable = variables #this line could later be used in a loop through multiple
 #variables 
