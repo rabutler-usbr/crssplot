@@ -22,11 +22,20 @@ iFolder <- paste0(CRSSDIR,"/Scenario/")
 
 scens <- list(
   "April 2018" = "Apr2018,DNF,2007Dems,IG,MTOM_Most", 
-  "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
+  "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most",
+  "Baseline" = "results_base_LTSP_12182017", 
+  "LTSP" = "results_LTSP_12142017"
 )
 
-oFigs <- "C:/Users/cfelletter/Documents/CRSS working/Aspinall"
-message('Figures and tables will be saved to: ', oFigs)
+# ofigs <- file.path(CRSSDIR,'results',mainScenGroup) 
+ofigs <- "C:/Users/cfelletter/Documents/CRSS working/2018UBRedesign"
+if (!file.exists(ofigs)) {
+  message(paste('Creating folder:', ofigs))
+  dir.create(ofigs)
+}
+
+
+message('Figures and tables will be saved to: ', ofigs)
 
 
 
@@ -41,7 +50,7 @@ library('tidyverse')
 # # #look at sample work flow
 # vignette("rwdataplyr-workflow", package = "RWDataPlyr")
 
-rwa1 <- rwd_agg(read.csv("C:/Users/cfelletter/Documents/CRSS working/RDF Process/rw_agg_UBdev_monthly.csv", stringsAsFactors = FALSE)) 
+rwa1 <- rwd_agg(read.csv("C:/Users/cfelletter/Documents/CRSS working/RDF Process/rw_agg_UBdev_monthly_noGun.csv", stringsAsFactors = FALSE)) 
 
 # scen_dir = paste0(MTOMDIR,"/Output Data/RDF Process/") #set to the folder containing the sub folders for each ensemble
 # names(my_scens) = my_scens #naming #must name these
@@ -71,7 +80,7 @@ scen_res$MonthNum = as.Date(paste0(scen_res$Year,scen_res$Month,"01"), format = 
 scen_res$MonthNum = as.numeric(format.Date(scen_res$MonthNum, format = "%m"))
 
 ## plot 
-pdf(paste0(oFigs,'/UBresDevPlots_Monthly_HP_Verify.pdf'), width=9, height=6)
+pdf(paste0(ofigs,'/UBresDevPlots_Monthly_HP_Verify.pdf'), width=9, height=6)
 # for(i in 1:1){
 
 variable = "Fontenelle.Outflow"

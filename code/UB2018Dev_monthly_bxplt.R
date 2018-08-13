@@ -25,8 +25,14 @@ scens <- list(
   "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
 )
 
-oFigs <- "C:/Users/cfelletter/Documents/CRSS working/Aspinall"
-message('Figures and tables will be saved to: ', oFigs)
+# ofigs <- file.path(CRSSDIR,'results',mainScenGroup) 
+ofigs <- "C:/Users/cfelletter/Documents/CRSS working/2018UBRedesign"
+if (!file.exists(ofigs)) {
+  message(paste('Creating folder:', ofigs))
+  dir.create(ofigs)
+}
+
+message('Figures and tables will be saved to: ', ofigs)
 
 
 
@@ -89,7 +95,7 @@ scen_res$MonthNum = as.numeric(format.Date(scen_res$MonthNum, format = "%m"))
 
 
 ## plot 
-pdf(paste0(oFigs,'/UBresDevPlots_Monthly.pdf'), width=9, height=6)
+pdf(paste0(ofigs,'/UBresDevPlots_Monthly.pdf'), width=9, height=6)
 # for(i in 1:1){
 variable = "Crystal.Outflow"
 y_lab = "Monthly Flow (ac-ft/mo)"
