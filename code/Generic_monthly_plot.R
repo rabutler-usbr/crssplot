@@ -52,8 +52,8 @@ variables = "Mead.Pool Elevation"
 floworpe = "pe" #"flow" or "pe" 
 
 #plot inputs 
-startyr = 2019 #filter out all years > this year
-filteryrlessorequal = 2022 #filter out all years > this year
+startyr = 2019 #filter out all years < this year
+endyr = 2022 #filter out all years > this year
 
 #file names 
 figs <- 'Generic_MonthlyFig' #objectslot + .pdf will be added when creating plots
@@ -151,15 +151,14 @@ variable = variables #this line could later be used in a loop through multiple
 if (figuretype == 1){
   p <- scen_res %>%
     # dplyr::filter(Variable == variable) %>%
-    dplyr::filter(Year >= startyr) %>% #filter year
-    dplyr::filter(Year <= filteryrlessorequal) %>% #filter year
+    dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, MonthNum) %>%
     dplyr::summarise(Value = mean(Value)) %>%
     ggplot(aes(x = MonthNum, y = Value, color = Scenario)) + 
     geom_line() +
     geom_point() +
     scale_x_discrete("Month",labels = month.abb) + #display abb. month names
-    labs(title = paste("Mean",variable,startyr,"-",filteryrlessorequal), 
+    labs(title = paste("Mean",variable,startyr,"-",endyr), 
          y = y_lab, x = "Year") 
   print(p)
 }
@@ -169,13 +168,12 @@ if (figuretype == 1){
 if (figuretype == 2){
   p <- scen_res %>%
     # dplyr::filter(Variable == variable) %>%
-    dplyr::filter(Year >= startyr) %>% #filter year
-    dplyr::filter(Year <= filteryrlessorequal) %>% #filter year
+    dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, MonthNum) %>%
     ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
     geom_boxplot() +
     scale_x_discrete("Month",labels = month.abb) + #display abb. month names
-    labs(title = paste(variable,startyr,"-",filteryrlessorequal), 
+    labs(title = paste(variable,startyr,"-",endyr), 
          y = y_lab, x = "Year") 
   print(p)
 }
@@ -185,15 +183,14 @@ if (figuretype == 2){
 if (figuretype == 3){
   p <- scen_res %>%
     # dplyr::filter(Variable == variable) %>%
-    dplyr::filter(Year >= startyr) %>% #filter year
-    dplyr::filter(Year <= filteryrlessorequal) %>% #filter year
+    dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::filter(MonthNum == exc_month) %>% #This is currently set to filter 
     #all but one month otherwise would lump all the months together
     dplyr::group_by(Scenario, MonthNum) %>%
     ggplot(aes(Value, color = Scenario)) +
     stat_eexccrv() +
     scale_x_discrete("Month",labels = month.abb) + #display abb. month names
-    labs(title = paste(variable,month.abb[exc_month],"Trace Exceedance",startyr,"-",filteryrlessorequal),
+    labs(title = paste(variable,month.abb[exc_month],"Trace Exceedance",startyr,"-",endyr),
          y = y_lab, x = "Year")
   print(p)
 }

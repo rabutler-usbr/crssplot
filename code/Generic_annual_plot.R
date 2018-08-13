@@ -53,8 +53,8 @@ floworpe = "pe" #"flow" or "pe"
 cyorwy = "cy" #"cy" or "wy" 
 
 #plot inputs 
-startyr = 2019 #filter out all years > this year
-filteryrlessorequal = 2022 #filter out all years > this year
+startyr = 2019 #filter out all years < this year
+endyr = 2022 #filter out all years > this year
 
 #file names 
 figs <- 'Generic_AnnualFig' #objectslot + .pdf will be added when creating plots
@@ -164,14 +164,13 @@ variable = variables
 if (figuretype == 1){
   p <- scen_res %>%
     # dplyr::filter(Variable == variable) %>%
-    dplyr::filter(Year >= startyr) %>% #filter year
-    dplyr::filter(Year <= filteryrlessorequal) %>% #filter year
+    dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, Year) %>%
     dplyr::summarise(Value = mean(Value)) %>%
     ggplot(aes(x = factor(Year), y = Value, color = Scenario)) + 
     geom_line() +
     geom_point() +
-    labs(title = paste("Mean",variable,startyr,"-",filteryrlessorequal), 
+    labs(title = paste("Mean",variable,startyr,"-",endyr), 
          y = y_lab, x = "Year") 
   print(p)
 }
@@ -181,12 +180,11 @@ if (figuretype == 1){
 if (figuretype == 2){
   p <- scen_res %>%
     # dplyr::filter(Variable == variable) %>%
-    dplyr::filter(Year >= startyr) %>% #filter year
-    dplyr::filter(Year <= filteryrlessorequal) %>% #filter year
+    dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, Year) %>%
     ggplot(aes(x = factor(Year), y = Value, color = Scenario)) + 
     geom_boxplot() +
-    labs(title = paste(variable,startyr,"-",filteryrlessorequal), 
+    labs(title = paste(variable,startyr,"-",endyr), 
          y = y_lab, x = "Year") 
   print(p)
 }
@@ -196,12 +194,11 @@ if (figuretype == 2){
 if (figuretype == 3){
   p <- scen_res %>%
     # dplyr::filter(Variable == variable) %>%
-    dplyr::filter(Year >= startyr) %>% #filter year
-    dplyr::filter(Year <= filteryrlessorequal) %>% #filter year
+    dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, Year) %>%
     ggplot(aes(Value, color = Scenario)) + 
     stat_eexccrv() + 
-    labs(title = paste(variable,"Trace Exceedance",startyr,"-",filteryrlessorequal), 
+    labs(title = paste(variable,"Trace Exceedance",startyr,"-",endyr), 
          y = y_lab, x = "Year") 
   print(p)
 }
