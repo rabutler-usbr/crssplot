@@ -31,21 +31,21 @@ scens <- list( #Short Name for Run = File Name with RDFs
 list.files(file.path(iFolder,scens[1])) #list files in scen folder for next input
 
 #rdf file with slot you want 
-file = "DailyFlows.rdf" 
+file <- "DailyFlows.rdf" 
 
 rdf_slot_names(read_rdf(iFile = file.path(iFolder,scens[1],file))) #check slots in rdf
 
-variables = c("DailyFlows.FlamingGorgeDaily","DailyFlows.JensenDaily")
-# objectslot = "DailyFlows.FlamingGorgeDaily"
-# objectslot ="DailyFlows.JensenDaily"                 
-# objectslot ="DailyFlows.YampaDailyNatural"          
-# objectslot ="DailyFlows.YampaDailyDeerlodgeDepleted"
+variables <- c("DailyFlows.FlamingGorgeDaily","DailyFlows.JensenDaily")
+# objectslot <- "DailyFlows.FlamingGorgeDaily"
+# objectslot <-"DailyFlows.JensenDaily"                 
+# objectslot <-"DailyFlows.YampaDailyNatural"          
+# objectslot <-"DailyFlows.YampaDailyDeerlodgeDepleted"
 
 #plot inputs 
-y_lab = "Daily Flow (cfs)"
-filteryrlessorequal = 2019 #filter out all years > this year
-plotfoldertitle = "FG Dev" #folder to create for output in results dir
-plotitle = "FG_Daily_Plots" #objectslot + .pdf will be added when creating plots 
+y_lab <- "Daily Flow (cfs)"
+filteryrlessorequal <- 2019 #filter out all years > this year
+plotfoldertitle <- "FG Dev" #folder to create for output in results dir
+plotitle <- "FG_Daily_Plots" #objectslot + .pdf will be added when creating plots 
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -59,33 +59,11 @@ if (!file.exists(oFigs)) {
 }
 message('Figures and tables will be saved to: ', oFigs)
 
-j=i=1
+j<-i<-1
 for (j in 1:length(variables)) {
   
-objectslot = variables[j]
-title = objectslot
-
-
-####CODE####
-# rwa1 <- rwd_agg(data.frame(
-#   file = file,
-#   slot = objectslot, 
-#   period = "asis", #Use for Daily or Monthly output, other options "cy","wy","eocy","eowy","djf","July"
-#   #see RWDATPlyr Workflow for more information on period, summary, eval, t_s
-#   summary = NA,
-#   eval = NA,
-#   t_s = NA,
-#   variable = objectslot, #could assign short variable name but keep full name
-#   stringsAsFactors = FALSE
-# ))
-# 
-# #rw_scen_aggregate() will aggregate and summarize multiple scenarios, essentially calling rdf_aggregate() for each scenario. Similar to rdf_aggregate() it relies on a user specified rwd_agg object to know how to summarize and process the scenarios.
-# scen_res <- rw_scen_aggregate(
-#   scens,
-#   agg = rwa1,#rwa2 for new run with daily output 
-#   scen_dir = iFolder 
-#   # ,keep_cols = T #keep all cols since need date and keep_cols = F will only give Month, Year
-# )
+objectslot <- variables[j]
+title <- objectslot
 
 for (i in 1:length(scens)) {
   #try getting daily another way
@@ -99,7 +77,7 @@ for (i in 1:length(scens)) {
   #add on Scenario since rdf_to_rwtbl2 doesn't add it  
   scen_res_x <- cbind.data.frame(
     scen_res_x,
-    Scenario = rep(names(scens)[i], Times = length(scen_res_x$Timestep))
+    Scenario <- rep(names(scens)[i], Times = length(scen_res_x$Timestep))
   )
   
   #convert Timestep chr to POSIXct
@@ -108,9 +86,9 @@ for (i in 1:length(scens)) {
   #first entry is 2019-1-31 24:00 which gets converted to 2019-02-01, is that okay????? 
   
   if(i == 1){
-    scen_res = scen_res_x
+    scen_res <- scen_res_x
   } else {
-    scen_res = rbind.data.frame(scen_res,scen_res_x)
+    scen_res <- rbind.data.frame(scen_res,scen_res_x)
   }
 } #close i Scenario loop 
 
@@ -118,9 +96,9 @@ unique(scen_res$ObjectSlot) #check variable names
 unique(scen_res$Scenario) #check Scenario names 
 
 
-scen_res$MonthNum = as.Date(paste0(scen_res$Year,scen_res$Month,"01"), format = "%Y%B%d")
+scen_res$MonthNum <- as.Date(paste0(scen_res$Year,scen_res$Month,"01"), format = "%Y%B%d")
 #get a numeric month number
-scen_res$MonthNum = as.numeric(format.Date(scen_res$Timestep, format = "%m"))
+scen_res$MonthNum <- as.numeric(format.Date(scen_res$Timestep, format = "%m"))
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #    ----        PLOTS - MODIFY AT YOUR OWN RISK        ----------------------
