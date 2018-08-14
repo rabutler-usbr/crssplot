@@ -63,7 +63,13 @@ figuretype <- 2 #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance
 # IF PICKING 3 you must specify a month
 exc_month = 12 #1 - Jan, 12 - Dec
 
-#### End of Normally You'll Only Change This ####
+#### End of Normal Change Section ####
+
+#output image parameters 
+width=9 #inches
+height=6
+imgtype = "pdf" #supports pdf, png, jpeg. pdf looks the best 
+customcaption <- NA #NA or this will over write the default caption on boxplots 
 
 # the mainScenGroup is the name of the subfolder this analysis will be stored
 #under in the results folder 
@@ -81,6 +87,7 @@ library(RWDataPlyr)
 # library(CRSSIO)
 # plotEOCYElev() and csVarNames()
 source('code/Stat_emp_ExcCrv.r')
+source('code/stat-boxplot-custom.r')
 
 # some sanity checks that UI is correct:
 if(!(mainScenGroup %in% names(scenarios))) 
@@ -116,7 +123,18 @@ if (floworpe == "flow"){
     peperiod = "eowy"
   }
 }
+
 figuretypes = c("Mean","Bxplt","Exceedance")
+
+#figure captions
+if (is.na(customcaption) &  figuretype == 2){
+  caption <- "Note: The boxplots show the distribution of traces, one for each year. The boxplot boxes correspond to the 25th and 75th quantiles,\nthe whiskers enclose the 10th to 90th quantiles,with points representing data that falls outside this range."
+} else if (is.na(customcaption)){
+  caption <- "" #no caption 
+} else {
+  caption <- customcaption #user supplied 
+}
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## 3. Process Results 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -154,8 +172,7 @@ unique(scen_res$TraceNumber) #check trace numbers
 ## 4. Plot Choosen Figure Type 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-## create a pdf  
-pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".pdf"), width=9, height=6)
+# pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".pdf"), width=9, height=6)
 
 variable = variables
 
@@ -167,11 +184,12 @@ if (figuretype == 1){
     dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, Year) %>%
     dplyr::summarise(Value = mean(Value)) %>%
-    ggplot(aes(x = factor(Year), y = Value, color = Scenario)) + 
+    ggplot(aes(x = factor(Year), y = Value, color = Scenario, group = Scenario)) + 
     geom_line() +
     geom_point() +
     labs(title = paste("Mean",variable,startyr,"-",endyr), 
-         y = y_lab, x = "Year") 
+         y = y_lab, x = "Year", caption = caption) +
+    theme(plot.caption = element_text(hjust = 0)) #left justify 
   print(p)
 }
 
@@ -183,10 +201,13 @@ if (figuretype == 2){
     dplyr::filter(startyr <= Year && Year <= endyr) %>% #filter year
     dplyr::group_by(Scenario, Year) %>%
     ggplot(aes(x = factor(Year), y = Value, color = Scenario)) + 
-    geom_boxplot() +
+    # geom_boxplot() + #generic geom uses 1.5 * IQR for the whiskers
+    # custom has whiskers go to the 10th/90th
+    stat_boxplot_custom(qs = c(0.1, 0.25, 0.5, 0.75, 0.9)) + 
     labs(title = paste(variable,startyr,"-",endyr), 
-         y = y_lab, x = "Year") 
-  print(p)
+         y = y_lab, x = "Year", caption = caption) +  
+    theme(plot.caption = element_text(hjust = 0)) #left justify 
+    print(p)
 }
 
 #    -------------------        Percent Exceedance of Traces       ----------------------
@@ -199,9 +220,13 @@ if (figuretype == 3){
     ggplot(aes(Value, color = Scenario)) + 
     stat_eexccrv() + 
     labs(title = paste(variable,"Trace Exceedance",startyr,"-",endyr), 
-         y = y_lab, x = "Year") 
+         y = y_lab, caption = caption) +
+    scale_x_continuous("Year",labels = scales::percent) + 
+    theme(plot.caption = element_text(hjust = 0)) #left justify 
   print(p)
 }
 
+## save off image 
+ggsave(filename = paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".",imgtype), width = width, height = height, units ="in")
 
 dev.off()

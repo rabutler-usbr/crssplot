@@ -62,7 +62,13 @@ figuretype <- 2 #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance
 # IF PICKING 3 you must specify a month
 exc_month = 12 #1 - Jan, 12 - Dec
 
-#### End of Normally You'll Only Change This ####
+#### End of Normal Change Section ####
+
+#output image parameters 
+width=9 #inches
+height=6
+imgtype = "pdf" #supports pdf, png, jpeg. pdf looks the best 
+customcaption <- NA #NA or this will over write the default caption on boxplots 
 
 # the mainScenGroup is the name of the subfolder this analysis will be stored
 #under in the results folder 
@@ -106,6 +112,16 @@ if (floworpe == "flow"){
   y_lab = "End of Month PE (ft)"
 }
 figuretypes = c("Mean","Bxplt","Exceedance")
+
+#figure captions
+if (is.na(customcaption) &  figuretype == 2){
+  caption <- "Note: The boxplots show the distribution of traces, one for each year. The boxplot boxes correspond to the 25th and 75th quantiles,\nthe whiskers enclose the 10th to 90th quantiles,with points representing data that falls outside this range."
+} else if (is.na(customcaption)){
+  caption <- "" #no caption 
+} else {
+  caption <- customcaption #user supplied 
+}
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## 3. Process Results 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -140,9 +156,6 @@ scen_res$MonthNum = as.numeric(format.Date(scen_res$MonthNum, format = "%m"))
 ## 4. Plot Choosen Figure Type 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-## create a pdf  
-pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".pdf"), width=9, height=6)
-
 variable = variables #this line could later be used in a loop through multiple
 #variables 
 
@@ -159,7 +172,8 @@ if (figuretype == 1){
     geom_point() +
     scale_x_discrete("Month",labels = month.abb) + #display abb. month names
     labs(title = paste("Mean",variable,startyr,"-",endyr), 
-         y = y_lab, x = "Year") 
+         y = y_lab, x = "Year", caption = caption) +  
+    theme(plot.caption = element_text(hjust = 0)) #left justify 
   print(p)
 }
 
@@ -174,7 +188,8 @@ if (figuretype == 2){
     geom_boxplot() +
     scale_x_discrete("Month",labels = month.abb) + #display abb. month names
     labs(title = paste(variable,startyr,"-",endyr), 
-         y = y_lab, x = "Year") 
+         y = y_lab, x = "Year", caption = caption) +  
+    theme(plot.caption = element_text(hjust = 0)) #left justify 
   print(p)
 }
 
@@ -191,9 +206,13 @@ if (figuretype == 3){
     stat_eexccrv() +
     scale_x_discrete("Month",labels = month.abb) + #display abb. month names
     labs(title = paste(variable,month.abb[exc_month],"Trace Exceedance",startyr,"-",endyr),
-         y = y_lab, x = "Year")
+         y = y_lab, caption = caption) +
+    scale_x_continuous("Year",labels = scales::percent) + 
+    theme(plot.caption = element_text(hjust = 0)) #left justify 
   print(p)
 }
 
+## save off image 
+ggsave(filename = paste0(file.path(ofigs,figs),"_",variables,"_",figuretypes[figuretype],".",imgtype), width = width, height = height, units ="in")
 
 dev.off()
