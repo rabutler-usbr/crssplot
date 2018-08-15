@@ -48,3 +48,5 @@ Temporary Items
 .apdisk
 .Rproj.user
 doc/README.html
+packrat/lib*/
+packrat/src/
