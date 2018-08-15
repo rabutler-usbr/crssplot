@@ -86,6 +86,7 @@ library(RWDataPlyr)
 # library(CRSSIO)
 # plotEOCYElev() and csVarNames()
 source('code/Stat_emp_ExcCrv.r')
+source('code/stat-boxplot-custom.r')
 
 # some sanity checks that UI is correct:
 if(!(mainScenGroup %in% names(scenarios))) 
