@@ -1,22 +1,11 @@
 
 library(CRSSIO)
-if(packageVersion("CRSSIO") < "0.6.0"){
-  detach("package:CRSSIO")
-  devtools::install_github("BoulderCodeHub/CRSSIO")
-  library(CRSSIO)
-}
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(grid))
 suppressPackageStartupMessages(library(feather))
 suppressPackageStartupMessages(library(stringr))
 library(RWDataPlyr)
-if(packageVersion("RWDataPlyr") < "0.6.0"){
-  # need 0.6.0 or higher for makeAllScenNames
-  detach("package:RWDataPlyr")
-  devtools::install_github("BoulderCodeHub/RWDataPlyr")
-  library(RWDataPlyr)
-}
-suppressPackageStartupMessages(library(data.table))
+pressPackageStartupMessages(library(data.table))
 source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
@@ -37,8 +26,8 @@ source('code/plotFirstYearShortCond.R')
 # you can read model output from the server, but save figures locally.
 
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
 # typical figures
 makeFiguresAndTables <- TRUE
 createSimple5yrTable <- TRUE
@@ -54,7 +43,7 @@ CRSSDIR <- Sys.getenv("CRSS_DIR")
 iFolder <- "M:/Shared/CRSS/2018/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "Jan2018_check"
+crssMonth <- "Aug2018"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -73,9 +62,8 @@ icDimNumber <- 5
 
 scens <- list(
   #"April 2017" = rw_scen_gen_names("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
-  
-  "January 2018" = rw_scen_gen_names("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
-  "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
+  "August 2018" = "Aug2018_2019,DNF,2007Dems,IG,Most",
+  "April 2018" = rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015)
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -84,15 +72,15 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  "January 2018" = file.path(
+  "August 2018" = c(3586.55, 1079.50),
+  "April 2018" = file.path(
     CRSSDIR, 
-    "dmi/InitialConditions/jan_2019Start/MtomToCrss_Monthly.xlsx"
-  ),
-  "August 2017" = c(3627.34, 1083.46)
+    "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
+  )
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c("January 2018" = "18-Dec", "August 2017" = "17-Dec")
+icMonth <- c("August 2018" = "18-Dec", "April 2018" = "18-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -100,7 +88,7 @@ icMonth <- c("January 2018" = "18-Dec", "August 2017" = "17-Dec")
 # to add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
-ss5 <- c("August 2017" = "August 2017", "January 2018" = "January 2018")
+ss5 <- c("April 2018" = "April 2018", "August 2018" = "August 2018")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 
@@ -114,17 +102,17 @@ yy5 <- 2019:2023
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "January 2018"
-mainScenGroup.name <- "January 2018"
+mainScenGroup <- "August 2018"
+mainScenGroup.name <- "August 2018"
 
 # text that will be added to figures
-annText <- 'Results from January 2018 CRSS Run' 
+annText <- 'Results from August 2018 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2019:2026 # years to show the crit stats figures
+peYrs <- 2018:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
