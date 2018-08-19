@@ -25,60 +25,66 @@ getMTOMConditionsData <- function(iFile, filterOn)
   zz
 }
 
+get_shortcond_from_rdf <- function(scenario, iFolder, oFolder)
+{
+  rwd1 <- read_rwd_agg("data/crss_short_cond.csv")
+  rwd2 <- rwd_agg(x = data.frame(
+    file = "KeySlots.rdf",
+    slot = "Powell.Outflow",
+    period = "asis",
+    summary = NA,
+    eval = NA,
+    t_s = NA,
+    variable = "powellOut",
+    stringsAsFactors = FALSE
+  ))
+  ann_file <- file.path(oFolder, "crssShortCond_ann.feather")
+  rw_scen_aggregate(scenario, agg = rwd1, scen_dir = iFolder, file = ann_file)
+  
+  mon_file <- file.path(oFolder, "crssShortCond_mon.feather")
+  rw_scen_aggregate(scenario, agg = rwd2, scen_dir = iFolder, file = mon_file)
+  invisible(scenario)
+}
+
 getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear) 
 {
-  # mead PE in December dataYear
-  # Powell WY Rel in dataYear
-  # Powell OND Rel in dataYear
-  # LB side inflow in dataYear
-  sal <- createSlotAggList(matrix(
-    c("KeySlots.rdf", "Mead.Pool Elevation", "EOCY", NA, "DecElev",
-    "KeySlots.rdf", "PowellOperation.PowellWYRelease", "EOCY", .000001, "WYRelease",
-    "Check.rdf", "TotVal.Mead", "AnnualSum", NA, "nfAbvMead",
-    "Check.rdf", "TotVal.BelowMead", "AnnualSum", NA, "nfBelowMead",
-    "BankAnn.rdf", "Mead Bank.California Take Schedule", "AnnualRaw", .001, "mwdTake",
-    "BankAnn.rdf", "Mead Bank.California Put Schedule", "AnnualRaw", .001, "mwdPut"),
-    byrow = TRUE,
-    ncol = 5
-  ))
-  sal2 <- createSlotAggList(matrix(
-    c("KeySlots.rdf", "Powell.Outflow", "Monthly", NA, "powellOut"),
-    byrow = TRUE,
-    nrow = 1
-  ))
-  zz <- getDataForAllScens(scenario, scenario, sal, iFolder, "crssCond.feather", TRUE)
-  on.exit(file.remove("crssCond.feather"))
-  zzMon <- getDataForAllScens(scenario, scenario, sal2, iFolder, "crssCond2.feather", TRUE)
-  on.exit(file.remove("crssCond2.feather"), add = TRUE)
+  zz <- feather::read_feather(file.path(iFolder, "crssShortCond_ann.feather"))
+  zzMon <- feather::read_feather(file.path(iFolder, "crssShortCond_mon.feather"))
   
   zz <- zz %>%
     filter(Year == dataYear) %>%
-    group_by(Scenario, Year, Trace) %>%
+    group_by(Scenario, Year, TraceNumber) %>%
     spread(Variable, Value) %>%
     mutate(lbGains = nfAbvMead + nfBelowMead,
            mwdIcs = mwdPut/.95 - mwdTake) %>%
     select(-nfAbvMead, -nfBelowMead, -mwdTake, -mwdPut)
   lbAvg <- mean(zz$lbGains)
-  
+ 
   zzMon <- zzMon %>%
-    filter(Year == dataYear, Month %in% c("Oct", "Nov", "Dec")) %>%
-    group_by(Scenario, Trace, Year, Variable) %>%
+    filter(Year == dataYear, Month %in% c("October", "November", "December")) %>%
+    group_by(Scenario, TraceNumber, Year, Variable) %>%
     summarise(Value = sum(Value)/1000000) %>% # now OND total release 
-    group_by(Scenario, Trace, Year) %>%
+    group_by(Scenario, TraceNumber, Year) %>%
     spread(Variable, Value)
   
-  message("Assuming that ", scenario, " uses full observed hydrology\n",
-          "If this is not the case, plotFirstYearShortCond() needs to be revisited")
+  message(
+    "Assuming that ", scenario, " uses full observed hydrology\n",
+    "If this is not the case, plotFirstYearShortCond() needs to be revisited"
+  )
   
-  zz <- full_join(zz, zzMon, by = c("Scenario", "Trace", "Year")) %>%
+  zz <- full_join(zz, zzMon, by = c("Scenario", "TraceNumber", "Year")) %>%
     ungroup() %>%
     select(-Scenario, -Year) %>%
     mutate(lbGains = paste0(round(lbGains/lbAvg*100,0), "%"),
-           Trace = as.factor(Trace + 1905),
+           TraceNumber = as.factor(TraceNumber + 1905),
            powellOut = as.factor(powellOut),
            WYRelease = round(WYRelease,2),
            mwdIcs = as.factor(mwdIcs)) %>%
-    rename(LBPrct = lbGains, OND.Release = powellOut, HydrologyYear = Trace)
+    rename(
+      LBPrct = lbGains, 
+      OND.Release = powellOut, 
+      HydrologyYear = TraceNumber
+    )
     
   
   if(filterOn == 'shortage'){
@@ -95,14 +101,15 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
 
 # filterOn: valid choices are 'shortage', 'pe'
 # if filterOn == pe, then will keep all traces that are <= 1077
-plotFirstYearShortCond <- function(model, iFile, scenario, filterOn = 'shortage', dataYear)
+plotFirstYearShortCond <- function(model, iFile, scenario, 
+                                   filterOn = 'shortage', dataYear, 
+                                   colorVar = "WYRelease")
 {
   if(model == "MTOM"){
     zz <- getMTOMConditionsData(iFile, filterOn)
     colorVar <- "WYRelease"
   } else if(model == "CRSS"){
     zz <- getCRSSConditionsData(iFile, scenario, filterOn, dataYear)
-    colorVar <- "mwdIcs"
   } else {
     stop("invalid model passed to plotFirstYearShortCond")
   }
@@ -118,6 +125,15 @@ plotFirstYearShortCond <- function(model, iFile, scenario, filterOn = 'shortage'
     color = colorVar,
     label = "LBPrct"
   ))
+  
+  color_lab <- if (colorVar == "WYRelease") {
+    "Powell WY Release"
+  } else if (colorVar == "mwdIcs") {
+    "MWD ICS (negative is take)"
+  } else {
+    colorVar
+  }
+  
   gg <- gg + 
     geom_point(size = 4) + 
     geom_hline(aes(yintercept = 1075),linetype = 2) + 
@@ -125,7 +141,8 @@ plotFirstYearShortCond <- function(model, iFile, scenario, filterOn = 'shortage'
     labs(
       shape = paste0('Powell Oct-Dec\n',dataYear,' Release (maf)'), 
       x = paste0(dataYear,' Hydrology from Year'),
-      y = paste0('Mead End-of-December ',dataYear,' elevation (feet)')
+      y = paste0('Mead End-of-December ',dataYear,' elevation (feet)'),
+      color = color_lab
     ) +
     scale_y_continuous(minor_breaks = 900:1200, breaks = seq(900,1200,1), label = comma) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +

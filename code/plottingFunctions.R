@@ -60,9 +60,13 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
               "> 1,077'" = '#2166ac')
   zz$TheColor <- factor(zz$TheColor, levels = names(myCols))
   
-  gg <- ggplot(zz, aes(Trace, Value, color = TheColor)) + geom_point(size = 3, shape = 18) +
+  gg <- ggplot(zz, aes(TraceNumber, Value, color = TheColor)) + 
+    geom_point(size = 3, shape = 18) +
     labs(x = 'Trace Number', y = 'Pool Elevation [ft]', title = myTitle) + 
-    scale_y_continuous(label = scales::comma, minor_breaks = seq(800, 1200, 5)) +
+    scale_y_continuous(
+      label = scales::comma, 
+      minor_breaks = seq(800, 1200, 5)
+    ) +
     scale_color_manual(values = myCols) +
     theme(legend.title = element_blank())
   
@@ -72,20 +76,32 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
              lt1076 = ifelse(Value <= 1076 & Value > 1075, 1, 0),
              lt1077 = ifelse(Value <= 1077 & Value > 1075, 1, 0)) %>%
       ungroup() %>%
-      summarise(lt1075 = sum(lt1075), lt1076 = sum(lt1076), lt1077 = sum(lt1077))
+      summarise(
+        lt1075 = sum(lt1075), 
+        lt1076 = sum(lt1076), 
+        lt1077 = sum(lt1077)
+      )
     
     myText <- paste(nn$lt1075, 'runs are below 1,075 ft\n','an additional',
                     nn$lt1076, 'runs are within 1 ft of being below 1,075 ft\n',
                     nn$lt1077, 'runs are within 2 ft of being below 1,075 ft')
     
     gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
-      annotate(geom = 'text', x = 1, y = max(zz$Value)-5, label = myText, hjust = 0)
+      annotate(
+        geom = 'text', 
+        x = 1, 
+        y = max(zz$Value) - 5, 
+        label = myText, 
+        hjust = 0
+      )
   }
   gg
 }
 
-compareCritStats <- function(zz, yrs, variable, annText, plotTitle, legendTitle = '', 
-                             legLoc = 'right', nC = 1, annSize = 3, legendWrap = NULL)
+compareCritStats <- function(zz, yrs, variable, annText, plotTitle, 
+                             legendTitle = '', 
+                             legLoc = 'right', nC = 1, annSize = 3, 
+                             legendWrap = NULL)
 {
 
   yL <- c(0,1)
