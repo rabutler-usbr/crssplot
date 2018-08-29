@@ -37,6 +37,7 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
   gg <- gg + geom_line(size = 1) + 
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs,
                        labels = myLabs) + 
+    scale_y_continuous(labels = scales::comma) +
     theme(panel.grid.minor = element_line(color = 'white', size = .4),
           panel.grid.major = element_line(color = 'white', size = .6)) +
     labs(y = '[feet]', title = myTitle) +
