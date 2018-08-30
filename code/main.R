@@ -1,21 +1,10 @@
 
 library(CRSSIO)
-if(packageVersion("CRSSIO") < "0.6.0"){
-  detach("package:CRSSIO")
-  devtools::install_github("BoulderCodeHub/CRSSIO")
-  library(CRSSIO)
-}
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(grid))
 suppressPackageStartupMessages(library(feather))
 suppressPackageStartupMessages(library(stringr))
 library(RWDataPlyr)
-if(packageVersion("RWDataPlyr") < "0.6.0"){
-  # need 0.6.0 or higher for makeAllScenNames
-  detach("package:RWDataPlyr")
-  devtools::install_github("BoulderCodeHub/RWDataPlyr")
-  library(RWDataPlyr)
-}
 suppressPackageStartupMessages(library(data.table))
 source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
@@ -36,25 +25,30 @@ source('code/plotFirstYearShortCond.R')
 # output it could be the same as CRSSDIR, but is allowed to be different so that 
 # you can read model output from the server, but save figures locally.
 
+# swtiches to read data. if you've already read the data in from rdfs once, 
+# you may be able to set this to FALSE, so it's faster
+getSysCondData <- TRUE
+getPeData <- TRUE
+get_crss_short_cond_data <- FALSE
+
 # "switches" to create/not create different figures
-getSysCondData <- FALSE
-getPeData <- FALSE
 # typical figures
 makeFiguresAndTables <- TRUE
-createSimple5yrTable <- TRUE
+pdf_name <- 'CRSS_August2018_hydroSens.pdf'
+createSimple5yrTable <- FALSE
 
 # optional figures/tables
-createShortConditions <- TRUE
+createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 addPEScatterFig <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
-CRSSDIR <- Sys.getenv("CRSS_DIR")
+CRSSDIR <- "C:/alan/CRSS/CRSS.2018" #Sys.getenv("CRSS_DIR")
 iFolder <- "M:/Shared/CRSS/2018/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "Jan2018_check"
+crssMonth <- "Aug2018_hydroSensitivity"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -72,10 +66,11 @@ crssMonth <- "Jan2018_check"
 icDimNumber <- 5 
 
 scens <- list(
-  #"April 2017" = rw_scen_gen_names("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
-  
-  "January 2018" = rw_scen_gen_names("Jan2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
-  "August 2017" = "Aug2017_2018,DNF,2007Dems,IG,Most"
+  "August 2018 - DNF" = "Aug2018_2019,DNF,2007Dems,IG,Most",
+  # "April 2018" = 
+  #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
+  # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
+  "August 2018 - ISM 1988-2015" = "Aug2018_2019,ISM1988_2015,CT,IG,Most"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -84,15 +79,18 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  "January 2018" = file.path(
-    CRSSDIR, 
-    "dmi/InitialConditions/jan_2019Start/MtomToCrss_Monthly.xlsx"
-  ),
-  "August 2017" = c(3627.34, 1083.46)
+  "August 2018 - DNF" = c(3586.55, 1079.50),
+  "August 2018 - ISM 1988-2015" = c(3586.55, 1079.50)
+  # "April 2018" = file.path(
+  #   CRSSDIR,
+  #   "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
+  # ),
+  # "April 2018 - most" =  c(3589.78, 1079.07)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c("January 2018" = "18-Dec", "August 2017" = "17-Dec")
+icMonth <- c("August 2018 - DNF" = "18-Dec",
+             "August 2018 - ISM 1988-2015" = "18-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -100,9 +98,8 @@ icMonth <- c("January 2018" = "18-Dec", "August 2017" = "17-Dec")
 # to add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
-ss5 <- c("August 2017" = "August 2017", "January 2018" = "January 2018")
-ss5 <- names(icMonth)
-names(ss5) <- names(icMonth)
+ss5 <- c("August 2018 - DNF" = "August 2018 - DNF", 
+         "August 2018 - ISM 1988-2015" = "August 2018 - ISM 1988-2015")
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
@@ -114,44 +111,49 @@ yy5 <- 2019:2023
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "January 2018"
-mainScenGroup.name <- "January 2018"
+mainScenGroup <- "August 2018 - DNF"
+mainScenGroup.name <- "August 2018 - DNF"
 
 # text that will be added to figures
-annText <- 'Results from January 2018 CRSS Run' 
+annText <- 'Results from August 2018 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2018:2026 # years to show the crit stats figures
-peYrs <- 2017:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2019:2060 # years to show the crit stats figures
+peYrs <- 2018:2060 # years to show the Mead/Powell 10/50/90 figures for
 
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
-peScatterYear <- 2018
+peScatterYear <- 2019
 # peScatterData should be set to either MTOM or CRSS
 # if relying on combined run, then this is likely MTOM; if using a CRSS only 
 # run, then likely set to CRSS
-peScatterData <- 'MTOM'
+peScatterData <- 'CRSS'
 
-conditionsFrom <- "MTOM" # string should be either CRSS or MTOM
+conditionsFrom <- "CRSS" # string should be either CRSS or MTOM
 
 # yearToAnalyze is used in the plot labeling. This is typically the first year
-# of the MTOM run, e.g., 2017 for a January 2017 MTOM run
-yearToAnalyze <- 2018
+# of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
+# the first year of shortage for a CRSS run, i.e., it uses the December elev.
+# at MEad for that year, and the OND release from that year from Powell
+yearToAnalyze <- 2019
 if (conditionsFrom == "CRSS") {
-  resFile <- iFolder
-  # set scenario to NA if using MTOM or to the main scenario folder if using CRSS
+  resFile <- resFolder
+  # set scenario to NA if using MTOM or 
+  # to the main scenario folder if using CRSS
   scenario <- scens[[mainScenGroup]]
+  
+  short_cond_color_var <- "mwdIcs" # WYRelease or mwdIcs
   
   # the label for the percent of average
   lbLabel <- "Total LB natural inflow percent\nof average (1906-2015)"
-  shortCondSubTitle <- "Results from the January 2018 CRSS run, based on observed December 31, 2017 conditions."
+  shortCondSubTitle <- "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study."
 } else if (conditionsFrom == "MTOM") {
   # see doc/README for instructions for how to create this csv file
   resFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/Jan2018MTOMResults.csv') 
   scenario <- NA
-  
+  short_cond_color_var <- "WYRelease" #only WYRelease
   # the label for the percent of average
   lbLabel <- 'LB total side inflow percent\nof average (1981-2015)'
   shortCondSubTitle <- 'Results from the January 2018 MTOM run based on the January 3, 2017 CBRFC forecast' 
@@ -160,7 +162,7 @@ if (conditionsFrom == "CRSS") {
   stop("Invalid `conditionsFrom` value.")
 }
 
-shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2019'
+shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2020'
 
 #                               END USER INPUT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -231,11 +233,8 @@ curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
 # file name for the system conditions procssed file
 sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
 
-# file name for figure with Powell and Mead 10/50/90 EOCY elevations
-eocyFigs <- 'MPEOCY.pdf' 
 
 critStatsProc <- 'CritStats.csv'
-critFigs <- 'CritFigs2026.pdf'
 condProbFile <- 'CondProbs.csv'
 
 shortCondFig <- 'shortConditionsFig.pdf'
@@ -293,11 +292,23 @@ if(getPeData){
   message('finished getPeData')
 }
 
+if (get_crss_short_cond_data) {
+  message("Starting to get CRSS shortage condition data...")
+  
+  get_shortcond_from_rdf(
+    scenario = scens[[mainScenGroup]], 
+    iFolder = iFolder, 
+    oFolder = resFolder
+  )
+  
+  message("Done getting CRSS shortage condition data")
+}
+
 if(makeFiguresAndTables){
   message("starting to create figures and tables")
   message("creating system conditions table")
   ## Create tables, figures, and data behind figures
-  # 1) system conditions table
+  # 1) system conditions table -------------
   sysCond <- read_feather(file.path(resFolder,sysCondFile)) %>%
     # trim to specified years and the current main scenario group 
     dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
@@ -310,7 +321,8 @@ if(makeFiguresAndTables){
     row.names = TRUE
   )
   
-  # 2) Plot Mead, Powell EOCY elvations and include previous month's results too
+  # 2) Plot Mead, Powell EOCY elvations -------------
+  # includes previous month's results too
   # read in current month data
   message("EOCY elevation figures")
   pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
@@ -328,16 +340,7 @@ if(makeFiguresAndTables){
                            'Mead End-of-December Elevation', colorLabel, 
                          legendWrap = legendWrap)
   
-  # save figures
-  pdf(file.path(oFigs,eocyFigs), width = 8, height = 6)
-  print(powellPE)
-  print(meadPE)
-  dev.off()
-  
-  rm(powellPE, meadPE)
-  
-  
-  # 3) Critical elevation thresholds; figures and data table
+  # 3) Critical elevation thresholds; figures and data table -------
   # have sysCond for some, and read in crit stats for others
   message("starting critical stats")
   
@@ -447,8 +450,10 @@ if(makeFiguresAndTables){
   )
 
 # save figures and table
-  message("creating critFigs pdf")
-  pdf(file.path(oFigs,critFigs),width = 8, height = 6)
+  message("creating pdf")
+  pdf(file.path(oFigs, pdf_name),width = 8, height = 6)
+  print(powellPE)
+  print(meadPE)
   print(p3490Fig)
   print(shortFig)
   print(surpFig)
@@ -564,27 +569,39 @@ if (createShortConditions) {
     stop("conditions leading to shortage is only designed to work with 1 scenario of data, at this point")
   
   message(
-    'Using hard coded values for the arrow in the shortage conditions figure.\n',
-    'You may need to update the values and re-run main.R'
+    'Using hard coded values for the arrow in the shortage conditions figure.',
+    '\nYou may need to update the values and re-run main.R'
   )
   # filterOn being set to pe shows results for traces that are <= 1077
   shortCond <- plotFirstYearShortCond(
     conditionsFrom, 
-    resFile, 
+    iFile = resFile, 
     scenario, 
     filterOn = 'pe', 
-    yearToAnalyze
+    yearToAnalyze,
+    colorVar = short_cond_color_var
   )
   shortCond <- shortCond + 
-    annotate('segment', x = 5.55, xend = 4.3, y = 1069.6, yend = 1068.85, 
+    annotate('segment', x = 16.9, xend = 14.5, y = 1055, yend = 1056.4, 
            arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
-    annotate('text', x = 5.65, y = 1069.6,label = lbLabel, size = 4, hjust = 0) +
-    ggtitle(shortCondTitle, subtitle = shortCondSubTitle) +
+    annotate(
+      'text', 
+      x = 17, 
+      y = 1054,
+      label = lbLabel, 
+      size = 4, 
+      hjust = 0
+    ) +
+    labs(title = shortCondTitle, caption = shortCondSubTitle) +
     theme(legend.title = element_text(size = 10))
   
-  pdf(file.path(oFigs,shortCondFig),width = 9, height = 6)
-  print(shortCond)
-  dev.off()
+  ggsave(
+    file.path(oFigs,paste(short_cond_color_var, shortCondFig, sep = "_")),
+    plot = shortCond,
+    units = "in",
+    width = 9, 
+    height = 6
+  )
 }
 
 # 5 year simple table -------------------------
@@ -620,7 +637,7 @@ if (addPEScatterFig) {
     pe <- decVals %>%
       select(`Mead.Pool Elevation`) %>%
       rename(Value = `Mead.Pool Elevation`) %>%
-      mutate(Trace = as.numeric(traceNum), 
+      mutate(TraceNumber = as.numeric(traceNum), 
              Year = peScatterYear,
              Variable = "Mead.Pool Elevation")
     
