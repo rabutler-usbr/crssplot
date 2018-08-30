@@ -27,28 +27,28 @@ source('code/plotFirstYearShortCond.R')
 
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
-getSysCondData <- FALSE
-getPeData <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
 get_crss_short_cond_data <- FALSE
 
 # "switches" to create/not create different figures
 # typical figures
-makeFiguresAndTables <- FALSE
-pdf_name <- 'CRSS_August2018_AprMostOnly.pdf'
+makeFiguresAndTables <- TRUE
+pdf_name <- 'CRSS_August2018_hydroSens.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
-createShortConditions <- TRUE
+createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 addPEScatterFig <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
-CRSSDIR <- Sys.getenv("CRSS_DIR")
-iFolder <- "//128.138.225.24/bor/Shared/CRSS/2018/Scenario"
+CRSSDIR <- "C:/alan/CRSS/CRSS.2018" #Sys.getenv("CRSS_DIR")
+iFolder <- "M:/Shared/CRSS/2018/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "Aug2018"
+crssMonth <- "Aug2018_hydroSensitivity"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -66,11 +66,11 @@ crssMonth <- "Aug2018"
 icDimNumber <- 5 
 
 scens <- list(
-  "August 2018" = "Aug2018_2019,DNF,2007Dems,IG,Most",
-  "April 2018" = 
-    rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
-  "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
-  "August 2018 w/Stress Test" = "Aug2018_2019,ISM1988_2015,2007Dems,IG,Most"
+  "August 2018 - DNF" = "Aug2018_2019,DNF,2007Dems,IG,Most",
+  # "April 2018" = 
+  #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
+  # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
+  "August 2018 - ISM 1988-2015" = "Aug2018_2019,ISM1988_2015,CT,IG,Most"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -79,18 +79,18 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  "August 2018" = c(3586.55, 1079.50),
-  "August 2018 w/Stress Test" = c(3586.55, 1079.50),
-  "April 2018" = file.path(
-    CRSSDIR,
-    "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
-  ),
-  "April 2018 - most" =  c(3589.78, 1079.07)
+  "August 2018 - DNF" = c(3586.55, 1079.50),
+  "August 2018 - ISM 1988-2015" = c(3586.55, 1079.50)
+  # "April 2018" = file.path(
+  #   CRSSDIR,
+  #   "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
+  # ),
+  # "April 2018 - most" =  c(3589.78, 1079.07)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c("August 2018" = "18-Dec", "April 2018" = "18-Dec", 
-             "April 2018 - most" = "18-Dec", "August 2018 w/Stress Test" = "18-Dec")
+icMonth <- c("August 2018 - DNF" = "18-Dec",
+             "August 2018 - ISM 1988-2015" = "18-Dec")
 
 # for the 5-year simple table
 # value are the scenario group variable names (should be same as above)
@@ -98,7 +98,8 @@ icMonth <- c("August 2018" = "18-Dec", "April 2018" = "18-Dec",
 # to add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
-ss5 <- c("April 2018" = "April 2018", "August 2018" = "August 2018")
+ss5 <- c("August 2018 - DNF" = "August 2018 - DNF", 
+         "August 2018 - ISM 1988-2015" = "August 2018 - ISM 1988-2015")
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
@@ -110,8 +111,8 @@ yy5 <- 2019:2023
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "August 2018"
-mainScenGroup.name <- "August 2018"
+mainScenGroup <- "August 2018 - DNF"
+mainScenGroup.name <- "August 2018 - DNF"
 
 # text that will be added to figures
 annText <- 'Results from August 2018 CRSS Run' 
@@ -119,8 +120,8 @@ annText <- 'Results from August 2018 CRSS Run'
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2019:2026 # years to show the crit stats figures
-peYrs <- 2018:2026 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2019:2060 # years to show the crit stats figures
+peYrs <- 2018:2060 # years to show the Mead/Powell 10/50/90 figures for
 
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
