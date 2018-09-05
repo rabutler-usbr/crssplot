@@ -4,6 +4,11 @@
 #It is borken out into UB2018Dev_main_PowMeadcompare.R and UB2018Dev_annual_bxplt.R
 ##############################################################################
 
+
+#CF, 20180905: modified and wont work any more 
+
+
+
 library(CRSSIO)
 if(packageVersion("CRSSIO") < "0.6.0"){
   detach("package:CRSSIO")
@@ -65,7 +70,7 @@ iFolder <- paste0(CRSSDIR,"/Scenario/")
 # a folder with this name
 
 #### Apr18 v NoTribs
-crssMonth <- "Apr18_vNoTribs"
+crssMonth <- "April 2018 + updates"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -86,7 +91,7 @@ scens <- list(
   #"April 2017" = rw_scen_gen_names("Apr2017_2018","DNF","2007Dems","IG",1981:2015),
   
   "April 2018" = "Apr2018,DNF,2007Dems,IG,MTOM_Most", 
-  "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
+  "April 2018 + updates" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -99,7 +104,7 @@ icList <- list(
     CRSSDIR, 
     "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
   ),
-  "Asp.NoTribs" = file.path(
+  "April 2018 + updates" = file.path(
     CRSSDIR, 
     "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
 ))
@@ -113,7 +118,7 @@ icMonth <- c("April 2018" = "18-Dec", "Asp.NoTribs" = "18-Dec")
 # to add a footnote or longer name
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
-ss5 <- c("April 2018" = "April 2018", "Asp.NoTribs" = "Asp.NoTribs")
+ss5 <- c("April 2018" = "April 2018", "April 2018 + updates" = "April 2018 + updates")
 ss5 <- names(icMonth)
 names(ss5) <- names(icMonth)
 
@@ -127,32 +132,32 @@ yy5 <- 2019:2023
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "Asp.NoTribs"
-mainScenGroup.name <- "Asp.NoTribs"
+mainScenGroup <- "April 2018 + updates"
+mainScenGroup.name <- "April 2018 + updates"
 
-######### Tribs v NoTribs Inputs ###############
-crssMonth <- "Tribs_vNoTribs"
-scens <- list(
-  "Asp.Tribs" = "9602.Tribs,DNF,2007Dems,IG.9004.Tribs,MTOM_Most", 
-  "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
-)
-icList <- list(
-  "Asp.Tribs" = file.path(
-    CRSSDIR, 
-    "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
-  ),
-  "Asp.NoTribs" = file.path(
-    CRSSDIR, 
-    "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
-  ))
-# The month in YY-Mmm format of the intitial condtions for each scenario group
-icMonth <- c("Asp.Tribs" = "18-Dec", "Asp.NoTribs" = "18-Dec")
-ss5 <- c("Asp.Tribs" = "Asp.Tribs", "Asp.NoTribs" = "Asp.NoTribs")
-ss5 <- names(icMonth)
-names(ss5) <- names(icMonth)
-mainScenGroup <- "Asp.NoTribs"
-mainScenGroup.name <- "Asp.NoTribs"
-######### End of Tribs v NoTribs Inputs ###############
+# ######### Tribs v NoTribs Inputs ###############
+# crssMonth <- "Tribs_vNoTribs"
+# scens <- list(
+#   "Asp.Tribs" = "9602.Tribs,DNF,2007Dems,IG.9004.Tribs,MTOM_Most", 
+#   "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
+# )
+# icList <- list(
+#   "Asp.Tribs" = file.path(
+#     CRSSDIR, 
+#     "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
+#   ),
+#   "Asp.NoTribs" = file.path(
+#     CRSSDIR, 
+#     "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
+#   ))
+# # The month in YY-Mmm format of the intitial condtions for each scenario group
+# icMonth <- c("Asp.Tribs" = "18-Dec", "Asp.NoTribs" = "18-Dec")
+# ss5 <- c("Asp.Tribs" = "Asp.Tribs", "Asp.NoTribs" = "Asp.NoTribs")
+# ss5 <- names(icMonth)
+# names(ss5) <- names(icMonth)
+# mainScenGroup <- "Asp.NoTribs"
+# mainScenGroup.name <- "Asp.NoTribs"
+# ######### End of Tribs v NoTribs Inputs ###############
 
 # text that will be added to figures
 annText <- 'Results from April 2018 CRSS Run' 
@@ -688,21 +693,24 @@ if (addPEScatterFig) {
 # vignette("rwdataplyr-workflow", package = "RWDataPlyr")
 
 rwa1 <- rwd_agg(read.csv("C:/Users/cfelletter/Documents/CRSS working/RDF Process/rw_agg_UBdev.csv", stringsAsFactors = FALSE)) 
+rwa_powonly <- rwd_agg(read.csv("C:/Users/cfelletter/Documents/CRSS working/RDF Process/rw_agg_pow.csv", stringsAsFactors = FALSE)) 
+
 
 # scen_dir = paste0(MTOMDIR,"/Output Data/RDF Process/") #set to the folder containing the sub folders for each ensemble
 # names(my_scens) = my_scens #naming #must name these
 
-# file = "UBRes.rdf" #"MTOM.rdf"
+file = "Res.rdf" #"MTOM.rdf"
 # #read in the rdf
-# rdf <- read_rdf(iFile = paste0(iFolder,scens[1],"/",file))
+rdf <- read_rdf(iFile = paste0(iFolder,scens[1],"/",file))
 # # ensure the slot you want is in the rdf:
-# rdf_slot_names(rdf)
+rdf_slot_names(rdf)
 
 for(i in 1:1){
 #rw_scen_aggregate() will aggregate and summarize multiple scenarios, essentially calling rdf_aggregate() for each scenario. Similar to rdf_aggregate() it relies on a user specified rwd_agg object to know how to summarize and process the scenarios.
 scen_res <- rw_scen_aggregate(
   scens,
-  agg = rwa1,
+  # agg = rwa1,
+  agg = rwa_powonly,
   scen_dir = iFolder
 )
 
@@ -711,18 +719,24 @@ unique(scen_res$Variable) #check variable names
 ## plot 
 pdf(paste0(oFigs,'/UBresDevPlots.pdf'), width=9, height=6)
 
+#CF, 20180905: modified and wont work any more 
+
 variable = "Powell.Inflow.CY"
-y_lab = "Annual Flow"
-title = variable
+y_lab = "Inflow (MAF/year)"
+title = "Powell CY Inflow 2019-2026"
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
   dplyr::filter(Year <= 2026) %>% #one run has 2023 so filter that out so axis work
   dplyr::group_by(Scenario, Year) %>%
+  dplyr::mutate(Value = Value/1000000) %>% # converts to maf 
   ggplot(aes(x = factor(Year), y = Value, color = Scenario)) + 
   geom_boxplot() +
+  # scale_y_continuous(labels = scales::comma) #add commas to axis
   # stat_boxplot_custom() +
-  labs(title = title, y = y_lab) 
+  labs(title = title, y = y_lab, x = "Year") 
+
+dev.off()
 
 variable = "Powell.Pool Elevation"
 y_lab = "EOCY PE"

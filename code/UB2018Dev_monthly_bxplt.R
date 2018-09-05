@@ -22,7 +22,7 @@ iFolder <- paste0(CRSSDIR,"/Scenario/")
 
 scens <- list(
   "April 2018" = "Apr2018,DNF,2007Dems,IG,MTOM_Most", 
-  "Asp.NoTribs" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
+  "April 2018 + updates" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
 )
 
 # ofigs <- file.path(CRSSDIR,'results',mainScenGroup) 
@@ -71,7 +71,7 @@ unique(scen_res$Scenario) #check Scenario names
 unique(scen_res$Year) #check Years names 
 
 variable = "Crystal.Outflow"
-y_lab = "Monthly Flow (ac-ft/mo)"
+y_lab = "Monthly Flow (acre-ft/month)"
 title = paste(variable,"2019-2026")
 
 #I CANT FIGURE OUT HOW TO ORDER BY MONTH w/o creating a new Numeric Month to plot by
@@ -100,7 +100,7 @@ scen_res$MonthNum = as.numeric(format.Date(scen_res$MonthNum, format = "%m"))
 pdf(paste0(ofigs,'/UBresDevPlots_Monthly.pdf'), width=9, height=6)
 # for(i in 1:1){
 variable = "Crystal.Outflow"
-y_lab = "Monthly Flow (ac-ft/mo)"
+y_lab = "Monthly Flow (acre-ft/month)"
 title = paste(variable,"2019-2026")
 
 scen_res %>%
@@ -128,7 +128,7 @@ scen_res %>%
   labs(title = title, y = y_lab) 
 
 variable = "BlueMesa.Outflow"
-y_lab = "Monthly Flow (ac-ft/mo)"
+y_lab = "Monthly Flow (acre-ft/month)"
 title = paste(variable,"2019-2026")
 
 scen_res %>%
@@ -143,16 +143,16 @@ scen_res %>%
 variable = "BlueMesa.Pool Elevation"
 y_lab = "End of Month PE (ft)"
 title = paste(variable,"2019-2026")
-Jan31PEtarget <- data.frame(yintercept=7487) 
-Feb31PEtarget <- data.frame(yintercept=7485) 
+# Jan31PEtarget <- data.frame(yintercept=7487) 
+# Feb31PEtarget <- data.frame(yintercept=7485) 
 Mar31PEtarget <- data.frame(yintercept=7484.5) 
-Apr31PEtarget <- data.frame(yintercept=7491) 
-MayNov31PEtarget <- data.frame(yintercept=7495) 
+# Apr31PEtarget <- data.frame(yintercept=7491) 
+# MayNov31PEtarget <- data.frame(yintercept=7495) 
 JunJul31PEtarget <- data.frame(yintercept=7516.4) 
-Aug31PEtarget <- data.frame(yintercept=7507) 
-Sep31PEtarget <- data.frame(yintercept=7498) 
-Oct31PEtarget <- data.frame(yintercept=7496.5) 
-Dec31PEtarget <- data.frame(yintercept=7490) 
+# Aug31PEtarget <- data.frame(yintercept=7507) 
+# Sep31PEtarget <- data.frame(yintercept=7498) 
+# Oct31PEtarget <- data.frame(yintercept=7496.5) 
+# Dec31PEtarget <- data.frame(yintercept=7490) 
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
@@ -161,40 +161,42 @@ scen_res %>%
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
   geom_boxplot() +
   scale_x_discrete("Month",labels = month.abb) + #display abb. month names
-  geom_hline(aes(yintercept=yintercept), data=Jan31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=Feb31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Jan31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Feb31PEtarget) +
   geom_hline(aes(yintercept=yintercept), data=Mar31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=Apr31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=MayNov31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Apr31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=MayNov31PEtarget) +
   geom_hline(aes(yintercept=yintercept), data=JunJul31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=Aug31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=Sep31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=Oct31PEtarget) +
-  geom_hline(aes(yintercept=yintercept), data=Dec31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Aug31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Sep31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Oct31PEtarget) +
+  # geom_hline(aes(yintercept=yintercept), data=Dec31PEtarget) +
   labs(title = title, y = y_lab) 
 
 variable = "GunnisonNearGrandJunction.AFOutflow"
-y_lab = "Monthly Flow (ac-ft/mo)"
+y_lab = "Monthly Flow (kaf/month)"
 title = paste(variable,"2019-2026")
-DryTarget <- data.frame(yintercept=55340) 
-AvgDryTarget <- data.frame(yintercept=496200)
-ModWetTarget <- data.frame(yintercept=882350) 
+DryTarget <- data.frame(yintercept=55.340) 
+AvgDryTarget <- data.frame(yintercept=496.200)
+ModWetTarget <- data.frame(yintercept=882.350) 
 
 scen_res %>%
   dplyr::filter(Variable == variable) %>%
   dplyr::filter(Year <= 2026) %>% #one run has 2023 so filter that out so axis work
   dplyr::group_by(Scenario, MonthNum) %>%
+  dplyr::mutate(Value = Value/1000) %>% # converts to kaf 
   ggplot(aes(x = factor(MonthNum), y = Value, color = Scenario)) + 
   geom_boxplot() +
   scale_x_discrete("Month",labels = month.abb) + #display abb. month names
   geom_hline(aes(yintercept=yintercept), data=DryTarget) +
   geom_hline(aes(yintercept=yintercept), data=AvgDryTarget) +
   geom_hline(aes(yintercept=yintercept), data=ModWetTarget) +
-  labs(title = title, y = y_lab) 
+  labs(title = "Gunnison Near Grand Junction 2019-2026", y = y_lab) +
+  scale_y_continuous(labels = scales::comma) #add commas to axis 
 
 
 variable = "Fontenelle.Outflow"
-y_lab = "Monthly Flow (ac-ft/mo)"
+y_lab = "Monthly Flow (acre-ft/month)"
 title = paste(variable,"2019-2026")
 
 scen_res %>%
@@ -227,7 +229,7 @@ scen_res %>%
   labs(title = title, y = y_lab) 
 
 variable = "FlamingGorge.Outflow"
-y_lab = "Monthly Flow (ac-ft/mo)"
+y_lab = "Monthly Flow (acre-ft/month)"
 title = paste(variable,"2019-2026")
 
 scen_res %>%
