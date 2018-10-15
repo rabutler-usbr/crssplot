@@ -4,8 +4,8 @@ library(readxl)
 # prep data for 10/50/90 figures for April Run compare to January Run
 # mmm = min/most/max
 
-# Want to show initial conditions on 10/50/90 figures, so have to append IC for each run
-# using the MTOM results
+# Want to show initial conditions on 10/50/90 figures, so have to append IC for 
+# each run using the MTOM results
 
 get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
   # convert icName to a trace number
@@ -20,10 +20,12 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
     icTrace <- paste0("Trace", icTrace$trace)
   }
  
-  # then read the provided file and get powell and mead PE for the provided month
-  # and return it
+  # then read the provided file and get powell and mead PE for the provided 
+  # month and return it
+  ic_date <- as.Date(paste0(icMonth,"-01"), format = "%y-%b-%d")
+  
   read_excel(icFile, sheet = icTrace) %>%
-    filter(as.Date(X__1, format = "%Y-%b-%d") == as.Date(paste0(icMonth,"-01"), format = "%y-%b-%d")) %>%
+    filter(as.Date(X__1, format = "%Y-%b-%d") == ic_date) %>%
     select(`Powell.Pool Elevation`, `Mead.Pool Elevation`)
 }
 
@@ -31,15 +33,15 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
 #' @param icList: a list of model run entries; the entries are either numeric, 
 #' actual IC or paths to files that contain the IC
 #' @param icMonth: the month/year to use as initial conditions
-#' @param traceMap: named list of matrices. Null, unless one of the icList is an excel 
-#' file, then provide a traceMap that maps the trace numbers found in the excel 
-#' file to the initial conditions dimension label
-#' @param icDimNumber: numeric dimension number for the initial condition label within
-#' the full scenario name
+#' @param traceMap: named list of matrices. Null, unless one of the icList is 
+#'   an excel file, then provide a traceMap that maps the trace numbers found 
+#'   in the excel file to the initial conditions dimension label
+#' @param icDimNumber: numeric dimension number for the initial condition label 
+#'   within the full scenario name
 getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth, 
-                           addAggAttribute = TRUE, aggFunction, traceMap, icDimNumber = 5)
+                           addAggAttribute = TRUE, aggFunction, traceMap, 
+                           icDimNumber = 5)
 {
- 
   res <- read_feather(fileToAppend)
   
   icSave <- data.frame()
@@ -71,14 +73,23 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
       
       # apply function over all i.c. dimension for the current groupName
       # get the ic dimensions
-      icDim <- stringr::str_split(scens[[groupName]], pattern = ',', simplify = TRUE)
+      icDim <- stringr::str_split(
+        scens[[groupName]], 
+        pattern = ',', 
+        simplify = TRUE
+      )
       icDim <- icDim[,icDimNumber] # get only the i.c. dimension
-      icVals <- do.call(rbind, lapply(icDim, get1TraceIc, icData, icMonth[[groupName]], traceMap))
+      icVals <- do.call(
+        rbind, 
+        lapply(icDim, get1TraceIc, icData, icMonth[[groupName]], traceMap)
+      )
+      
       mp <- data.frame(
         'Scenario' = scens[[groupName]], 
         'Value' = icVals$`Mead.Pool Elevation`,
         stringsAsFactors = FALSE
       )
+      
       pp <- data.frame(
         'Scenario' = scens[[groupName]], 
         'Value' = icVals$`Powell.Pool Elevation`,
@@ -91,7 +102,10 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
     mp$Variable <- 'Mead.Pool Elevation'
     ic <- rbind(pp,mp)
     ic$TraceNumber <- 0
-    ic$Year <- as.numeric(paste0('20',simplify2array(strsplit(icMonth,'-'))[1,j])) #2015
+    ic$Year <- as.numeric(paste0(
+      '20',
+      simplify2array(strsplit(icMonth,'-'))[1,j]
+    )) #2015
     ic$Month <- "December"
     # order ic
     ic <- select(ic, one_of(names(res)[names(res) != "Agg"]))

@@ -1,0 +1,7 @@
+file,slot,period,summary,eval,t_s,variable
+KeySlots.rdf,Mead.Pool Elevation,eocy,NA,NA,NA,meadPe
+KeySlots.rdf,Mead.Pool Elevation,cy,min,NA,NA,meadMinPe
+KeySlots.rdf,Powell.Pool Elevation,eocy,NA,NA,NA,powellPe
+KeySlots.rdf,Powell.Pool Elevation,wy,min,NA,NA,powellMinPe
+KeySlots.rdf,PowellOperation.PowellWYRelease,eocy,NA,NA,0.001,powellWyRel
+KeySlots.rdf,TotVal.Powell,cy,sum,NA,0.001,lfNf
