@@ -1,7 +1,8 @@
 ##############################################################################
-#This script creates annual plots of Outflow and PE to compare two CRSS runs
-
-#DEVELOPMENT IS ON GOING ON THIS
+#This script creates annual boxplots of all traces and exceedances for 
+#Powell Inflow and Outflow to compare two CRSS runs
+#It is intended as an example of how Generic_annual_plot.R can be ADAPTED to 
+#create a custom set of outputs
 
 #Contents 
 ## 1. Set Up ##
@@ -9,9 +10,7 @@
 ## 3. Process Results ## 
 ## 4. Plot ## 
 
-#   Created by C. Felletter 8/2018
-#   Updated by CF on 10/2018 to include logic for adapting for development of
-#   multiple plot types in one pdf
+#   Created by C. Felletter 10/2018
 ##############################################################################
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -44,33 +43,28 @@ scens <- list(
 
 list.files(file.path(scen_dir,scens[1])) #list files in scen folder for next input
 
-
-
-
-#files, variables, floworpes, cyorwys & figuretypes should be set to a single value
-#but could be used to loop through multiple plots if additional loops were added
-
 #rdf file with slot you want 
-files = "Res.rdf" 
+file = "Res.rdf" 
 
-# variables = "Mead.Pool Elevation"
-variables = "Powell.Inflow"
+rdf_slot_names(read_rdf(iFile = file.path(scen_dir,scens[1],file))) #check slots in rdf
 
-floworpes = "flow" #"flow" or "pe" 
-cyorwys = "cy" #"cy" or "wy" 
-#could be used to loop through multiple plots with additional loops added
+#### ADAPTATION ####
+variables = c("Powell.Inflow","Powell.Outflow")
 
-figuretypes <- 2 #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance 
-# IF PICKING 3 you must specify a month
-exc_months = 12 #1 - Jan, 12 - Dec
+floworpe = "flow" #"flow" or "pe" 
+cyorwy = "cy" #"cy" or "wy" 
 
 #plot inputs 
 startyr = 2019 #filter out all years > this year
 filteryrlessorequal = 2026 #filter out all years > this year
 
 #file names 
-figs <- 'Generic_AnnualFig' #objectslot + .pdf will be added when creating plots
-#must change to custom name if using multiple plots 
+figs <- 'Powell_Annual_InOut' #objectslot + .pdf will be added when creating plots
+
+#### ADAPTATION ####
+figuretypes <- c(2,3,2,3) #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance 
+# IF PICKING 3 you must specify a month
+exc_month = 12 #1 - Jan, 12 - Dec
 
 #### End of Normally You'll Only Change This ####
 
@@ -109,15 +103,13 @@ if (!file.exists(ofigs)) {
 
 message('Figures will be saved to: ', ofigs)
 
-figurenames <- c("Mean","Bxplt","Exceedance")
-
 ## create a pdf  
-pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figurenames[figuretypes],".pdf"), width=9, height=6)
-#change this if using loops (advanced)
+#### ADAPTATION ####
+pdf(paste0(file.path(ofigs,figs),".pdf"), width=9, height=6)
 
-#these could be used to loop through multiple plots 
-floworpe <- floworpes
-cyorwy <- cyorwys
+#### ADAPTATION ####
+for(i in 1:length(variables)){ #loop through variables and also possibly floworpe
+  #cyorwy 
 
 #y axis titles 
 if (floworpe == "flow"){
@@ -140,18 +132,10 @@ if (floworpe == "flow"){
 ## 3. Process Results 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#this could be used to loop through multiple plots 
-file <- files 
-variable <- variables
+  #### ADAPTATION ####
+variable = variables[i] #loop through multiple
 
-#check slots in rdf
-if(!any(rdf_slot_names(read_rdf(iFile = file.path(scen_dir,scens[1],file))) 
-       # !any() checks if none in the vector are true 
-        %in% variable)){ # %in% checks if variable is in the character vector
-  stop(paste('Slot ',variable,' does not exist in given rdf'))
-} 
-
-#generic agg file 
+  #generic agg file 
 rwa1 <- rwd_agg(data.frame(
   file = file,
   slot = variable, 
@@ -179,16 +163,17 @@ scen_res <- rw_scen_aggregate(
 ) 
 
 unique(scen_res$Variable) #check variable names
-unique(scen_res$TraceNumber) #check trace numbers 
+# unique(scen_res$TraceNumber) #check trace numbers 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## 4. Plot Choosen Figure Type 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#this could be used to loop through multiple plots 
-figuretype <- figuretypes 
-exc_month <- exc_months
+#### ADAPTATION ####
+for (j in 1:length(figuretypes)){ #loop through fig types 
 
+figuretype <- figuretypes[j]   
+  
 #    -------------------        All Trace Mean        ----------------------
 
 if (figuretype == 1){
@@ -235,6 +220,10 @@ if (figuretype == 3){
          y = y_lab, x = "Year") 
   print(p)
 }
+
+#### ADAPTATION ####
+} #close j fig type loop
+} #close i variable loop
 
 
 dev.off()

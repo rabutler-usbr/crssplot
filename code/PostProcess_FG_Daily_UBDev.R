@@ -24,8 +24,8 @@ list.dirs(iFolder) #list dirs in set folder folder for us in next input
 
 #scenarios you want to compare 
 scens <- list(
-  "April 2018" = "Apr2018,DNF,2007Dems,IG,MTOM_Most", 
-  "April 2018 + updates" = "9601.NoTribs,DNF,2007Dems,IG.9003.NoTribs,MTOM_Most"
+  "Aug 2018" = "Aug2018_2019,DNF,2007Dems,IG,Most",
+  "Aug 2018 + Fix" = "Aug2018_2019_9000,DNF,2007Dems,IG_9000,Most_BM_FGltsp"
 )
 
 list.files(file.path(iFolder,scens[1])) #list files in scen folder for next input
@@ -46,7 +46,7 @@ y_lab = "Daily Flow (cfs)"
 filteryrlessorequal = 2019 #filter out all years > this year
 # plotfoldertitle = "FG Dev" #folder to create for output in results dir 
 ####I'm using a custom location for output for now 
-plotitle = "FG_Daily_Plots" #objectslot + .pdf will be added when creating plots 
+plotitle = "FG_Daily_Plots_LTSP" #objectslot + .pdf will be added when creating plots 
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
