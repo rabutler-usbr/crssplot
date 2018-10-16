@@ -40,6 +40,13 @@ generic.annual.plot <- function(scen_res) {
     }
   }
   
+  if (is.na(custom_y_lab)){
+    y_lab <- y_lab #default
+  } else {
+    y_lab <- custom_y_lab
+  }
+  
+  
   figs <- figname
   
   # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

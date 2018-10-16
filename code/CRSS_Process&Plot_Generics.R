@@ -45,25 +45,31 @@ scens <- list(
 list.files(file.path(scen_dir,scens[1])) #list files in scen folder for next input
 
 #files, variables, floworpes, cyorwys, figuretypes, exc_months (if using exceed
-# on PE), & customcaptions should be set to a single value
+# on PE), & custom captions/y_lab should be set to a single value
 #but could be used to loop through multiple plots if all c() variable were extended 
 #see example below 
 
-
 ## Process Variables ##
 
-rdffiles <- c("Res.rdf") #rdf file with slot you want 
+# rdffiles <- c("Res.rdf") #rdf file with slot you want 
+rdffiles <- c("DailyFlows.rdf") #rdf file with slot you want
+# rdffiles <- c("UBRes.rdf") #rdf file with slot you want 
 
-variables <- c("Powell.Inflow") #RW Object.Slot
-variables <- c("Powell.Pool Elevation") #RW Object.Slot
+# variables <- c("Powell.Inflow") #RW Object.Slot
+# variables <- c("Powell.Pool Elevation") #RW Object.Slot
+# variables <- c("FlamingGorge.Pool Elevation") #RW Object.Slot
+variables <- c("DailyFlows.FlamingGorgeDaily") #RW Object.Slot
 
-timesteps <- c("annual") #"annual" or "monthly"
+# timesteps <- c("annual") #"annual" or "monthly"
 timesteps <- c("monthly") #"annual" or "monthly"
+# timesteps <- c("daily") #"annual" or "monthly" or "daily"
+
 
 floworpes <- c("flow") #"flow" or "pe" 
-floworpes <- c("pe") #"flow" or "pe" 
+# floworpes <- c("pe") #"flow" or "pe" 
 
 cyorwys <- c("cy") #"cy" or "wy". wy not tested for all plot configurations  
+#daily only supports cy 
 
 mainScenGroup <<- names(scens)[1] #name of the subfolder this analysis will be stored
 
@@ -71,15 +77,23 @@ mainScenGroup <<- names(scens)[1] #name of the subfolder this analysis will be s
 
 combineplots <<- F #F for individual files saved, true to combineplots multiple files
 
-figuretypes <- c(1) #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance 
-# IF PICKING 3 you must specify a month
+figuretypes <- c(2) #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance 
+# IF PICKING "monthly" 3 you must specify a month
 exc_months <- c(12) #1 - Jan, 12 - Dec
 
-startyr <<- 2019 #filter out all years > this year
-endyr <<- 2026 #filter out all years > this year
+startyr <- c(2019) #filter out all years > this year
+endyr <- c(2026) #filter out all years > this year
+#these must match if doing daily slot 
 
-customcaptions <- c(NA) #NA or this will over write the default captions 
+customcaptions <- c(NA) #NA or this will overwrite the default captions 
+# customcaptions <- c("May") #NA or this will overwrite the default captions 
 #set for mean (1) and boxplot (2) 
+
+custom_y_labs <- c(NA) #NA gives defaults, enter if want soemthing different 
+custom_y_labs <- c("May") #NA gives defaults, enter if want soemthing different 
+## daily = "Daily Flow (cfs)"
+## monthly = "Monthly Flow (ac-ft/mo)" OR "End of Month PE (ft)"
+## annual = "Annual C/WY Flow (ac-ft/mo)" OR "EOC/WY PE (ft)" it knows CYorWY
 
 #file names 
 figname <<- 'Generic_Fig' 
@@ -96,48 +110,35 @@ imgtype <<- "pdf" #supports pdf, png, jpeg. pdf looks the best
 #only works when individual plots are selected 
 
 
-#### Example of Multi Slot Process 
-## Process Variables ##
-
-# rdffiles <- c("Res.rdf","Res.rdf","Res.rdf") #rdf file with slot you want
-# variables <- c("Powell.Inflow","Powell.Pool Elevation","Powell.Outflow") #RW Object.Slot
-# timesteps <- c("annual","monthly","annual") #"annual" or "monthly"
-# floworpes <- c("flow","pe","flow") #"flow" or "pe"
-# cyorwys <- c("cy","cy","cy") #"cy" or "wy". wy not tested for all plot configurations
+#### Example of Multi Slot Process select region and hit ctrl+c to enable
+# ## Process Variables ##
+# rdffiles <- c("DailyFlows.rdf","UBRes.rdf","Res.rdf","Res.rdf") #rdf file with slot you want
+# variables <- c("DailyFlows.FlamingGorgeDaily","FlamingGorge.Pool Elevation","Powell.Inflow","Powell.Pool Elevation") #RW Object.Slot
+# timesteps <- c("daily","monthly","monthly","annual")
+# floworpes <- c("flow","pe","flow","pe") #"flow" or "pe"
+# cyorwys <- c("cy","cy","wy","wy") #"cy" or "wy". wy not tested for all plot configurations
 # mainScenGroup <<- names(scens)[1] #name of the subfolder this analysis will be stored
 # ## Plot Variables ##
 # combineplots <<- T #F for individual files saved, true to combineplots multiple files
-# figuretypes <- c(2,1,3) #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance
-# exc_months <- c(12,12,12) #1 - Jan, 12 - Dec
-# startyr <<- 2019 #filter out all years > this year
-# endyr <<- 2026 #filter out all years > this year
-# customcaptions <- c(NA,NA,"Test") #NA or this will over write the default caption on boxplots
-
+# figuretypes <- c(1,3,2,2) #1 is Trace Mean, 2 is Bxplt of Traces, 3 is Exceedance
+# exc_months <- c(NA,5,NA,NA) #1 - Jan, 12 - Dec
+# startyr <<- c(2019,2019,2019,2019) #filter out all years > this year
+# endyr <<- C(2019,2026,2026,2026) #filter out all years > this year
+# customcaptions <- c(NA,"May PE",NA,NA) #NA or this will over write the default caption on boxplots
+# custom_y_labs <- c(NA,"May PE (ft) Exceedance",NA,NA) #NA gives defaults, enter if want soemthing different
+# # 
+#### End Example
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #                               END USER INPUT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# source('code/Generic_Scen_Process.r')
-source('code/Generic_Scen_Process_AnnOrMon.r')
+source('code/Generic_Scen_Process.r')
+source('code/Generic_Daily_Plot.r')
 source('code/Generic_annual_plot.r')
 source('code/Generic_monthly_plot.r')
 
-
 ofigs <- file.path(results_dir,mainScenGroup) 
-if (!file.exists(ofigs)) {
-  message(paste('Creating folder:', ofigs))
-  dir.create(ofigs)
-}
-
-message('Figures will be saved to: ', ofigs)
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-## 3. Process Results 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-ofigs <<- file.path(results_dir,mainScenGroup) 
 if (!file.exists(ofigs)) {
   message(paste('Creating folder:', ofigs))
   dir.create(ofigs)
@@ -160,17 +161,28 @@ for(i in 1:length(variables)){
   ## Plot Variables ##
   figuretype <<- figuretypes[i]
   exc_month <<- exc_months[i]
+  startyr <<- startyr[i] 
+  endyr <<- startyr[i]
   customcaption <<- customcaptions[i]
+  custom_y_lab <<- custom_y_labs[i]
   
-  ## Process ##
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ## 3. Process Results 
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
   scen_res <- generic.scen.process(scen_dir,scens,timestep) 
   # scen_res <- generic.scen.process(scen_dir,scens,file,variable,timestep,floworpe,cyorwy,mainScenGroup) 
   
-  ## Plot ##
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ## 4. Plot Choosen Timestep Type 
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+  
   if(timestep == "annual"){
     generic.annual.plot(scen_res)
   } else if(timestep == "monthly"){
     generic.monthly.plot(scen_res) 
+  } else if(timestep == "daily"){
+    generic.daily.plot(scen_res)
   } else {
     stop(paste0("Plot type ",timestep," not supported"))
   }

@@ -31,6 +31,12 @@ generic.monthly.plot <- function(scen_res) {
   } else {
     y_lab = "End of Month PE (ft)"
   }
+  
+  if (is.na(custom_y_lab)){
+    y_lab <- y_lab #default
+  } else {
+    y_lab <- custom_y_lab
+  }
 
 
   figs <- figname
@@ -108,4 +114,4 @@ generic.monthly.plot <- function(scen_res) {
     dev.off()
   }
 
-}
+} #end function
