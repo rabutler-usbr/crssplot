@@ -119,7 +119,7 @@ figurenames <- c("Mean","Bxplt","Exceedance")
 ## create a pdf  
 # pdf(paste0(file.path(ofigs,figs),"_",variables,"_",figurenames[figuretypes],".pdf"), width=9, height=6)
 #enable the above if using loops (advanced) and want one pdf
-#must disable ggsave at bottom
+#must disable ggsave at bottom and captions won't work w/o ggsave
 
 #these could be used to loop through multiple plots 
 floworpe <- floworpes
@@ -208,7 +208,7 @@ if (is.na(customcaption) &  figuretype == 2){
   caption <- customcaption #user supplied 
 }
 
-print(paste("Creating ",variable," ",cyorwy," ",figurenames[figuretype]))
+message(paste("Creating ",variable," ",cyorwy," ",figurenames[figuretype]))
 
 #    -------------------        All Trace Mean        ----------------------
 
