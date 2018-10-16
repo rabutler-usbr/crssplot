@@ -157,9 +157,6 @@ if(!any(rdf_slot_names(read_rdf(iFile = file.path(scen_dir,scens[1],file)))
   stop(paste('Slot ',variable,' does not exist in given rdf'))
 } 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-## 3. Process Results 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #generic agg file 
 rwa1 <- rwd_agg(data.frame(
   file = file,

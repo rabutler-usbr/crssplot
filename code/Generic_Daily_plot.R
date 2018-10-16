@@ -20,7 +20,6 @@
 ## 1. Set Up ##
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 rm(list=ls()) #clear the enviornment 
-library(RWDataPlyr)
 
 ## Directory Set Up
 #Set folder where studies are kept as sub folders. 
