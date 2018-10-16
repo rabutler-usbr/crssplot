@@ -8,23 +8,82 @@
 # ##############################################################################
 
 
-generic.daily.plot <- function(scen_dir,scens,timestep) { 
+generic.daily.process <- function(scen_dir,scens,timestep) { 
+  
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ## 1. Set Up ##
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+  
+  #Additional plotting functions and libraries 
+  library('tidyverse') #ggplot2,dplyr,tidyr
+  library('devtools')
+  library(RWDataPlyr)
+  library('scales') #need this for scale_x_date()
+  source('code/Stat_emp_ExcCrv.r')
+  source('code/stat-boxplot-custom.r')
+  
+  # some sanity checks that UI is correct:
+  if(!(mainScenGroup %in% names(scens))) 
+    stop(mainScenGroup, ' is not found in scens.')
+  
+  # check folders
+  if(!file.exists(file.path(scen_dir, scens[1])) 
+     | !file.exists(file.path(scen_dir, scens[2])))
+    stop('scens folder(s) do not exist or scen_dir is set up incorrectly. 
+         Please ensure scens is set correctly.')
+
+  figurenames <- c("mean","bxplt","exceedance")
+  
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ## 3. Process Results 
+  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+  title <- variable
+  
+  #Special rw scen agg since RWDataPlyr doesn't support daily 
+  for (i in 1:length(scens)) {
+    
+    scen_res_x <- file.path(scen_dir,scens[i],rdffile) %>% #this means "pipe" the data to the next function 
+      rdf_to_rwtbl2() %>%
+      filter(ObjectSlot == variable)
+    
+    # #filter out Most,Min,Max only would do this for MTOM 
+    # filter(TraceNumber >= first_ensemble[1]) 
+    
+    #add on Scenario since rdf_to_rwtbl2 doesn't add it  
+    scen_res_x <- cbind.data.frame(
+      scen_res_x,
+      Scenario = rep(names(scens)[i], Times = length(scen_res_x$Timestep))
+    )
+    
+    #convert Timestep chr to POSIXct
+    scen_res_x$Timestep <- as.POSIXct(strptime(scen_res_x$Timestep,"%Y-%m-%d %H:%M")) 
+    scen_res_x$Timestep <- as.Date(scen_res_x$Timestep)
+    #first entry is 2019-1-31 24:00 which gets converted to 2019-02-01, is that okay????? 
+    
+    if(i == 1){
+      scen_res = scen_res_x
+    } else {
+      scen_res = rbind.data.frame(scen_res,scen_res_x)
+    }
+    
+  } #close i Scenario loop 
+  
+  # unique(scen_res$ObjectSlot) #check variable names 
+  # unique(scen_res$Scenario) #check Scenario names 
+
+  #get everything on a date 
+  scen_res$MonthNum = as.Date(paste0(scen_res$Year,scen_res$Month,"01"), format = "%Y%B%d")
+  #get a numeric month number
+  scen_res$MonthNum = as.numeric(format.Date(scen_res$Timestep, format = "%m"))
+  scen_res$DayNum = as.numeric(format.Date(scen_res$Timestep, format = "%d"))
+  
   
   # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## 4. Plot Choosen Figure Type 
   # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  if (startyr != endyr){
-    warning("startyr != endyr, only using start yr")
-  }
-  
-  plotyr <- startyr  
   
   figs <- figname
-  
-  figurenames <- c("mean","bxplt","exceedance")
-  
-  title <- variable
   
   #y labels
   if (is.na(custom_y_lab)){
