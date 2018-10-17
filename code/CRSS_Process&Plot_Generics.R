@@ -186,6 +186,14 @@ imgtype <<- "pdf" #supports pdf, png, jpeg. pdf looks the best
 # # # Note: use of custom caption and labels and compare to standard labels on next plot 
 # figname <<- 'Example_4_Fig'
 
+#Example 5: Bad UI, slot not in rdf
+
+# figuretypes <- 4
+
+#Example 6: Bad UI, slot not in rdf
+
+# variables <- "Fake.News"
+
 #### End Examples #### 
 
 
@@ -194,6 +202,7 @@ imgtype <<- "pdf" #supports pdf, png, jpeg. pdf looks the best
 #                               END USER INPUT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+source('code/Generic_Input_Check.r')
 source('code/Generic_Scen_Process.r')
 source('code/Generic_Daily_Plot.r')
 source('code/Generic_annual_plot.r')
@@ -226,6 +235,9 @@ for(i in 1:length(variables)){
   endyr <<- endyrs[i]
   customcaption <<- customcaptions[i]
   custom_y_lab <<- custom_y_labs[i]
+  
+  # some sanity checks that UI is correct:
+  generic.input.check(scen_dir,scens,timestep) 
   
   # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## 3. Process Results 

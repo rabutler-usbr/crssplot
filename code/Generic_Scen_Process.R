@@ -22,15 +22,15 @@ generic.scen.process <- function(scen_dir,scens,timestep) {
   source('code/stat-boxplot-custom.r')
   library('scales') #need this for scale_x_date()
   
-  # some sanity checks that UI is correct:
-  if(!(mainScenGroup %in% names(scens))) 
-    stop(mainScenGroup, ' is not found in scens.')
-  
-  # check folders
-  if(!file.exists(file.path(scen_dir, scens[1])) 
-     | !file.exists(file.path(scen_dir, scens[2])))
-    stop('scens folder(s) do not exist or scen_dir is set up incorrectly. 
-         Please ensure scens is set correctly.')
+  # # some sanity checks that UI is correct:
+  # if(!(mainScenGroup %in% names(scens))) 
+  #   stop(mainScenGroup, ' is not found in scens.')
+  # 
+  # # check folders
+  # if(!file.exists(file.path(scen_dir, scens[1])) 
+  #    | !file.exists(file.path(scen_dir, scens[2])))
+  #   stop('scens folder(s) do not exist or scen_dir is set up incorrectly. 
+  #        Please ensure scens is set correctly.')
   
   # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ## 3. Process Results 
@@ -38,12 +38,12 @@ generic.scen.process <- function(scen_dir,scens,timestep) {
   
   if(timestep == "annual" | timestep == "monthly"){
     
-    #check slots in rdf
-    if(!any(rdf_slot_names(read_rdf(iFile = file.path(scen_dir,scens[1],rdffile))) 
-           # !any() checks if none in the vector are true 
-            %in% variable)){ # %in% checks if variable is in the character vector
-      stop(paste('Slot ',variable,' does not exist in given rdf'))
-    } 
+    # #check slots in rdf
+    # if(!any(rdf_slot_names(read_rdf(iFile = file.path(scen_dir,scens[1],rdffile))) 
+    #        # !any() checks if none in the vector are true 
+    #         %in% variable)){ # %in% checks if variable is in the character vector
+    #   stop(paste('Slot ',variable,' does not exist in given rdf'))
+    # } 
       
     if (floworpe == "pe"){
       if (cyorwy == "cy"){
