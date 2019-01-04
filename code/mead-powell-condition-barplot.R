@@ -24,6 +24,12 @@ mead_vars <- c(
   "Surplus - Flood Control","Normal Year or ICS Surplus Condition"
 )
 
+mead_vars2 <- c(
+  "Shortage - 1st Level (Mead <= 1,075 and >= 1,050",
+  "Shortage - 2nd Level (Mead < 1,050 and >= 1,025",       
+  "Shortage - 3rd Level (Mead < 1,025)"
+)
+
 mead_powell_condition_barplot <- function(ifile)
 {
   yrs2show <- 2019:2026
@@ -57,4 +63,8 @@ mead_powell_condition_barplot <- function(ifile)
   ggplot(filter(sys_data, Variable %in% mead_vars), aes(Year, Value, fill = Scenario)) +
     geom_bar(position = "dodge", stat = "identity") +
     facet_wrap(~Variable, ncol = 1)
+  
+  ggplot(filter(sys_data, Variable %in% mead_vars2), aes(Scenario, Value, fill = Variable)) +
+    geom_bar(stat = "identity") +
+    facet_wrap(~Year, nrow = 1)
 }
