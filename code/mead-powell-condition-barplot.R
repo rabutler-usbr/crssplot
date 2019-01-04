@@ -38,6 +38,10 @@ names(mead_vars2) <- c(
   "Shortage - 3rd Level (Mead < 1,025)"
 )
 
+ifile <- "C:/alan/CRSS/CRSS.2018/results/Aug2018/tempData/SysCond.feather"
+
+to_percent <- function(x) {paste0(round(x, 0), "%")}
+
 mead_powell_condition_barplot <- function(ifile)
 {
   yrs2show <- 2019:2026
@@ -86,8 +90,8 @@ mead_powell_condition_barplot <- function(ifile)
       gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
-    mutate(val_lab = as.character(round(Value, 0))) %>%
-    mutate(val_lab = if_else(val_lab == "0", NA_character_, val_lab)) %>%
+    mutate(val_lab = to_percent(Value)) %>%
+    mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
     unite(fill_var, Scenario, Variable, remove = FALSE)
   
   color_map <- c("#00BFC4", "#1e959a", "#00686d",
@@ -109,15 +113,7 @@ mead_powell_condition_barplot <- function(ifile)
     all_names[4:6] <- short_to_long[all_names[4:6]]
     str_wrap(all_names, width = 20)
   }
-  
-    # gather(Variable, Value, -Year, -Scenario, -short3_fill, -short2_fill, -short1_fill) %>%
-    # gather(fill_var, fill_val, -Year, -Scenario, -Variable, -Value) %>%
-    # filter(
-    #   (Variable == "short1" && fill_var == "short1_fill") ||
-    #     (Variable == "short2" && fill_var == "short2_fill") || 
-    #     (Variable == "short3" && fill_var == "short3_fill")
-    # )
-    # 
+
   gg_short <- ggplot(short_data, aes(Scenario, Value, fill = fill_var)) +
     geom_bar(stat = "identity") +
     facet_wrap(~Year, nrow = 1, strip.position = "bottom") + 
@@ -126,16 +122,16 @@ mead_powell_condition_barplot <- function(ifile)
     guides(fill = guide_legend(ncol = 2)) +
     scale_y_continuous(
       breaks = seq(0, 100, 10), 
-      labels = function(x){paste0(round(x, 0), "%")}
+      labels = to_percent
     ) +
     labs(
       y = NULL,
       x = NULL, 
-      title = "Shortage Conditions (Mead <= 1,075')",
+      title = "Shortage Condition - any amount (Mead <= 1,075')",
       fill = "Shortage Tiers",
       caption = paste(
-        "The top of the bars indicate the chance of any shortage.",
-        "The numbers report the chance of the different shortage tiers.",
+        "The tops of the bars indicate the chances of any shortage.",
+        "The numbers report the chances of the different shortage tiers.",
         sep = "\n"
       )
     ) +
@@ -161,7 +157,7 @@ mead_powell_condition_barplot <- function(ifile)
     scale_fill_manual(values = normal_color_map) +
     scale_y_continuous(
       breaks = seq(0, 100, 10), 
-      labels = function(x){paste0(round(x, 0), "%")}
+      labels = to_percent
     ) +
     labs(
       y = NULL,
@@ -174,8 +170,9 @@ mead_powell_condition_barplot <- function(ifile)
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank(),
       panel.spacing = unit(0, "lines"), 
-      legend.key.height = unit(2, "lines"),
-      legend.spacing.x = unit(0, "lines")
+      legend.key.height = unit(1, "lines"),
+      legend.spacing.x = unit(1, "lines"),
+      legend.direction = "horizontal"
     )
   
   # surplus plot ----------------------
@@ -197,8 +194,8 @@ mead_powell_condition_barplot <- function(ifile)
       gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
-    mutate(val_lab = as.character(round(Value, 0))) %>%
-    mutate(val_lab = if_else(val_lab == "0", NA_character_, val_lab)) %>%
+    mutate(val_lab = to_percent(Value)) %>%
+    mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
     unite(fill_var, Scenario, Variable, remove = FALSE)
   
   surp_color_map <- c("#00BFC4", "#1e959a",
@@ -214,7 +211,9 @@ mead_powell_condition_barplot <- function(ifile)
     all_names[1:2] <- NA_character_
     all_names <- str_split_fixed(all_names, "_", 2)[,2]
     short_to_long <- names(mead_surplus)
-    short_to_long[short_to_long == "Surplus Condition - any amount (Mead>= 1,145 ft)"] <- "Surplus - Domestic or Quantified"
+    short_to_long[
+      short_to_long == "Surplus Condition - any amount (Mead>= 1,145 ft)"
+    ] <- "Surplus - Domestic or Quantified"
     names(short_to_long) <- mead_surplus
     
     all_names[3:4] <- short_to_long[all_names[3:4]]
@@ -229,7 +228,7 @@ mead_powell_condition_barplot <- function(ifile)
     guides(fill = guide_legend(ncol = 2)) +
     scale_y_continuous(
       breaks = seq(0, 100, 10), 
-      labels = function(x){paste0(round(x, 0), "%")}
+      labels = to_percent
     ) +
     labs(
       y = NULL,
@@ -237,8 +236,8 @@ mead_powell_condition_barplot <- function(ifile)
       title = "Surplus Condition - any amount (Mead >= 1,145 ft)",
       fill = "Surplus Conditions",
       caption = paste(
-        "The top of the bars indicate the chance of any surplus.",
-        "The numbers report the chance of the different surplus conditions.",
+        "The tops of the bars indicate the chances of any surplus.",
+        "The numbers report the chances of the different surplus conditions.",
         sep = "\n"
       )
     ) +
@@ -256,10 +255,30 @@ mead_powell_condition_barplot <- function(ifile)
   short_grob <- ggplotGrob(gg_short)
   surp_grob <- ggplotGrob(gg_surplus)
   
+  get_legend <- function(grob) {
+    grob$grobs[[which(sapply(grob$grobs, function(x) x$name) == "guide-box")]]
+  }
+  
+  scen_leg <- get_legend(norm_grob)
+  short_leg <- get_legend(short_grob)
+  surp_leg <- get_legend(surp_grob)
+    
+  norm_grob <- ggplotGrob(gg_normal + theme(legend.position = 'none'))
+  short_grob <- ggplotGrob(gg_short + theme(legend.position = 'none'))
+  surp_grob <- ggplotGrob(gg_surplus + theme(legend.position = 'none'))
+  
   gg <- grid.arrange(arrangeGrob(
-    surp_grob, norm_grob, short_grob,
-    layout_matrix = matrix(1:3, ncol = 1)
+    scen_leg, surp_grob, surp_leg, norm_grob, grid::nullGrob(), short_grob, short_leg,
+    layout_matrix = matrix(c(1,1:7), ncol = 2, byrow = TRUE),
+    widths = c(.8, .2),
+    heights = c(.05, rep(.95/3, 3))
   ))
   
-  ggsave("C:/alan/projects/LC Website/LBConditions.png", gg, width = 8.5, height = 11, units = "in")
+  ggsave(
+    "C:/alan/projects/LC Website/LBConditions.png", 
+    gg, 
+    width = 8.5, 
+    height = 11, 
+    units = "in"
+  )
 }
