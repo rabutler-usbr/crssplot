@@ -3,6 +3,9 @@
 
 library(tidyverse)
 library(gridExtra)
+library(grid)
+library(imager)
+library(feather)
 
 powell_vars <- c(
   "Equalization Tier", "Equalization - annual release > 8.23 maf",
@@ -128,12 +131,7 @@ mead_powell_condition_barplot <- function(ifile)
       y = NULL,
       x = NULL, 
       title = "Shortage Condition - any amount (Mead <= 1,075')",
-      fill = "Shortage Tiers",
-      caption = paste(
-        "The tops of the bars indicate the chances of any shortage.",
-        "The numbers report the chances of the different shortage tiers.",
-        sep = "\n"
-      )
+      fill = "Shortage Tiers"
     ) +
     theme_light() +
     theme(
@@ -234,12 +232,7 @@ mead_powell_condition_barplot <- function(ifile)
       y = NULL,
       x = NULL, 
       title = "Surplus Condition - any amount (Mead >= 1,145 ft)",
-      fill = "Surplus Conditions",
-      caption = paste(
-        "The tops of the bars indicate the chances of any surplus.",
-        "The numbers report the chances of the different surplus conditions.",
-        sep = "\n"
-      )
+      fill = "Surplus Conditions"
     ) +
     theme_light() +
     theme(
@@ -267,11 +260,29 @@ mead_powell_condition_barplot <- function(ifile)
   short_grob <- ggplotGrob(gg_short + theme(legend.position = 'none'))
   surp_grob <- ggplotGrob(gg_surplus + theme(legend.position = 'none'))
   
+  # logo -------------------------------
+  logo <- imager::load.image("logo/660LT-TK-flush.png")
+  logo <- grid::rasterGrob(logo, interpolate = TRUE)
+  
+  l2 <- ggplot() +
+    geom_blank() + 
+    theme_minimal() +
+    annotation_custom(logo)
+  
+  cap_text <- paste(
+    "The tops of the bars indicate the chances of any shortage or surplus.",
+    "The numbers report the chances of the different shortage or surplus conditions.",
+    sep = "\n"
+  )
+  
+  cap_grob <- grid::textGrob(cap_text, x = 1, hjust = 1, gp=gpar(fontsize = 9))
+  
   gg <- grid.arrange(arrangeGrob(
-    scen_leg, surp_grob, surp_leg, norm_grob, grid::nullGrob(), short_grob, short_leg,
-    layout_matrix = matrix(c(1,1:7), ncol = 2, byrow = TRUE),
+    scen_leg, short_grob, short_leg, surp_grob, surp_leg, norm_grob, cap_grob, l2,
+    layout_matrix = matrix(c(1,1:6, NA, 7, 8), ncol = 2, byrow = TRUE),
     widths = c(.8, .2),
-    heights = c(.05, rep(.95/3, 3))
+    heights = c(.05, rep(.9/3, 3), .05)
+    #bottom = cap_text
   ))
   
   ggsave(
