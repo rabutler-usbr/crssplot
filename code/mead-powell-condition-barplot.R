@@ -169,8 +169,9 @@ mead_powell_condition_barplot <- function(ifile)
       axis.ticks.x = element_blank(),
       panel.spacing = unit(0, "lines"), 
       legend.key.height = unit(1, "lines"),
-      legend.spacing.x = unit(1, "lines"),
-      legend.direction = "horizontal"
+      legend.spacing.x = unit(.2, "lines"),
+      legend.direction = "horizontal",
+      legend.background = element_rect(fill = "grey90")
     )
   
   # surplus plot ----------------------
