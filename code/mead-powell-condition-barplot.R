@@ -279,10 +279,10 @@ mead_powell_condition_barplot <- function(ifile)
   cap_grob <- grid::textGrob(cap_text, x = 1, hjust = 1, gp=gpar(fontsize = 9))
   
   gg <- grid.arrange(arrangeGrob(
-    scen_leg, short_grob, short_leg, surp_grob, surp_leg, norm_grob, cap_grob, l2,
-    layout_matrix = matrix(c(1,1:6, NA, 7, 8), ncol = 2, byrow = TRUE),
+    short_grob, short_leg, surp_grob, surp_leg, norm_grob, scen_leg, cap_grob, l2,
+    layout_matrix = matrix(c(1:5, NA, 6, 6, 7, 8), ncol = 2, byrow = TRUE),
     widths = c(.8, .2),
-    heights = c(.05, rep(.9/3, 3), .05)
+    heights = c(rep(.9/3, 3), .05, .05)
     #bottom = cap_text
   ))
   
