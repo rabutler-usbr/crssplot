@@ -1,5 +1,6 @@
 
 library(CRSSIO)
+stopifnot(packageVersion("CRSSIO") >= "0.6.3")
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(grid))
 suppressPackageStartupMessages(library(feather))
@@ -27,7 +28,7 @@ source('code/plotFirstYearShortCond.R')
 
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
-getSysCondData <- FALSE
+getSysCondData <- TRUE
 getPeData <- FALSE
 get_crss_short_cond_data <- FALSE
 
@@ -257,6 +258,8 @@ if (getSysCondData) {
   
   # system condition rwa
   sys_rwa <- CRSSIO::sys_cond_rwa()
+  if (packageVersion("CRSSIO") <= "0.7.0")
+    sys_rwa$period <- "eocy"
   
   getScenarioData(
     scens, 
