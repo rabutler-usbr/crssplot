@@ -27,14 +27,14 @@ source('code/plotFirstYearShortCond.R')
 
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
-getSysCondData <- TRUE
-getPeData <- TRUE
+getSysCondData <- FALSE
+getPeData <- FALSE
 get_crss_short_cond_data <- FALSE
 
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'CRSS_August2018_hydroSens.pdf'
+pdf_name <- 'Jan2019PowerRun.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
@@ -44,11 +44,11 @@ addPEScatterFig <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
-CRSSDIR <- "C:/alan/CRSS/CRSS.2018" #Sys.getenv("CRSS_DIR")
-iFolder <- "M:/Shared/CRSS/2018/Scenario"
+CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
+iFolder <- "M:/Shared/CRSS"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "Aug2018_BM_FG_update"
+crssMonth <- "january_2019_power"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -70,8 +70,8 @@ scens <- list(
   # "April 2018" = 
   #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
   # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
-  "August 2018 - BM, FG fix" = "Aug2018_2019_9000,DNF,2007Dems,IG_9000,Most",
-  "August 2018 - official" = "Aug2018_2019,DNF,2007Dems,IG,Most"
+  "August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
+  "January 2019" = "2019/Scenario/Jan2019_2019,DNF,2007Dems,IG,Hist"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -80,8 +80,8 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  "August 2018 - BM, FG fix" = c(3586.55, 1079.50),
-  "August 2018 - official" = c(3586.55, 1079.50)
+  "August 2018" = c(3586.55, 1079.50),
+  "January 2019" = c(3581.85, 1081.46)
   # "April 2018" = file.path(
   #   CRSSDIR,
   #   "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
@@ -91,8 +91,8 @@ icList <- list(
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
 icMonth <- c(
-  "August 2018 - BM, FG fix" = "18-Dec",
-  "August 2018 - official" = "18-Dec"
+  "August 2018" = "18-Dec",
+  "January 2019" = "18-Dec"
 )
 
 # for the 5-year simple table
@@ -102,7 +102,7 @@ icMonth <- c(
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
 ss5 <- c(
-  "August 2018 - BM, FG fix" = "August 2018 - BM, FG fix"
+  "August 2018" = "August 2018"
 )
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
@@ -115,11 +115,11 @@ yy5 <- 2019:2023
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "August 2018 - BM, FG fix"
+mainScenGroup <- "January 2019"
 mainScenGroup.name <- mainScenGroup
 
 # text that will be added to figures
-annText <- 'Results from August 2018 CRSS Run' 
+annText <- 'Results from January 2019 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
@@ -255,18 +255,8 @@ traceMap <- read.csv('data/Trace2IcMap.csv')
 if (getSysCondData) {
   message('starting getSysCondData')
   
-  # create rwd_agg from sys_cond_matrix()
-  sys_mat <- CRSSIO::sys_cond_matrix()
-  sys_rwa <- rwd_agg(data.frame(
-    file = sys_mat[,1],
-    slot = sys_mat[,2],
-    period = "asis",
-    summary = NA,
-    eval = NA,
-    t_s = NA,
-    variable = sys_mat[,5],
-    stringsAsFactors = FALSE
-  ))
+  # system condition rwa
+  sys_rwa <- CRSSIO::sys_cond_rwa()
   
   getScenarioData(
     scens, 
@@ -570,7 +560,9 @@ if(computeConditionalProbs){
 # pulled annotation out of generic function
 if (createShortConditions) {
   if (length(resFile) > 1)
-    stop("conditions leading to shortage is only designed to work with 1 scenario of data, at this point")
+    stop(
+      "conditions leading to shortage is only designed to work with 1 scenario"
+    )
   
   message(
     'Using hard coded values for the arrow in the shortage conditions figure.',
