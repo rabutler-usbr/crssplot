@@ -129,6 +129,11 @@ colorLabel <- 'Scenario'
 yrs2show <- 2019:2060 # years to show the crit stats figures
 peYrs <- 2018:2060 # years to show the Mead/Powell 10/50/90 figures for
 
+# More descriptive labels for hydrologies used in the cloud plots
+cloudScen <- c("January 2019 DNF","January 2019 ST")
+cloudLabs <-c("January 2019 DNF" = "Jan \"Full\" Hydrology",
+              "January 2019 ST" = "Jan \"Stress Test\" Hydrology")
+
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
 peScatterYear <- 2019
@@ -337,6 +342,18 @@ if(makeFiguresAndTables){
   meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
                            'Mead End-of-December Elevation', colorLabel, 
                          legendWrap = legendWrap)
+  
+  # plot Clouds
+  powellCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Powell.Pool Elevation',
+                               'Powell End-of-December Elevation', colorLabel,
+                               legendWrap = legendWrap)
+  ggsave(file.path(oFigs,'Powell.png'), width = 9, height = 6.5, units = "in", dpi = 600)
+  
+  meadCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Mead.Pool Elevation', 
+                             'Mead End-of-December Elevation', colorLabel, 
+                             legendWrap = legendWrap)
+  ggsave(file.path(oFigs,'Mead.png'), width = 9, height = 6.5, units = "in", dpi = 600)
+  
   
   # 3) Critical elevation thresholds; figures and data table -------
   # have sysCond for some, and read in crit stats for others
