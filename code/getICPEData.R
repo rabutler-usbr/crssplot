@@ -98,8 +98,8 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
     }
     
     # add other attributes to data frame
-    pp$Variable <- 'Powell.Pool Elevation'
-    mp$Variable <- 'Mead.Pool Elevation'
+    pp$Variable <- "powell_dec_pe"
+    mp$Variable <- "mead_dec_pe"
     ic <- rbind(pp,mp)
     ic$TraceNumber <- 0
     ic$Year <- as.numeric(paste0(

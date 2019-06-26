@@ -38,13 +38,14 @@ get_crss_short_cond_data <- FALSE
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'june_results_2026.pdf'
+pdf_name <- 'june_results_full_v2.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 addPEScatterFig <- FALSE
+should_plot_clouds <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
 
@@ -53,6 +54,8 @@ iFolder <- "M:/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
 crssMonth <- "june2019"
+# inserted onto some files. Can be ''
+extra_label <- "fullV2_"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -90,7 +93,11 @@ scens <- list(
   "June 2019 - Most" = "Jun2019_2020,DNF,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
   "January 2019" = jan_ensemble,
   "June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
-  "June 2019" = jun_ensemble
+  "June 2019" = jun_ensemble,
+  "June 2019 - Stress Test" = 
+    "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
+  "June 2019 - Stress Test - No DCP" = 
+    "Jun2019_2020,ISM1988_2017,NV300,IG,Most,No_DCP_Cons"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -118,7 +125,9 @@ icList <- list(
   "June 2019 - Most" = c(3619.82, 1088.09),
   "June 2019 - No DCP" = c(3619.56, 1085.88),
   "January 2019" = jan_path,
-  "June 2019" = jun_path
+  "June 2019" = jun_path,
+  "June 2019 - Stress Test" = c(3619.82, 1088.09),
+  "June 2019 - Stress Test - No DCP" = c(3619.56, 1085.88)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
@@ -128,7 +137,9 @@ icMonth <- c(
   "June 2019 - Most" = "19-Dec",
   "June 2019 - No DCP" = "19-Dec",
   "January 2019" = "19-Dec",
-  "June 2019" = "19-Dec"
+  "June 2019" = "19-Dec",
+  "June 2019 - Stress Test" = "19-Dec",
+  "June 2019 - Stress Test - No DCP" = "19-Dec"
 )
 
 # for the 5-year simple table
@@ -163,6 +174,8 @@ colorLabel <- 'Scenario'
 
 # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
 plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
+#plot_scenarios <- c("June 2019 - Stress Test", "June 2019 - Stress Test - No DCP")
+#plot_scenarios <- c("June 2019", "June 2019 - Stress Test")
 
 end_year <- 2060
 
@@ -282,12 +295,15 @@ tmpPEFile <- 'tempPE.feather'
 curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
 
 # file name for the system conditions procssed file
-sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
+sysCondTable <- paste0(extra_label, 'SysTableFull', yrs2show[1], '_',
+                       tail(yrs2show,1),'.csv') 
 
 
-critStatsProc <- 'CritStats.csv'
+critStatsProc <- paste0(extra_label, 'CritStats.csv')
 condProbFile <- 'CondProbs.csv'
-dcp_prob_file <- "dcp_probs.csv"
+
+dcp_prob_file <- paste0(extra_label, yrs2show[1], "_", tail(yrs2show,1), 
+                        "dcp_probs.csv")
 
 shortCondFig <- 'shortConditionsFig.pdf'
 
@@ -319,7 +335,7 @@ if (getSysCondData) {
   message('finished getSysCondData')
 }
 
-if(getPeData){
+if (getPeData) {
   ## get the Mead and Powel EOCY Data
   message('starting getPeData')
   pe_rwa <- rwd_agg(read.csv(
@@ -348,7 +364,7 @@ if (get_crss_short_cond_data) {
   message("Done getting CRSS shortage condition data")
 }
 
-if(makeFiguresAndTables){
+if (makeFiguresAndTables) {
   message("starting to create figures and tables")
   message("creating system conditions table")
   ## Create tables, figures, and data behind figures
@@ -363,7 +379,7 @@ if(makeFiguresAndTables){
   # save the sys cond table
   data.table::fwrite(
     as.data.frame(sysTable[['fullTable']]), 
-    file.path(oFigs,sysCondTable), 
+    file.path(oFigs, sysCondTable), 
     row.names = TRUE
   )
   
@@ -396,21 +412,32 @@ if(makeFiguresAndTables){
     filter(StartMonth %in% plot_scenarios)
 
   # plot
-  powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
-                           'Powell End-of-December Elevation', colorLabel,
-                           legendWrap = legendWrap)
-  meadPE <- plotEOCYElev(pe, peYrs, 'Mead.Pool Elevation', 
-                           'Mead End-of-December Elevation', colorLabel, 
-                         legendWrap = legendWrap)
+  powellPE <- plotEOCYElev(
+    pe, 
+    peYrs, 
+    "powell_dec_pe", 
+    'Powell End-of-December Elevation', 
+    colorLabel,
+    legendWrap = legendWrap
+  )
+  
+  meadPE <- plotEOCYElev(
+    pe, 
+    peYrs, 
+    "mead_dec_pe", 
+    'Mead End-of-December Elevation', 
+    colorLabel, 
+    legendWrap = legendWrap
+  )
   
   # plot Clouds ----------------
-  if (FALSE) {
-  powellCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Powell.Pool Elevation',
+  if (should_plot_clouds) {
+  powellCloud <- plotCloudFigs(cloudScen, pe, peYrs, "powell_dec_pe",
                                'Powell End-of-December Elevation', colorLabel,
                                legendWrap = legendWrap)
   ggsave(file.path(oFigs,'Powell.png'), width = 9, height = 6.5, units = "in", dpi = 600)
   
-  meadCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Mead.Pool Elevation', 
+  meadCloud <- plotCloudFigs(cloudScen, pe, peYrs, "mead_dec_pe", 
                              'Mead End-of-December Elevation', colorLabel, 
                              legendWrap = legendWrap)
   ggsave(file.path(oFigs,'Mead.png'), width = 9, height = 6.5, units = "in", dpi = 600)
@@ -425,12 +452,15 @@ if(makeFiguresAndTables){
   # get the necessary variables by filtering from the pe and syscond data files
   cs <- pe %>%
     filter(
-      Variable %in% c('meadLt1000', 'meadLt1020', 'powellLt3490', 
-                      'powellLt3525', 'meadLt1025')
+      Variable %in% c('mead_min_lt_1000', 'mead_min_lt_1020', 
+                      'powell_wy_min_lt_3490', 
+                      'powell_wy_min_lt_3525', 'mead_min_lt_1025', 
+                      "mead_min_lt_1025", "mead_dec_lt_1025", 
+                      "powell_dec_lt_3525")
     ) %>%
     rename(AggName = Agg) %>%
     select(-StartMonth)
-  rm(pe) # don't need pe any longer
+  #rm(pe) # don't need pe any longer
   
   cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
     rename(AggName = Agg) %>%
@@ -444,10 +474,10 @@ if(makeFiguresAndTables){
     sep = "\n"
   )
   
-  p3490Fig <- compareCritStats(
+  p_3490_fig <- compareCritStats(
     cs, 
     yrs2show, 
-    'powellLt3490', 
+    'powell_wy_min_lt_3490', 
     '', 
     ptitle, 
     colorLabel, 
@@ -460,6 +490,37 @@ if(makeFiguresAndTables){
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
   surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, 
                               colorLabel, legendWrap = legendWrap)
+  
+  # compare critical stat figures 1025, 1000, 3490, 3525 -----------------
+  p_3525_fig <- compareCritStats(
+    cs, 
+    yrs2show, 
+    'powell_wy_min_lt_3525', 
+    '', 
+    "Powell: Percent of Traces Less than elevation 3,525' in Any Water Year", 
+    colorLabel, 
+    legendWrap = legendWrap
+  )
+  
+  m_1025_fig <- compareCritStats(
+    cs, 
+    yrs2show, 
+    "mead_dec_lt_1025", 
+    '', 
+    "Mead: Percent of Traces Less than elevation 1,025' in December", 
+    colorLabel, 
+    legendWrap = legendWrap
+  )
+  
+  m_1000_fig <- compareCritStats(
+    cs, 
+    yrs2show, 
+    "mead_min_lt_1000", 
+    '', 
+    "Mead: Percent of Traces Less than elevation 1,000' in Any Month", 
+    colorLabel, 
+    legendWrap = legendWrap
+  )
   
   # now create figures only for the current "main scenario"
   # defaults are ok for legendTitle, legLoc, nC, and annSize
@@ -530,7 +591,10 @@ if(makeFiguresAndTables){
   pdf(file.path(oFigs, pdf_name),width = 8, height = 6)
   print(powellPE)
   print(meadPE)
-  print(p3490Fig)
+  print(p_3525_fig)
+  print(p_3490_fig)
+  print(m_1025_fig)
+  print(m_1000_fig)
   print(shortFig)
   print(surpFig)
   print(critStatsFig1)
