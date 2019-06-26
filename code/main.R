@@ -15,6 +15,8 @@ source('code/getICPEData.R')
 source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
+source("code/compute_dcp_probs.R")
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #    -------------------        USER INPUT        ----------------------
@@ -29,14 +31,14 @@ source('code/plotFirstYearShortCond.R')
 
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
-getSysCondData <- TRUE
+getSysCondData <- FALSE
 getPeData <- FALSE
 get_crss_short_cond_data <- FALSE
 
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'Jan2019PowerRun.pdf'
+pdf_name <- 'june_results_2026.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
@@ -47,10 +49,10 @@ addPEScatterFig <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
-iFolder <- "M:/Shared/CRSS"
+iFolder <- "M:/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "january_2019_power"
+crssMonth <- "june2019"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -67,13 +69,28 @@ crssMonth <- "january_2019_power"
 # update if for some reason the scenario naming convention has changed
 icDimNumber <- 5 
 
+jun_ensemble <- rw_scen_gen_names(
+  "Jun2019_2020,DNF,2007Dems,IG_DCP", 
+  paste0("Trace", 4:38), 
+  "DCP_Cons"
+)
+
+jan_ensemble <- rw_scen_gen_names(
+  "Jan2019_2020,DNF,2007Dems,IG", 
+  1981:2015,
+  "No_DCP_Cons"
+)
+
 scens <- list(
   #"August 2018 - DNF" = "Aug2018_2019,DNF,2007Dems,IG,Most",
   # "April 2018" = 
   #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
   # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
-  "August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
-  "January 2019" = "2019/Scenario/Jan2019_2019,DNF,2007Dems,IG,Hist"
+  #"August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
+  "June 2019 - Most" = "Jun2019_2020,DNF,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
+  "January 2019" = jan_ensemble,
+  "June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
+  "June 2019" = jun_ensemble
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -81,20 +98,37 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # for each scenario group name, it should be either 2 numbers or 2 file paths, 
 # both ordered powell, then mead.
 
+jan_path <- file.path(
+  CRSSDIR,
+  "dmi/InitialConditions/jan_2019/MtomToCrss_Monthly.xlsx"
+)
+
+jun_path <- file.path(
+  CRSSDIR, 
+  "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
+)
+
 icList <- list(
-  "August 2018" = c(3586.55, 1079.50),
-  "January 2019" = c(3581.85, 1081.46)
-  # "April 2018" = file.path(
+  #"August 2018" = c(3586.55, 1079.50),
+  #"January 2019" = c(3581.85, 1081.46)
+  # "January 2019 - 110" = file.path(
   #   CRSSDIR,
-  #   "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
+  #   "dmi/InitialConditions/jan_2019/MtomToCrss_Monthly.xlsx"
   # ),
-  # "April 2018 - most" =  c(3589.78, 1079.07)
+  "June 2019 - Most" = c(3619.82, 1088.09),
+  "June 2019 - No DCP" = c(3619.56, 1085.88),
+  "January 2019" = jan_path,
+  "June 2019" = jun_path
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
 icMonth <- c(
-  "August 2018" = "18-Dec",
-  "January 2019" = "18-Dec"
+  #"August 2018" = "18-Dec",
+  #"January 2019" = "18-Dec",
+  "June 2019 - Most" = "19-Dec",
+  "June 2019 - No DCP" = "19-Dec",
+  "January 2019" = "19-Dec",
+  "June 2019" = "19-Dec"
 )
 
 # for the 5-year simple table
@@ -104,30 +138,36 @@ icMonth <- c(
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
 ss5 <- c(
-  "August 2018" = "August 2018"
+  "January 2019" = "January 2019",
+  "June 2019" = "June 2019 w/DCP"
 )
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
 
 # years to use for the simple 5-year table
-yy5 <- 2019:2023
+yy5 <- 2020:2024
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "January 2019"
+mainScenGroup <- "June 2019"
 mainScenGroup.name <- mainScenGroup
 
 # text that will be added to figures
-annText <- 'Results from January 2019 CRSS Run' 
+annText <- 'Results from June 2019 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2019:2060 # years to show the crit stats figures
-peYrs <- 2018:2060 # years to show the Mead/Powell 10/50/90 figures for
+# the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
+plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
+
+end_year <- 2060
+
+yrs2show <- 2020:2026 # years to show the crit stats figures
+peYrs <- 2019:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # More descriptive labels for hydrologies used in the cloud plots
 cloudScen <- c("January 2019 DNF","January 2019 ST")
@@ -247,6 +287,7 @@ sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv')
 
 critStatsProc <- 'CritStats.csv'
 condProbFile <- 'CondProbs.csv'
+dcp_prob_file <- "dcp_probs.csv"
 
 shortCondFig <- 'shortConditionsFig.pdf'
 
@@ -315,12 +356,30 @@ if(makeFiguresAndTables){
   sysCond <- read_feather(file.path(resFolder,sysCondFile)) %>%
     # trim to specified years and the current main scenario group 
     dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
-  # create the system cond. table
+  
+  # create the IG system cond. table
   sysTable <- CRSSIO::crsso_get_sys_cond_table(sysCond, yrs2show)
+  
   # save the sys cond table
   data.table::fwrite(
     as.data.frame(sysTable[['fullTable']]), 
     file.path(oFigs,sysCondTable), 
+    row.names = TRUE
+  )
+  
+  # get the DCP related probabilities
+  pe <- read_feather(file.path(resFolder,curMonthPEFile))
+  dcp_probs <- bind_rows(
+    compute_mead_dcp_probs(pe, mainScenGroup, 2019:2060),
+    compute_powell_dcp_probs(pe, mainScenGroup, yrs2show)
+    ) %>%
+    filter(Year %in% yrs2show) %>%
+    format_dcp_table()
+  
+  # save the dcp probabilities table
+  data.table::fwrite(
+    dcp_probs, 
+    file.path(oFigs, dcp_prob_file), 
     row.names = TRUE
   )
   
@@ -333,7 +392,8 @@ if(makeFiguresAndTables){
     # the names that should show up in the legend/differentiate scenario groups
     # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
     # StartMonth for now
-    dplyr::mutate(StartMonth = Agg)
+    dplyr::mutate(StartMonth = Agg) %>%
+    filter(StartMonth %in% plot_scenarios)
 
   # plot
   powellPE <- plotEOCYElev(pe, peYrs, 'Powell.Pool Elevation', 
@@ -343,7 +403,8 @@ if(makeFiguresAndTables){
                            'Mead End-of-December Elevation', colorLabel, 
                          legendWrap = legendWrap)
   
-  # plot Clouds
+  # plot Clouds ----------------
+  if (FALSE) {
   powellCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Powell.Pool Elevation',
                                'Powell End-of-December Elevation', colorLabel,
                                legendWrap = legendWrap)
@@ -353,7 +414,7 @@ if(makeFiguresAndTables){
                              'Mead End-of-December Elevation', colorLabel, 
                              legendWrap = legendWrap)
   ggsave(file.path(oFigs,'Mead.png'), width = 9, height = 6.5, units = "in", dpi = 600)
-  
+  }
   
   # 3) Critical elevation thresholds; figures and data table -------
   # have sysCond for some, and read in crit stats for others
@@ -367,15 +428,15 @@ if(makeFiguresAndTables){
       Variable %in% c('meadLt1000', 'meadLt1020', 'powellLt3490', 
                       'powellLt3525', 'meadLt1025')
     ) %>%
-    mutate(AggName = Agg) %>%
+    rename(AggName = Agg) %>%
     select(-StartMonth)
   rm(pe) # don't need pe any longer
   
   cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
-    mutate(AggName = Agg) %>%
+    rename(AggName = Agg) %>%
     filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
-    mutate(AggName = Agg) %>%
-    rbind(cs)
+    rbind(cs) %>%
+    filter(AggName %in% plot_scenarios)
 
   ptitle <- paste(
     'Powell: Percent of Traces Less than Power Pool', 
@@ -407,7 +468,7 @@ if(makeFiguresAndTables){
 
   critStatsFig1 <- plotCritStats(dplyr::filter(
       cs, 
-      Agg == mainScenGroup, 
+      AggName == mainScenGroup, 
       !(Variable %in% c('meadLt1020','lbSurplus'))
     ), 
     yrs2show, 
@@ -416,7 +477,7 @@ if(makeFiguresAndTables){
   
   critStatsFig2 <- plotCritStats(dplyr::filter(
       cs, 
-      Agg == mainScenGroup, 
+      AggName == mainScenGroup, 
       !(Variable %in% c('meadLt1025','lbSurplus'))
     ), 
     yrs2show, 
@@ -428,7 +489,7 @@ if(makeFiguresAndTables){
   cs <- cs %>%
     dplyr::filter(
       Year %in% yrs2show, 
-      Agg == mainScenGroup, 
+      AggName == mainScenGroup, 
       Variable != 'lbSurplus'
     ) %>%
     # compute the percent of traces by averaging values 
