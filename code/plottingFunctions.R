@@ -6,6 +6,7 @@ library(scales)
 library(stringr)
 library(cowplot)
 library(imager)
+theme_set(theme_grey())
 
 plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
 {
