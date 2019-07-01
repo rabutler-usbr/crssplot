@@ -6,9 +6,12 @@ library(scales)
 library(stringr)
 library(cowplot)
 library(imager)
+library(assertthat)
+
 theme_set(theme_grey())
 
-plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
+plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
+                         plot_colors = NULL)
 {
   zz <- zz %>%
     dplyr::filter(Year %in% yrs, Variable == var) %>%
@@ -24,15 +27,22 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
   qLt <- c(3,1,2)
   names(qLt) <- c('10th','50th','90th')
   
-  if(length(yrs) < 15){
+  if (length(yrs) < 15) {
     myLabs <- 1990:3000
   } else{
     myLabs <- seq(1990,3000,5)
   }
   
-  if(!is.null(legendWrap)) {
+  # determine colors
+  plot_colors <- determine_plot_colors(plot_colors, unique(zz$StartMonth))
+  
+  # wrap legend lables, if specified
+  if (!is.null(legendWrap)) {
     zz <- zz %>%
       mutate(StartMonth = stringr::str_wrap(StartMonth, width = legendWrap))
+    
+    # also update the plot color names
+    names(plot_colors) <- str_wrap(names(plot_colors), width = legendWrap)
   }
   
   # plot
@@ -43,9 +53,12 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
     scale_y_continuous(labels = scales::comma) +
     theme(panel.grid.minor = element_line(color = 'white', size = .4),
           panel.grid.major = element_line(color = 'white', size = .6)) +
-    labs(y = '[feet]', title = myTitle) +
-    theme(legend.key.height = unit(2,'line'), legend.key.width = grid::unit(2, 'line')) +
-    scale_color_discrete(guide = guide_legend(title = legendTitle)) +
+    labs(y = 'feet', title = myTitle) +
+    theme(
+      legend.key.height = unit(2,'line'), 
+      legend.key.width = grid::unit(2, 'line')
+    ) +
+    scale_color_manual(values = plot_colors, guide = guide_legend(title = legendTitle)) +
     scale_linetype_manual(values = qLt)
   gg
 }
@@ -102,17 +115,17 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
   gg
 }
 
-compareCritStats <- function(zz, yrs, variable, annText, plotTitle, 
+compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle, 
                              legendTitle = '', 
                              legLoc = 'right', nC = 1, annSize = 3, 
-                             legendWrap = NULL)
+                             legendWrap = NULL, plot_colors = NULL)
 {
 
   yL <- c(0,1)
   
-  if(length(yrs) < 15){
+  if (length(yrs) < 15) {
     myLabs <- 1990:3000
-  } else{
+  } else {
     myLabs <- seq(1990,3000,5)
   }
   
@@ -121,12 +134,17 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle,
     group_by(Year, AggName) %>%
     summarise(Value = mean(Value))
   
-  if(!is.null(legendWrap)) {
+  # determine plotting colors
+  plot_colors <- determine_plot_colors(plot_colors, unique(zz$AggName))
+  
+  if (!is.null(legendWrap)) {
     aggsN <- as.character(as.factor(zz$AggName))
     aggs <- stringr::str_wrap(aggsN, width = legendWrap)
     names(aggs) <- aggsN
     zz <- zz %>%
       mutate(AggName = aggs[AggName])
+    
+    names(plot_colors) <- str_wrap(names(plot_colors), width = legendWrap)
   }
   
   ggplot(zz, aes(Year, Value, color = AggName)) +
@@ -144,8 +162,19 @@ compareCritStats <- function(zz, yrs, variable, annText, plotTitle,
       legend.position = legLoc, 
       legend.key.size = unit(2, "line")
     ) +
-    scale_color_discrete(guide = guide_legend(title = legendTitle,ncol = nC)) + 
-    annotate('text', x = min(yrs), y = 0.95, label = annText, vjust=0, hjust=0,size = annSize) + 
+    scale_color_manual(
+      guide = guide_legend(title = legendTitle,ncol = nC),
+      values = plot_colors
+    ) + 
+    annotate(
+      'text', 
+      x = min(yrs), 
+      y = 0.95, 
+      label = annText, 
+      vjust=0, 
+      hjust=0,
+      size = annSize
+    ) + 
     labs(y = 'Percent of Traces', title = plotTitle)
 }
 
@@ -634,4 +663,20 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
     annotation_custom(im_rast, ymin = yaxmin, ymax = yaxmin + 12, xmin = 1999, xmax = 2006) 
   gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4))
   gg
+}
+
+determine_plot_colors <- function(plot_colors, col_vars)
+{
+  if (is.null(plot_colors)) {
+    plot_colors <- scales::hue_pal()(length(col_vars))
+    names(plot_colors) <- col_vars
+  } else {
+    # check that there are specified colors for each Variable
+    assert_that(
+      all(col_vars %in% names(plot_colors)), 
+      msg = "Scenario names not found in `plot_colors`"
+    )
+  }
+  
+  plot_colors
 }
