@@ -6,7 +6,7 @@ compute_mead_dcp_probs <- function(zz, aggs, yrs)
     filter(
       Agg %in% aggs, 
       Year %in% yrs, 
-      Variable == "Mead.Pool Elevation"
+      Variable == "mead_dec_pe"
     ) %>%
     mutate(
       dcp1 = as.numeric(Value <= 1090 & Value > 1075),
@@ -17,7 +17,9 @@ compute_mead_dcp_probs <- function(zz, aggs, yrs)
       dcp6 = as.numeric(Value <= 1035 & Value > 1030),
       dcp7 = as.numeric(Value <= 1030 & Value > 1025),
       dcp8 = as.numeric(Value <= 1025),
-      dcp_recovery = as.numeric(Value > 1110)
+      dcp_recovery = as.numeric(Value > 1110 & Value < 1145),
+      normal = as.numeric(Value <= 1110 & Value > 1090),
+      surplus = as.numeric(Value >= 1145)
     ) %>%
     select(-Variable, -Value, -Month) %>%
     gather(Variable, Value, -Year, -Scenario, -TraceNumber, -Agg) %>%
@@ -34,7 +36,7 @@ compute_powell_dcp_probs <- function(zz, aggs, yrs)
     filter(
       Agg %in% aggs, 
       Year %in% yrs, 
-      Variable == "powellLt3490"
+      Variable == "powell_wy_min_lt_3490"
     ) %>%
     group_by(Year, Agg, Variable) %>%
     summarise(Value = mean(Value))
@@ -51,8 +53,10 @@ dcp_tier_names <- function()
     "dcp6" = "DCP Contribution - Level 4 (Mead <= 1,035 and > 1,030 ft)",
     "dcp7" = "DCP Contribution - Level 5 (Mead <= 1,030 and >= 1,025 ft)",
     "dcp8" = "DCP Contribution - Level 5 (Mead < 1,025 ft)",
-    "dcp_recovery" = "Recovery of DCP ICS (Mead > 1,110 ft)",
-    "powellLt3490" = "Below Minimum Power Pool (Powell < 3,490 ft)"
+    "dcp_recovery" = "Normal + Recovery of DCP ICS (Mead <1,145 and > 1,110 ft)",
+    "powell_wy_min_lt_3490" = "Below Minimum Power Pool (Powell < 3,490 ft)",
+    "normal" = "Normal - (Mead <= 1,110 and > 1,090 ft)",
+    "surplus" = "Surplus + Recovery of DCP ICS (Mead >= 1,145 ft)"
   )
 }
 
