@@ -16,6 +16,7 @@ source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
 source("code/compute_dcp_probs.R")
+source("code/system_condition_heat_map.R")
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -38,7 +39,7 @@ get_crss_short_cond_data <- FALSE
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'june_results_full_v2.pdf'
+pdf_name <- 'june_results_full_vs_st_v2.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
@@ -55,7 +56,7 @@ iFolder <- "M:/Shared/CRSS/2019/Scenario"
 # a folder with this name
 crssMonth <- "june2019"
 # inserted onto some files. Can be ''
-extra_label <- "fullV2_"
+extra_label <- "fullVST_v2_"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -84,6 +85,12 @@ jan_ensemble <- rw_scen_gen_names(
   "No_DCP_Cons"
 )
 
+jun_st_ensemble <- rw_scen_gen_names(
+  "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP",
+  paste0("Trace", 4:38),
+  "DCP_Cons"
+)
+
 scens <- list(
   #"August 2018 - DNF" = "Aug2018_2019,DNF,2007Dems,IG,Most",
   # "April 2018" = 
@@ -94,8 +101,7 @@ scens <- list(
   "January 2019" = jan_ensemble,
   "June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
   "June 2019" = jun_ensemble,
-  "June 2019 - Stress Test" = 
-    "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
+  "June 2019 - Stress Test" = jun_st_ensemble,
   "June 2019 - Stress Test - No DCP" = 
     "Jun2019_2020,ISM1988_2017,NV300,IG,Most,No_DCP_Cons"
 )
@@ -126,7 +132,7 @@ icList <- list(
   "June 2019 - No DCP" = c(3619.56, 1085.88),
   "January 2019" = jan_path,
   "June 2019" = jun_path,
-  "June 2019 - Stress Test" = c(3619.82, 1088.09),
+  "June 2019 - Stress Test" = jun_path,
   "June 2019 - Stress Test - No DCP" = c(3619.56, 1085.88)
 )
 
@@ -164,7 +170,7 @@ yy5 <- 2020:2024
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
 mainScenGroup <- "June 2019"
-mainScenGroup.name <- mainScenGroup
+names(mainScenGroup) <- mainScenGroup
 
 # text that will be added to figures
 annText <- 'Results from June 2019 CRSS Run' 
@@ -173,9 +179,15 @@ annText <- 'Results from June 2019 CRSS Run'
 colorLabel <- 'Scenario'
 
 # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
-plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
+#plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
 #plot_scenarios <- c("June 2019 - Stress Test", "June 2019 - Stress Test - No DCP")
-#plot_scenarios <- c("June 2019", "June 2019 - Stress Test")
+plot_scenarios <- c("June 2019 - Stress Test", "June 2019")
+
+# set plotting colors (optional)
+# use scales::hue_pal()(n) to get default ggplot colors
+plot_colors <- c("#F8766D", "#00BFC4")
+#plot_colors <- c("#619CFF", "#F8766D", "#00BA38")
+names(plot_colors) <- plot_scenarios
 
 end_year <- 2060
 
@@ -367,6 +379,7 @@ if (get_crss_short_cond_data) {
 if (makeFiguresAndTables) {
   message("starting to create figures and tables")
   message("creating system conditions table")
+  
   ## Create tables, figures, and data behind figures
   # 1) system conditions table -------------
   sysCond <- read_feather(file.path(resFolder,sysCondFile)) %>%
@@ -384,6 +397,7 @@ if (makeFiguresAndTables) {
   )
   
   # get the DCP related probabilities
+  message("... DCP Probabilities")
   pe <- read_feather(file.path(resFolder,curMonthPEFile))
   dcp_probs <- bind_rows(
     compute_mead_dcp_probs(pe, mainScenGroup, 2019:2060),
@@ -397,6 +411,29 @@ if (makeFiguresAndTables) {
     dcp_probs, 
     file.path(oFigs, dcp_prob_file), 
     row.names = TRUE
+  )
+  
+  # system condition heatmap -------------------------
+  message("... System conditions heatmap")
+  hydrology_names = c(
+    "June 2019" = "Full", 
+    "June 2019 - Stress Test" = "Stresss Test"
+  )
+  lb_dcp <- compute_mead_dcp_probs(pe, names(hydrology_names), 2019:2026)
+  
+  mead_system_condition_heatmap(
+    lb_dcp, 
+    yrs2show, 
+    scen_rename = hydrology_names, 
+    my_title = "Lake Mead Conditions from June 2019 CRSS"
+  )
+  
+  ggsave(
+    file.path(oFigs, "mead_heat_old.png"), 
+    plot = last_plot(), 
+    width = 8.91, 
+    height = 5.65, 
+    units = "in"
   )
   
   # 2) Plot Mead, Powell EOCY elvations -------------
@@ -418,7 +455,8 @@ if (makeFiguresAndTables) {
     "powell_dec_pe", 
     'Powell End-of-December Elevation', 
     colorLabel,
-    legendWrap = legendWrap
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
   )
   
   meadPE <- plotEOCYElev(
@@ -427,20 +465,46 @@ if (makeFiguresAndTables) {
     "mead_dec_pe", 
     'Mead End-of-December Elevation', 
     colorLabel, 
-    legendWrap = legendWrap
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
   )
   
   # plot Clouds ----------------
   if (should_plot_clouds) {
-  powellCloud <- plotCloudFigs(cloudScen, pe, peYrs, "powell_dec_pe",
-                               'Powell End-of-December Elevation', colorLabel,
-                               legendWrap = legendWrap)
-  ggsave(file.path(oFigs,'Powell.png'), width = 9, height = 6.5, units = "in", dpi = 600)
-  
-  meadCloud <- plotCloudFigs(cloudScen, pe, peYrs, "mead_dec_pe", 
-                             'Mead End-of-December Elevation', colorLabel, 
-                             legendWrap = legendWrap)
-  ggsave(file.path(oFigs,'Mead.png'), width = 9, height = 6.5, units = "in", dpi = 600)
+    powellCloud <- plotCloudFigs(
+      cloudScen, 
+      pe, 
+      peYrs, 
+      "powell_dec_pe",
+      'Powell End-of-December Elevation', 
+      colorLabel,
+      legendWrap = legendWrap
+    )
+    
+    ggsave(
+      file.path(oFigs,'Powell.png'), 
+      width = 9, 
+      height = 6.5, 
+      units = "in", 
+      dpi = 600
+    )
+    
+    meadCloud <- plotCloudFigs(
+      cloudScen, 
+      pe, 
+      peYrs, 
+      "mead_dec_pe", 
+      'Mead End-of-December Elevation', 
+      colorLabel, 
+      legendWrap = legendWrap
+    )
+    ggsave(
+      file.path(oFigs,'Mead.png'), 
+      width = 9, 
+      height = 6.5, 
+      units = "in", 
+      dpi = 600
+    )
   }
   
   # 3) Critical elevation thresholds; figures and data table -------
@@ -474,52 +538,73 @@ if (makeFiguresAndTables) {
     sep = "\n"
   )
   
-  p_3490_fig <- compareCritStats(
+  p_3490_fig <- compare_crit_stats(
     cs, 
     yrs2show, 
     'powell_wy_min_lt_3490', 
     '', 
     ptitle, 
     colorLabel, 
-    legendWrap = legendWrap
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
   )
   
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
-  shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 
-                               colorLabel, legendWrap = legendWrap)
+  shortFig <- compare_crit_stats(
+    cs, 
+    yrs2show, 
+    'lbShortage', 
+    '', 
+    shortTitle, 
+    colorLabel, 
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
+  )
+  
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
-  surpFig <- compareCritStats(cs, yrs2show, 'lbSurplus', '', surpTitle, 
-                              colorLabel, legendWrap = legendWrap)
+  surpFig <- compare_crit_stats(
+    cs, 
+    yrs2show, 
+    'lbSurplus', 
+    '', 
+    surpTitle, 
+    colorLabel, 
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
+  )
   
   # compare critical stat figures 1025, 1000, 3490, 3525 -----------------
-  p_3525_fig <- compareCritStats(
+  p_3525_fig <- compare_crit_stats(
     cs, 
     yrs2show, 
     'powell_wy_min_lt_3525', 
     '', 
     "Powell: Percent of Traces Less than elevation 3,525' in Any Water Year", 
     colorLabel, 
-    legendWrap = legendWrap
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
   )
   
-  m_1025_fig <- compareCritStats(
+  m_1025_fig <- compare_crit_stats(
     cs, 
     yrs2show, 
     "mead_dec_lt_1025", 
     '', 
     "Mead: Percent of Traces Less than elevation 1,025' in December", 
     colorLabel, 
-    legendWrap = legendWrap
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
   )
   
-  m_1000_fig <- compareCritStats(
+  m_1000_fig <- compare_crit_stats(
     cs, 
     yrs2show, 
     "mead_min_lt_1000", 
     '', 
     "Mead: Percent of Traces Less than elevation 1,000' in Any Month", 
     colorLabel, 
-    legendWrap = legendWrap
+    legendWrap = legendWrap,
+    plot_colors = plot_colors
   )
   
   # now create figures only for the current "main scenario"
@@ -571,7 +656,7 @@ if (makeFiguresAndTables) {
       Agg == mainScenGroup
       ), 
     yrs2show, 
-    mainScenGroup.name
+    names(mainScenGroup)
   )
     
   # stacked barplot of different shortage tiers
