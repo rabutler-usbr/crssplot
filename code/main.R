@@ -17,6 +17,7 @@ source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
 source("code/compute_dcp_probs.R")
 source("code/system_condition_heat_map.R")
+source("code/crss_res_directory_setup.R")
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -26,7 +27,7 @@ source("code/system_condition_heat_map.R")
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
 # store the intermediate data and figures/tables created here
-# iFolder is a path to the top level crss directory that contains the model 
+# i_folder is a path to the top level crss directory that contains the model 
 # output it could be the same as CRSSDIR, but is allowed to be different so that 
 # you can read model output from the server, but save figures locally.
 
@@ -39,7 +40,7 @@ get_crss_short_cond_data <- FALSE
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'june_results_full_vs_st_v2.pdf'
+pdf_name <- 'june_test.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
@@ -51,12 +52,12 @@ should_plot_clouds <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
-iFolder <- "M:/Shared/CRSS/2019/Scenario"
+i_folder <- "//128.138.214.42/bor/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "june2019"
+crssMonth <- "june2019_test"
 # inserted onto some files. Can be ''
-extra_label <- "fullVST_v2_"
+extra_label <- "full_"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -98,10 +99,11 @@ scens <- list(
   # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
   #"August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
   "June 2019 - Most" = "Jun2019_2020,DNF,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
-  "January 2019" = jan_ensemble,
+  #"January 2019" = jan_ensemble,
   "June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
-  "June 2019" = jun_ensemble,
-  "June 2019 - Stress Test" = jun_st_ensemble,
+  
+  #"June 2019" = jun_ensemble,
+  #"June 2019 - Stress Test" = jun_st_ensemble,
   "June 2019 - Stress Test - No DCP" = 
     "Jun2019_2020,ISM1988_2017,NV300,IG,Most,No_DCP_Cons"
 )
@@ -130,9 +132,9 @@ icList <- list(
   # ),
   "June 2019 - Most" = c(3619.82, 1088.09),
   "June 2019 - No DCP" = c(3619.56, 1085.88),
-  "January 2019" = jan_path,
-  "June 2019" = jun_path,
-  "June 2019 - Stress Test" = jun_path,
+  #"January 2019" = jan_path,
+  #"June 2019" = jun_path,
+  #"June 2019 - Stress Test" = jun_path,
   "June 2019 - Stress Test - No DCP" = c(3619.56, 1085.88)
 )
 
@@ -142,9 +144,9 @@ icMonth <- c(
   #"January 2019" = "18-Dec",
   "June 2019 - Most" = "19-Dec",
   "June 2019 - No DCP" = "19-Dec",
-  "January 2019" = "19-Dec",
-  "June 2019" = "19-Dec",
-  "June 2019 - Stress Test" = "19-Dec",
+  #"January 2019" = "19-Dec",
+  #"June 2019" = "19-Dec",
+  #"June 2019 - Stress Test" = "19-Dec",
   "June 2019 - Stress Test - No DCP" = "19-Dec"
 )
 
@@ -155,8 +157,16 @@ icMonth <- c(
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
 ss5 <- c(
-  "January 2019" = "January 2019",
-  "June 2019" = "June 2019 w/DCP"
+  "June 2019 - Most" = "June 2019 - Most",
+  "June 2019 - Stress Test - No DCP" = "June 2019 - Stress Test - No DCP"
+)
+
+# use this to select which scenarios are shown in the heat map, and what those
+# scenarios should be labeled as in the heatmap. The names should be existing
+# scenario names, and the values are what they will be labeled as in the heatmap
+heatmap_names = c(
+  "June 2019 - No DCP" = "Full", 
+  "June 2019 - Stress Test - No DCP" = "Stresss Test"
 )
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
@@ -169,7 +179,7 @@ yy5 <- 2020:2024
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "June 2019"
+mainScenGroup <- "June 2019 - Most"
 names(mainScenGroup) <- mainScenGroup
 
 # text that will be added to figures
@@ -181,7 +191,7 @@ colorLabel <- 'Scenario'
 # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
 #plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
 #plot_scenarios <- c("June 2019 - Stress Test", "June 2019 - Stress Test - No DCP")
-plot_scenarios <- c("June 2019 - Stress Test", "June 2019")
+plot_scenarios <- c("June 2019 - Stress Test - No DCP", "June 2019 - Most")
 
 # set plotting colors (optional)
 # use scales::hue_pal()(n) to get default ggplot colors
@@ -247,84 +257,29 @@ shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2020'
 #    --------------      SETUP DIRECTORIES AND FILENAMES   -----------------
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# some sanity checks that UI is correct:
-if(!(mainScenGroup %in% names(scens)))
-  stop(mainScenGroup, ' is not found in scens.')
-if(!(mainScenGroup %in% names(icList)))
-  stop(mainScenGroup, ' is not found in icList')
+crss_res_check_scen_names(scens, icList, icMonth, mainScenGroup, ss5, heatmap_names)
+folder_paths <- crss_res_directory_setup(
+  i_folder, 
+  get_pe_data = getPeData, 
+  get_sys_cond_data = getSysCondData,
+  CRSSDIR = CRSSDIR,
+  crss_month = crssMonth
+)
 
-# check that the names of scens, icList, and icMonth are all the same; they
-# don't necessarily need to be in the same order, just all exist in one another
-if(!all(names(scens) %in% names(icList), names(icList) %in% names(scens), 
-        names(scens) %in% names(icMonth), names(icMonth) %in% names(scens),
-        names(icList) %in% names(icMonth), names(icMonth) %in% names(icList)))
-  stop("scenario group names do not match.",
-       "\nthe names() of scens, icList, and icMonth should all be the same")
-
-# if we made it here, we know names() of scens, icList, and icMonth all match, 
-# so just check to make sure that ss5 is withing scens
-if(!all(names(ss5) %in% names(scens)))
-  stop("scenario goup names of ss5 must match the names found in scens")
-
-# onlyl check if reading in data if you have to getData
-if(getPeData | getSysCondData){
-  message('Scenario data will be read in from: ', iFolder)
-  if(!file.exists(iFolder))
-    stop(iFolder, ' does not exist. Please ensure iFolder is set correctly.')
-}
-
-# folder location to save figures and fully procssed tables
-if (!file.exists(CRSSDIR)) {
-  stop(
-    CRSSDIR, 
-    ' does not exist. Please ensure CRSS_DIR environment variable is set correctly'
+o_files <- crss_res_get_file_names(
+  extra_label, 
+  yrs = yrs2show, 
+  main_pdf = pdf_name
+) %>%
+  crss_res_append_file_path(
+    figs_folder = folder_paths$figs_folder, 
+    res_folder = folder_paths$res_folder
   )
-}
-
-if (!file.exists(file.path(CRSSDIR, 'results'))) {
-  message(paste(file.path(CRSSDIR, 'results'),
-                'does not exist. Creating this folder...'))
-  dir.create(file.path(CRSSDIR, 'results'))
-}
-
-oFigs <- file.path(CRSSDIR,'results', crssMonth) 
-if (!file.exists(oFigs)) {
-  message(paste('Creating folder:', oFigs))
-  dir.create(oFigs)
-}
-message('Figures and tables will be saved to: ', oFigs)
-
-# folder to save procssed text files to (intermediate processed data)
-resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
-if (!file.exists(resFolder)) {
-  message(paste('Creating folder:', resFolder))
-  dir.create(resFolder)
-}
-message('Intermediate data will be saved to: ', resFolder)
-
-sysCondFile <- 'SysCond.feather' # file name of system conditions data
-tmpPEFile <- 'tempPE.feather'
-curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
-
-# file name for the system conditions procssed file
-sysCondTable <- paste0(extra_label, 'SysTableFull', yrs2show[1], '_',
-                       tail(yrs2show,1),'.csv') 
-
-
-critStatsProc <- paste0(extra_label, 'CritStats.csv')
-condProbFile <- 'CondProbs.csv'
-
-dcp_prob_file <- paste0(extra_label, yrs2show[1], "_", tail(yrs2show,1), 
-                        "dcp_probs.csv")
-
-shortCondFig <- 'shortConditionsFig.pdf'
-
-simple5YrFile <- '5yrSimple.pdf'
 
 traceMap <- read.csv('data/Trace2IcMap.csv')
 
 # *****************************************************************************
-#       Process results --------------
+#       PROCESS RESULTS --------------
 # *****************************************************************************
 
 # System Conditions Table Data
@@ -338,8 +293,8 @@ if (getSysCondData) {
   
   getScenarioData(
     scens, 
-    iFolder, 
-    file.path(resFolder,sysCondFile),
+    i_folder, 
+    o_files$sys_cond_file,
     TRUE,
     'aggFromScenList', 
     sys_rwa
@@ -354,11 +309,11 @@ if (getPeData) {
     "data/MPPEStats_sam.csv", 
     stringsAsFactors = FALSE
   ))
-  getScenarioData(scens, iFolder, file.path(resFolder,tmpPEFile), TRUE, 
+  getScenarioData(scens, i_folder, o_files$tmp_pe_file, TRUE, 
                   'aggFromScenList', pe_rwa)
   ## append initial conditions onto May data
-  getAndAppendIC(scens, file.path(resFolder,tmpPEFile), 
-                 file.path(resFolder,curMonthPEFile), icList, icMonth, 
+  getAndAppendIC(scens, o_files$tmp_pe_file, 
+                 o_files$cur_month_pe_file, icList, icMonth, 
                  TRUE, 'aggFromScenList', traceMap, icDimNumber = icDimNumber)
   
   message('finished getPeData')
@@ -369,7 +324,7 @@ if (get_crss_short_cond_data) {
   
   get_shortcond_from_rdf(
     scenario = scens[[mainScenGroup]], 
-    iFolder = iFolder, 
+    i_folder = i_folder, 
     oFolder = resFolder
   )
   
@@ -382,7 +337,7 @@ if (makeFiguresAndTables) {
   
   ## Create tables, figures, and data behind figures
   # 1) system conditions table -------------
-  sysCond <- read_feather(file.path(resFolder,sysCondFile)) %>%
+  sysCond <- read_feather(o_files$sys_cond_file) %>%
     # trim to specified years and the current main scenario group 
     dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
   
@@ -392,13 +347,13 @@ if (makeFiguresAndTables) {
   # save the sys cond table
   data.table::fwrite(
     as.data.frame(sysTable[['fullTable']]), 
-    file.path(oFigs, sysCondTable), 
+    o_files$sys_cond_table, 
     row.names = TRUE
   )
   
   # get the DCP related probabilities
   message("... DCP Probabilities")
-  pe <- read_feather(file.path(resFolder,curMonthPEFile))
+  pe <- read_feather(o_files$cur_month_pe_file)
   dcp_probs <- bind_rows(
     compute_mead_dcp_probs(pe, mainScenGroup, 2019:2060),
     compute_powell_dcp_probs(pe, mainScenGroup, yrs2show)
@@ -409,27 +364,24 @@ if (makeFiguresAndTables) {
   # save the dcp probabilities table
   data.table::fwrite(
     dcp_probs, 
-    file.path(oFigs, dcp_prob_file), 
+    o_files$dcp_prob_file, 
     row.names = TRUE
   )
   
   # system condition heatmap -------------------------
   message("... System conditions heatmap")
-  hydrology_names = c(
-    "June 2019" = "Full", 
-    "June 2019 - Stress Test" = "Stresss Test"
-  )
-  lb_dcp <- compute_mead_dcp_probs(pe, names(hydrology_names), 2019:2026)
+ 
+  lb_dcp <- compute_mead_dcp_probs(pe, names(heatmap_names), 2019:2026)
   
-  mead_system_condition_heatmap(
+  mead_system_condition_heatmap2(
     lb_dcp, 
     yrs2show, 
-    scen_rename = hydrology_names, 
+    scen_rename = heatmap_names, 
     my_title = "Lake Mead Conditions from June 2019 CRSS"
   )
   
   ggsave(
-    file.path(oFigs, "mead_heat_old.png"), 
+    file.path(folder_paths$figs_folder, "mead_heat_side-by-side.png"), 
     plot = last_plot(), 
     width = 8.91, 
     height = 5.65, 
@@ -440,7 +392,7 @@ if (makeFiguresAndTables) {
   # includes previous month's results too
   # read in current month data
   message("EOCY elevation figures")
-  pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
+  pe <- read_feather(o_files$cur_month_pe_file) %>%
     # The StartMonth column is used as the color variable in plotEOCYElev, and 
     # the names that should show up in the legend/differentiate scenario groups
     # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
@@ -482,7 +434,7 @@ if (makeFiguresAndTables) {
     )
     
     ggsave(
-      file.path(oFigs,'Powell.png'), 
+      o_files$powell_cloud, 
       width = 9, 
       height = 6.5, 
       units = "in", 
@@ -499,7 +451,7 @@ if (makeFiguresAndTables) {
       legendWrap = legendWrap
     )
     ggsave(
-      file.path(oFigs,'Mead.png'), 
+      o_files$mead_cloud,
       width = 9, 
       height = 6.5, 
       units = "in", 
@@ -526,7 +478,7 @@ if (makeFiguresAndTables) {
     select(-StartMonth)
   #rm(pe) # don't need pe any longer
   
-  cs <- read_feather(file.path(resFolder,sysCondFile)) %>%
+  cs <- read_feather(o_files$sys_cond_file) %>%
     rename(AggName = Agg) %>%
     filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
     rbind(cs) %>%
@@ -673,7 +625,7 @@ if (makeFiguresAndTables) {
 
 # save figures and table
   message("creating pdf")
-  pdf(file.path(oFigs, pdf_name),width = 8, height = 6)
+  pdf(o_files$main_pdf, width = 8, height = 6)
   print(powellPE)
   print(meadPE)
   print(p_3525_fig)
@@ -687,14 +639,14 @@ if (makeFiguresAndTables) {
   print(ssPlot)
   print(shortStack)
   dev.off()
-  data.table::fwrite(cs,file.path(oFigs,critStatsProc),row.names = F)
+  data.table::fwrite(cs, o_files$crit_stats_proc, row.names = F)
 }
 
 if(computeConditionalProbs){
   ## CONDITIONAL PROBABILITIES
   # use sysCond
   if(is.na(match('sysCond',ls()))){
-    sysCond <- read.table(paste0(resFolder,sysCondFile),header = T) 
+    sysCond <- read.table(o_files$sys_cond_file, header = T) 
     sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
     sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   }
@@ -784,7 +736,7 @@ if(computeConditionalProbs){
   # rearrange columns
   cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
   cpt1$PrctChance <- cpt1$PrctChance*100
-  data.table::fwrite(cpt1,paste0(oFigs,condProbFile),row.names = F)
+  data.table::fwrite(cpt1, o_files$cond_prob_file, row.names = F)
 }
 
 # conditions leading to shortage ---------------------------------
@@ -823,7 +775,7 @@ if (createShortConditions) {
     theme(legend.title = element_text(size = 10))
   
   ggsave(
-    file.path(oFigs,paste(short_cond_color_var, shortCondFig, sep = "_")),
+    o_files$short_cond_fig,
     plot = shortCond,
     units = "in",
     width = 9, 
@@ -832,13 +784,14 @@ if (createShortConditions) {
 }
 
 # 5 year simple table -------------------------
-if(createSimple5yrTable){
+if (createSimple5yrTable) {
   ## create the 5-yr simple table that compares to the previous run
   message("creating 5-year simple table")
-  zz <- read_feather(file.path(resFolder, sysCondFile)) %>%
-    rbind(read_feather(file.path(resFolder,curMonthPEFile))) 
+  zz <- read_feather(o_files$sys_cond_file) %>%
+    rbind(read_feather(o_files$cur_month_pe_file))
+          
   simple5Yr <- create5YrSimpleTable(zz, ss5, yy5, tableFootnote)
-  pdf(file.path(oFigs,simple5YrFile),width = 8, height = 8)
+  pdf(o_files$simple_5yr_file, width = 8, height = 8)
   print(simple5Yr)
   dev.off()
   rm(zz)
@@ -849,7 +802,7 @@ if (addPEScatterFig) {
   message("elevation scatter plot figure")
   ### This did not properly compile for the January run.
   if (peScatterData == "CRSS") {
-    pe <- read_feather(file.path(resFolder,curMonthPEFile)) %>%
+    pe <- read_feather(o_files$cur_month_pe_file) %>%
       filter(Agg == mainScenGroup)
   } else if (peScatterData == "MTOM") {
 
@@ -877,7 +830,10 @@ if (addPEScatterFig) {
   gg <- singleYearPEScatter(pe, peScatterYear, 'Mead.Pool Elevation', 
                           scatterTitle, TRUE)
   
-  tpath <- file.path(oFigs, paste0('meadScatterFigure_', peScatterYear, '.pdf'))
+  tpath <- file.path(
+    folder_paths$figs_folder, 
+    paste0('meadScatterFigure_', peScatterYear, '.pdf')
+  )
   pdf(tpath, width = 8, height = 6)
   print(gg)
   dev.off()
