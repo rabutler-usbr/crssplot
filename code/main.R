@@ -40,7 +40,7 @@ get_crss_short_cond_data <- FALSE
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'june_test.pdf'
+pdf_name <- 'june_only.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
@@ -52,10 +52,10 @@ should_plot_clouds <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
-i_folder <- "//128.138.214.42/bor/Shared/CRSS/2019/Scenario"
+i_folder <- "M:/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "june2019_test"
+crssMonth <- "june2019"
 # inserted onto some files. Can be ''
 extra_label <- "full_"
 
@@ -305,10 +305,9 @@ if (getSysCondData) {
 if (getPeData) {
   ## get the Mead and Powel EOCY Data
   message('starting getPeData')
-  pe_rwa <- rwd_agg(read.csv(
-    "data/MPPEStats_sam.csv", 
-    stringsAsFactors = FALSE
-  ))
+  
+  pe_rwa <- read_rwd_agg("data/MPPEStats_sam.csv")
+  
   getScenarioData(scens, i_folder, o_files$tmp_pe_file, TRUE, 
                   'aggFromScenList', pe_rwa)
   ## append initial conditions onto May data
