@@ -4,6 +4,7 @@
 
 library(stringr)
 library(data.table)
+library(assertthat)
 
 #' Change folder names to have no commas
 #' 
@@ -45,6 +46,11 @@ createCombinerBatchTxt <- function(fNames, rdf, oFile, batchDir)
 #' @return TRUE if successful
 callCombinerByRdf <- function(rdf, fNames, batchDir)
 {
+  assert_that(
+    all(file.exists(fNames)),
+    msg = "At least one of the fNames does not exist."
+  )
+  
   oFile <- file.path(batchDir,rdf)
   message(paste('Creating batch text file for',rdf,'...'))
   createCombinerBatchTxt(fNames = fNames, rdf = rdf, oFile = oFile, batchDir = batchDir)
@@ -52,7 +58,7 @@ callCombinerByRdf <- function(rdf, fNames, batchDir)
   owd <- getwd()
   setwd(batchDir)
   message(paste('Starting RDF Combiner for',rdf,'...'))
-  system(file.path(batchDir,'RiverWareBatchRdfCombiner'))
+  system2(file.path(batchDir,'RiverWareBatchRdfCombiner'))
   setwd(owd)
   return(TRUE)
 }
