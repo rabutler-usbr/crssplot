@@ -1,0 +1,4 @@
+"file","slot","period","summary","eval","t_s","variable"
+LBEnergy.rdf,Mead.Outflow,cy,sum,NA,NA,mead_out
+LBEnergy.rdf,Havasu.Outflow,cy,sum,NA,NA,havasu_out
+LBEnergy.rdf,Mohave.Outflow,cy,sum,NA,NA,mohave_out
