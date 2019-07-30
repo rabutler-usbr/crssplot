@@ -336,12 +336,12 @@ if (makeFiguresAndTables) {
   
   ## Create tables, figures, and data behind figures
   # 1) system conditions table -------------
-  sysCond <- read_feather(o_files$sys_cond_file) %>%
-    # trim to specified years and the current main scenario group 
-    dplyr::filter(Year %in% yrs2show & Agg == mainScenGroup)
-  
+  sys_cond <- read_feather(o_files$sys_cond_file)
+
   # create the IG system cond. table
-  sysTable <- CRSSIO::crsso_get_sys_cond_table(sysCond, yrs2show)
+  sysTable <- CRSSIO::crsso_get_sys_cond_table(
+    dplyr::filter(sysCond, Year %in% yrs2show & Agg == mainScenGroup), yrs2show
+  )
   
   # save the sys cond table
   data.table::fwrite(
@@ -352,11 +352,19 @@ if (makeFiguresAndTables) {
   
   # get the DCP related probabilities
   message("... DCP Probabilities")
+  
+  dcp_yrs <- c(min(yrs2show) - 1, yrs2show)
+  
+  dcp_scens <- unique(c(mainScenGroup, names(heatmap_names)))
+  
+  lb_dcp <- compute_mead_dcp_probs(pe, dcp_scens, 2019:2026)
+  ub_dcp <- compute_powell_dcp_probs(pe, dcp_scens, 2019:2026)
+  
   pe <- read_feather(o_files$cur_month_pe_file)
   dcp_probs <- bind_rows(
-    compute_mead_dcp_probs(pe, mainScenGroup, 2019:2060),
-    compute_powell_dcp_probs(pe, mainScenGroup, yrs2show)
-    ) %>%
+    filter(lb_dcp, Agg == mainScenGroup),
+    filter(ub_dcp, Agg == mainScenGroup)
+  ) %>%
     filter(Year %in% yrs2show) %>%
     format_dcp_table()
   
@@ -370,10 +378,8 @@ if (makeFiguresAndTables) {
   # system condition heatmap -------------------------
   message("... System conditions heatmap")
  
-  lb_dcp <- compute_mead_dcp_probs(pe, names(heatmap_names), 2019:2026)
-  
-  mead_system_condition_heatmap2(
-    lb_dcp, 
+  mead_system_condition_heatmap(
+    filter(lb_dcp, Agg %in% names(heatmap_names)), 
     yrs2show, 
     scen_rename = heatmap_names, 
     my_title = "Lake Mead Conditions from June 2019 CRSS"
@@ -385,6 +391,13 @@ if (makeFiguresAndTables) {
     width = 8.91, 
     height = 5.65, 
     units = "in"
+  )
+  
+  powell_system_condition_heatmap(
+    filter(sys_cond, Agg %in% names(heatmap_names)),
+    yrs2show,
+    scen_rename = heatmap_names,
+    my_title = "Lake Powell Conditions from June 2019 CRSS"
   )
   
   # 2) Plot Mead, Powell EOCY elvations -------------
