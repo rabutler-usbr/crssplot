@@ -24,8 +24,10 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
   # month and return it
   ic_date <- as.Date(paste0(icMonth,"-01"), format = "%y-%b-%d")
   
-  read_excel(icFile, sheet = icTrace) %>%
-    filter(as.Date(X__1, format = "%Y-%b-%d") == ic_date) %>%
+  tmp <- read_excel(icFile, sheet = icTrace)
+  colnames(tmp)[1] <- "month"
+  
+  filter(tmp, as.Date(month, format = "%Y-%b-%d") == ic_date) %>%
     select(`Powell.Pool Elevation`, `Mead.Pool Elevation`)
 }
 
@@ -43,7 +45,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
                            icDimNumber = 5)
 {
   res <- read_feather(fileToAppend)
-  
+
   icSave <- data.frame()
   
   for(j in 1:length(scens)){
