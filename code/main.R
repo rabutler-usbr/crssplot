@@ -40,7 +40,7 @@ get_crss_short_cond_data <- FALSE
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'june_only.pdf'
+pdf_name <- 'june_v3.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
@@ -52,12 +52,12 @@ should_plot_clouds <- FALSE
 # ** make sure CRSS_DIR is set correctly before running
 
 CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
-i_folder <- "M:/Shared/CRSS/2019/Scenario"
+i_folder <- "//128.138.214.42/bor/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
 crssMonth <- "june2019"
 # inserted onto some files. Can be ''
-extra_label <- "full_"
+extra_label <- "full_v3_"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -98,14 +98,14 @@ scens <- list(
   #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
   # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
   #"August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
-  "June 2019 - Most" = "Jun2019_2020,DNF,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
+  #"June 2019 - Most" = "Jun2019_2020,DNF,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
   #"January 2019" = jan_ensemble,
-  "June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
+  #"June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
   
-  #"June 2019" = jun_ensemble,
-  #"June 2019 - Stress Test" = jun_st_ensemble,
-  "June 2019 - Stress Test - No DCP" = 
-    "Jun2019_2020,ISM1988_2017,NV300,IG,Most,No_DCP_Cons"
+  "June 2019" = jun_ensemble,
+  "June 2019 - Stress Test" = jun_st_ensemble
+  #"June 2019 - Stress Test - No DCP" = 
+  #  "Jun2019_2020,ISM1988_2017,NV300,IG,Most,No_DCP_Cons"
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -130,24 +130,24 @@ icList <- list(
   #   CRSSDIR,
   #   "dmi/InitialConditions/jan_2019/MtomToCrss_Monthly.xlsx"
   # ),
-  "June 2019 - Most" = c(3619.82, 1088.09),
-  "June 2019 - No DCP" = c(3619.56, 1085.88),
+  #"June 2019 - Most" = c(3619.82, 1088.09),
+  #"June 2019 - No DCP" = c(3619.56, 1085.88),
   #"January 2019" = jan_path,
-  #"June 2019" = jun_path,
-  #"June 2019 - Stress Test" = jun_path,
-  "June 2019 - Stress Test - No DCP" = c(3619.56, 1085.88)
+  "June 2019" = jun_path,
+  "June 2019 - Stress Test" = jun_path
+  #"June 2019 - Stress Test - No DCP" = c(3619.56, 1085.88)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
 icMonth <- c(
   #"August 2018" = "18-Dec",
   #"January 2019" = "18-Dec",
-  "June 2019 - Most" = "19-Dec",
-  "June 2019 - No DCP" = "19-Dec",
+  #"June 2019 - Most" = "19-Dec",
+  #"June 2019 - No DCP" = "19-Dec",
   #"January 2019" = "19-Dec",
-  #"June 2019" = "19-Dec",
-  #"June 2019 - Stress Test" = "19-Dec",
-  "June 2019 - Stress Test - No DCP" = "19-Dec"
+  "June 2019" = "19-Dec",
+  "June 2019 - Stress Test" = "19-Dec"
+  #"June 2019 - Stress Test - No DCP" = "19-Dec"
 )
 
 # for the 5-year simple table
@@ -157,17 +157,18 @@ icMonth <- c(
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
 ss5 <- c(
-  "June 2019 - Most" = "June 2019 - Most",
-  "June 2019 - Stress Test - No DCP" = "June 2019 - Stress Test - No DCP"
+  "June 2019" = "June 2019",
+  "June 2019 - Stress Test" = "June 2019 - Stress Test"
 )
 
 # use this to select which scenarios are shown in the heat map, and what those
 # scenarios should be labeled as in the heatmap. The names should be existing
 # scenario names, and the values are what they will be labeled as in the heatmap
 heatmap_names = c(
-  "June 2019 - No DCP" = "Full", 
-  "June 2019 - Stress Test - No DCP" = "Stresss Test"
+  "June 2019" = "Full Hydrology", 
+  "June 2019 - Stress Test" = "Stresss Test Hydrology"
 )
+heatmap_title <- "June 2019 CRSS"
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
@@ -179,7 +180,7 @@ yy5 <- 2020:2024
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "June 2019 - Most"
+mainScenGroup <- "June 2019"
 names(mainScenGroup) <- mainScenGroup
 
 # text that will be added to figures
@@ -191,7 +192,7 @@ colorLabel <- 'Scenario'
 # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
 #plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
 #plot_scenarios <- c("June 2019 - Stress Test", "June 2019 - Stress Test - No DCP")
-plot_scenarios <- c("June 2019 - Stress Test - No DCP", "June 2019 - Most")
+plot_scenarios <- c("June 2019 - Stress Test", "June 2019")
 
 # set plotting colors (optional)
 # use scales::hue_pal()(n) to get default ggplot colors
@@ -340,7 +341,7 @@ if (makeFiguresAndTables) {
 
   # create the IG system cond. table
   sysTable <- CRSSIO::crsso_get_sys_cond_table(
-    dplyr::filter(sysCond, Year %in% yrs2show & Agg == mainScenGroup), yrs2show
+    dplyr::filter(sys_cond, Year %in% yrs2show & Agg == mainScenGroup), yrs2show
   )
   
   # save the sys cond table
@@ -357,10 +358,10 @@ if (makeFiguresAndTables) {
   
   dcp_scens <- unique(c(mainScenGroup, names(heatmap_names)))
   
+  pe <- read_feather(o_files$cur_month_pe_file)
   lb_dcp <- compute_mead_dcp_probs(pe, dcp_scens, 2019:2026)
   ub_dcp <- compute_powell_dcp_probs(pe, dcp_scens, 2019:2026)
   
-  pe <- read_feather(o_files$cur_month_pe_file)
   dcp_probs <- bind_rows(
     filter(lb_dcp, Agg == mainScenGroup),
     filter(ub_dcp, Agg == mainScenGroup)
@@ -378,26 +379,34 @@ if (makeFiguresAndTables) {
   # system condition heatmap -------------------------
   message("... System conditions heatmap")
  
-  mead_system_condition_heatmap(
+  m_heat <- mead_system_condition_heatmap(
     filter(lb_dcp, Agg %in% names(heatmap_names)), 
     yrs2show, 
     scen_rename = heatmap_names, 
-    my_title = "Lake Mead Conditions from June 2019 CRSS"
+    my_title = paste("Lake Mead Conditions from", heatmap_title)
   )
   
   ggsave(
-    file.path(folder_paths$figs_folder, "mead_heat_side-by-side.png"), 
-    plot = last_plot(), 
+    file.path(folder_paths$figs_folder, "site/mead_heat.png"), 
+    plot = m_heat, 
     width = 8.91, 
     height = 5.65, 
     units = "in"
   )
   
-  powell_system_condition_heatmap(
+  p_heat <- powell_system_condition_heatmap(
     filter(sys_cond, Agg %in% names(heatmap_names)),
     yrs2show,
     scen_rename = heatmap_names,
-    my_title = "Lake Powell Conditions from June 2019 CRSS"
+    my_title = paste("Lake Powell Conditions from", heatmap_title)
+  )
+  
+  ggsave(
+    file.path(folder_paths$figs_folder, "site/powell_heat.png"), 
+    plot = p_heat, 
+    width = 8.91, 
+    height = 5.65, 
+    units = "in"
   )
   
   # 2) Plot Mead, Powell EOCY elvations -------------
@@ -579,7 +588,7 @@ if (makeFiguresAndTables) {
   critStatsFig1 <- plotCritStats(dplyr::filter(
       cs, 
       AggName == mainScenGroup, 
-      !(Variable %in% c('meadLt1020','lbSurplus'))
+      !(Variable %in% c('mead_min_lt_1020','lbSurplus'))
     ), 
     yrs2show, 
     annText
@@ -588,7 +597,7 @@ if (makeFiguresAndTables) {
   critStatsFig2 <- plotCritStats(dplyr::filter(
       cs, 
       AggName == mainScenGroup, 
-      !(Variable %in% c('meadLt1025','lbSurplus'))
+      !(Variable %in% c('mead_dec_lt_1025','lbSurplus'))
     ), 
     yrs2show, 
     annText
@@ -615,7 +624,7 @@ if (makeFiguresAndTables) {
   # defaults ok for legendTitle, nC, and legLoc
   ssPlot <- plotShortageSurplus(
     dplyr::filter(
-      sysCond, 
+      sys_cond, 
       Variable %in% c('lbShortage', 'lbSurplus'),
       Agg == mainScenGroup
       ), 
@@ -627,7 +636,7 @@ if (makeFiguresAndTables) {
   # default for annSize is ok
   shortStack <- plotShortStackedBar(
     dplyr::filter(
-      sysCond, 
+      sys_cond, 
       Variable %in% c('lbShortageStep1','lbShortageStep2','lbShortageStep3'),
       Agg == mainScenGroup
     ), 
