@@ -107,7 +107,8 @@ mead_system_condition_heatmap2 <- function(dcp, yrs, scen_rename, my_title)
          subtitle = "Percent of Traces in each Operating Condition")
 }
 
-mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title)
+mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
+                                          y_wrap = 15)
 {
   tier_names <- mead_tier_names()
   
@@ -134,22 +135,29 @@ mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title)
     ) %>%
     mutate(
       Agg = str_wrap(Agg, width = 10), 
-      Variable = factor(tier_names[Variable], levels = rev(tier_names))
+      Variable = factor(
+        str_wrap(tier_names[Variable], y_wrap), 
+        levels = rev(str_wrap(tier_names, y_wrap))
+      )
     )
   
-  system_conditions_heat_map(zz, n_yrs, tier_names, my_title)
+  gg <- system_conditions_heat_map(zz, n_yrs, tier_names, my_title) %>%
+    add_logo()
+  
+  gg
 }
 
-powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title)
+powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title, 
+                                            y_wrap = 15)
 {
   tier_names <- powell_tier_names()
-  
   n_yrs <- length(yrs)
-  
-  # convert from all of the different dcp tiers to the simplified number of rows
+
+    # convert from all of the different dcp tiers to the simplified number of rows
   # then add in labels
   zz <- dcp %>%
     ungroup() %>%
+    select(-Month) %>%
     filter(Year %in% yrs) %>%
     mutate(Agg = scen_rename[Agg]) %>%
     spread(Variable, Value) %>%
@@ -158,8 +166,11 @@ powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title)
       mer = mer823 + mer748,
       leb = lebGt823 + leb823 + lebLt823
     ) %>%
-    gather(Variable, Value, -Year, -Agg) %>%
+    gather(Variable, Value, -Year, -Agg, -TraceNumber, -Scenario) %>%
     filter(Variable %in% c("eq", "ueb", "mer", "leb")) %>%
+    group_by(Year, Agg, Variable) %>%
+    summarise(Value = mean(Value)) %>%
+    ungroup() %>%
     mutate(Value = if_else(Value == 0, NA_real_, Value * 100)) %>%
     mutate(
       val_lab = paste0(formatC(Value, digits=0, format = "f"), "%"),
@@ -168,10 +179,41 @@ powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title)
     ) %>%
     mutate(
       Agg = str_wrap(Agg, width = 10), 
-      Variable = factor(tier_names[Variable], levels = rev(tier_names))
+      Variable = factor(
+        str_wrap(tier_names[Variable], y_wrap), 
+        levels = rev(str_wrap(tier_names, y_wrap))
+      )
     )
   
-  system_conditions_heat_map(zz, n_yrs, tier_names, my_title)
+  gg <- system_conditions_heat_map(zz, n_yrs, tier_names, my_title) %>%
+    add_logo()
+  
+  gg
+}
+
+add_logo <- function(gg)
+{
+  # arrange all 3 plots together
+  gg_grob <- ggplotGrob(gg)
+  
+  # logo -------------------------------
+  logo <- imager::load.image("logo/660LT-TK-flush.png")
+  logo <- grid::rasterGrob(logo, interpolate = TRUE)
+  
+  l2 <- ggplot() +
+    geom_blank() + 
+    theme_minimal() +
+    annotation_custom(logo)
+
+  gg <- grid.arrange(arrangeGrob(
+    gg_grob, nullGrob(), l2,
+    layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
+    heights = c(.9, .1),
+    widths = c(.8, .2)
+    #bottom = cap_text
+  ))
+  
+  gg
 }
 
 system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title)
@@ -179,7 +221,7 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title)
   # plot as a side-by-side heatmap
   zz %>%
     ggplot(aes(as.factor(Year), Variable, fill = Value)) +
-    facet_wrap(~Agg, nrow = 1, strip.position = "top") +
+    facet_wrap(~Agg, nrow = 1, strip.position = "top", labeller = label_wrap_gen()) +
     geom_tile() +
     # from https://uigradients.com/#HoneyDew
     scale_fill_gradient(
@@ -196,8 +238,9 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title)
     geom_text(aes(label = val_lab), size = 3, color = "black") +
     theme_light() +
     theme(
-      axis.text.x = element_text(size = 8),
-      axis.text.y = element_text(size = 8),
+      axis.text.x = element_text(size = 10),
+      axis.text.y = element_text(size = 10),
+      strip.text = element_text(size = 12),
       axis.ticks.x = element_blank(),
       panel.spacing = unit(0, "lines"), 
       legend.key.height = unit(2, "lines"),
