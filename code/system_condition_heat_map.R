@@ -34,7 +34,13 @@ mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
       )
     )
   
-  gg <- system_conditions_heat_map(zz, n_yrs, tier_names, my_title) %>%
+  gg <- system_conditions_heat_map(
+    zz, 
+    n_yrs, 
+    tier_names, 
+    my_title,
+    y_title = "Previous Decmeber Elevation"
+  ) %>%
     add_logo()
   
   gg
@@ -78,7 +84,13 @@ powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
       )
     )
   
-  gg <- system_conditions_heat_map(zz, n_yrs, tier_names, my_title) %>%
+  gg <- system_conditions_heat_map(
+    zz, 
+    n_yrs, 
+    tier_names, 
+    my_title,
+    y_title = ''
+  ) %>%
     add_logo()
   
   gg
@@ -109,7 +121,7 @@ add_logo <- function(gg)
   gg
 }
 
-system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title)
+system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title)
 {
   # plot as a side-by-side heatmap
   zz %>%
@@ -143,7 +155,7 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title)
       panel.border = element_blank()
     ) +
     labs(
-      y = "Previous Decmeber Elevation", 
+      y = y_title, 
       x = NULL, fill = "%", title = my_title,
       subtitle = "Percent of Traces in each Elevation Range"
     )
@@ -151,10 +163,11 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title)
 
 powell_tier_names <- function() {
   c(
-    "eq" = "Powell >= Equalization Elevation",
-    "ueb" = "Powell < Equalization Elevation and >= 3,575'",
-    "mer" = "Powell < 3,575' and >= 3,525'",
-    "leb" = "Powell < 3,525'"
+    "eq" = "Equalization Tier (Powell >= Equalization [EQ] Elevation)",
+    "ueb" = 
+      "Upper Elevation Balancing Tier (Powell < EQ Elevation and >= 3,575')",
+    "mer" = "Mid-Elevation Release Tier (Powell < 3,575' and >= 3,525')",
+    "leb" = "Lower Elevation Balancing Tier (Powell < 3,525')"
   )
 }
 
