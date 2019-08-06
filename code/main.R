@@ -387,7 +387,7 @@ if (makeFiguresAndTables) {
   )
   
   ggsave(
-    file.path(folder_paths$figs_folder, "site/mead_heat.png"), 
+    file.path(folder_paths$png_out, "mead_heat.png"), 
     plot = m_heat, 
     width = 8.91, 
     height = 5.65, 
@@ -402,7 +402,7 @@ if (makeFiguresAndTables) {
   )
   
   ggsave(
-    file.path(folder_paths$figs_folder, "site/powell_heat.png"), 
+    file.path(folder_paths$png_out, "powell_heat.png"), 
     plot = p_heat, 
     width = 8.91, 
     height = 5.65, 

@@ -88,6 +88,14 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   }
   message('Figures and tables will be saved to: ', oFigs)
   
+  png_out <- file.path(oFigs, "png")
+  
+  if (!file.exists(png_out)) {
+    message("Creating folder: ", png_out)
+    dir.create(png_out)
+  }
+  message("pngs will be saved to: ", png_out)
+  
   # folder to save procssed text files to (intermediate processed data)
   resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
   if (!file.exists(resFolder)) {
@@ -97,7 +105,7 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   message('Intermediate data will be saved to: ', resFolder)
   
   # return
-  list(figs_folder = oFigs, res_folder = resFolder)
+  list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out)
 }
 
 # returns a list of all the necessary output file names
