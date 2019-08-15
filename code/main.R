@@ -8,6 +8,7 @@ suppressPackageStartupMessages(library(stringr))
 library(RWDataPlyr)
 stopifnot(packageVersion("RWDataPlyr") >= "0.6.0")
 suppressPackageStartupMessages(library(data.table))
+library(CoRiverNF)
 source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
@@ -15,6 +16,7 @@ source('code/getICPEData.R')
 source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
+source('code/plotCloudFig.R')
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #    -------------------        USER INPUT        ----------------------
@@ -30,27 +32,28 @@ source('code/plotFirstYearShortCond.R')
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
 getSysCondData <- TRUE
-getPeData <- FALSE
-get_crss_short_cond_data <- FALSE
+getPeData <- TRUE
+get_crss_short_cond_data <- TRUE
 
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
-pdf_name <- 'Jan2019PowerRun.pdf'
+pdf_name <- 'StandardFigs.pdf'
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 addPEScatterFig <- FALSE
+make_DNF_ST_Boxplot <- FALSE #NOTE:For code to work correctly the main scene group needs to be the DNF dataset.
 
 # ** make sure CRSS_DIR is set correctly before running
 
-CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
-iFolder <- "M:/Shared/CRSS"
+CRSSDIR <- Sys.getenv("CRSS_DIR")
+iFolder <- "M:/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "january_2019_power"
+crssMonth <- "AugustPreliminary"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -68,12 +71,9 @@ crssMonth <- "january_2019_power"
 icDimNumber <- 5 
 
 scens <- list(
-  #"August 2018 - DNF" = "Aug2018_2019,DNF,2007Dems,IG,Most",
-  # "April 2018" = 
-  #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
-  # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
-  "August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
-  "January 2019" = "2019/Scenario/Jan2019_2019,DNF,2007Dems,IG,Hist"
+  "August 2019" = "Aug2019_2020_RW75,DNF,2007Dems,IG_DCP,Most",
+  "June 2019" = 
+    rw_scen_gen_names("Jun2019_2020", "DNF", "2007Dems", "IG_DCP", paste("Trace",4:38, sep=""),"DCP_Cons")
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -82,19 +82,17 @@ legendWrap <- 20 # setting to NULL will not wrap legend entries at all
 # both ordered powell, then mead.
 
 icList <- list(
-  "August 2018" = c(3586.55, 1079.50),
-  "January 2019" = c(3581.85, 1081.46)
-  # "April 2018" = file.path(
-  #   CRSSDIR,
-  #   "dmi/InitialConditions/april_2018/MtomToCrss_Monthly.xlsx"
-  # ),
-  # "April 2018 - most" =  c(3589.78, 1079.07)
+  "June 2019" = file.path(
+    CRSSDIR,
+    "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
+  ),
+  "August 2019" = c(3618.56, 1089.40)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
 icMonth <- c(
-  "August 2018" = "18-Dec",
-  "January 2019" = "18-Dec"
+  "June 2019" = "19-DEC",
+  "August 2019" = "19-DEC"
 )
 
 # for the 5-year simple table
@@ -104,35 +102,36 @@ icMonth <- c(
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
 ss5 <- c(
-  "August 2018" = "August 2018"
+  "June 2019" = "June 2019", "August 2019" = "August 2019"
 )
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
 
 # years to use for the simple 5-year table
-yy5 <- 2019:2023
+yy5 <- 2020:2024
 
 # the mainScenGroup is the scenario to use when creating the current month's 
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "January 2019"
+mainScenGroup <- "August 2019"
 mainScenGroup.name <- mainScenGroup
 
 # text that will be added to figures
-annText <- 'Results from January 2019 CRSS Run' 
+annText <- 'Results from August 2019 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
 
-yrs2show <- 2019:2060 # years to show the crit stats figures
-peYrs <- 2018:2060 # years to show the Mead/Powell 10/50/90 figures for
+yrs2show <- 2020:2026 # years to show the crit stats figures
+peYrs <- 2019:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # More descriptive labels for hydrologies used in the cloud plots
-cloudScen <- c("January 2019 DNF","January 2019 ST")
-cloudLabs <-c("January 2019 DNF" = "Jan \"Full\" Hydrology",
-              "January 2019 ST" = "Jan \"Stress Test\" Hydrology")
+cloudScen <- c("June 2019","August 2019")#, "June 2019 Base","June 2019 DCP"
+cloudLabs <-c("June 2019" = "June Full Hydrology",
+              "August 2019" = "August Full Hydrology"
+              )
 
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
@@ -240,6 +239,7 @@ message('Intermediate data will be saved to: ', resFolder)
 sysCondFile <- 'SysCond.feather' # file name of system conditions data
 tmpPEFile <- 'tempPE.feather'
 curMonthPEFile <- 'MeadPowellPE.feather' # file name of Powell and Mead PE data
+boxplotFile <- 'tmpBxplt.feather' # file name of Natural Flow at Lees Ferry (for DNF/ST boxplots)
 
 # file name for the system conditions procssed file
 sysCondTable <- paste0('SysTableFull',yrs2show[1],'_',tail(yrs2show,1),'.csv') 
@@ -345,13 +345,13 @@ if(makeFiguresAndTables){
   
   # plot Clouds
   powellCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Powell.Pool Elevation',
-                               'Powell End-of-December Elevation', colorLabel,
-                               legendWrap = legendWrap)
+                               'Lake Powell End-of-December Elevation from June 2019 CRSS',
+                               colorLabel, legendWrap = legendWrap)
   ggsave(file.path(oFigs,'Powell.png'), width = 9, height = 6.5, units = "in", dpi = 600)
   
   meadCloud <- plotCloudFigs(cloudScen, pe, peYrs, 'Mead.Pool Elevation', 
-                             'Mead End-of-December Elevation', colorLabel, 
-                             legendWrap = legendWrap)
+                             'Lake Mead End-of-December Elevation from June 2019 CRSS', 
+                             colorLabel, legendWrap = legendWrap)
   ggsave(file.path(oFigs,'Mead.png'), width = 9, height = 6.5, units = "in", dpi = 600)
   
   
@@ -392,6 +392,14 @@ if(makeFiguresAndTables){
     colorLabel, 
     legendWrap = legendWrap
   )
+  csDNF <- cs %>% dplyr::filter(AggName %in% c('June 2019 DCP_DNF','June 2019 NoDCP_DNF'))
+  csST <- cs %>% dplyr::filter(AggName %in% c('June 2019 DCP_ST','June 2019 NoDCP_ST'))
+  
+  p1020FigDNF <- compareCritStats(csDNF,yrs2show,'meadLt1020','','Mead: Percent of Traces Less than elevation 1,020 ft in Any Month',
+                               colorLabel, legendWrap=legendWrap)
+  p1020FigST <- compareCritStats(csST,yrs2show,'meadLt1020','','Mead: Percent of Traces Less than elevation 1,020 ft in Any Month',
+                                 colorLabel, legendWrap=legendWrap)
+  p1020Fig <- grid.arrange(p1020FigDNF, p1020FigST, nrow = 1)
   
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
   shortFig <- compareCritStats(cs, yrs2show, 'lbShortage', '', shortTitle, 
@@ -469,6 +477,7 @@ if(makeFiguresAndTables){
   pdf(file.path(oFigs, pdf_name),width = 8, height = 6)
   print(powellPE)
   print(meadPE)
+  print(p1020Fig)
   print(p3490Fig)
   print(shortFig)
   print(surpFig)
@@ -575,7 +584,7 @@ if(computeConditionalProbs){
   cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
   cpt1$PrctChance <- cpt1$PrctChance*100
   data.table::fwrite(cpt1,paste0(oFigs,condProbFile),row.names = F)
-}
+} #COME BACK TO THIS
 
 # conditions leading to shortage ---------------------------------
 # pulled annotation out of generic function
@@ -622,6 +631,7 @@ if (createShortConditions) {
 }
 
 # 5 year simple table -------------------------
+
 if(createSimple5yrTable){
   ## create the 5-yr simple table that compares to the previous run
   message("creating 5-year simple table")
@@ -671,5 +681,38 @@ if (addPEScatterFig) {
   pdf(tpath, width = 8, height = 6)
   print(gg)
   dev.off()
+}
+
+if (make_DNF_ST_Boxplot){
+  message('starting make_DNF_ST_Boxplot')
+  FullQ = as.data.frame(cyAnnTot$LeesFerry['1906/'])
+  STQ = as.data.frame(cyAnnTot$LeesFerry['1988/'])
+  FullQ$scen = "Full Hydrology"
+  STQ$scen = "Stress Test Hydrology"
+  Q = rbind(FullQ, STQ)
+  Q$LeesFerry = Q$LeesFerry/1000000
+
+  plotColors <- c("#00BFC4", "#F8766D")
+  names(plotColors) <- c("Full Hydrology", "Stress Test Hydrology")
+  
+  gg = ggplot(Q, aes(x = scen, y = LeesFerry, fill = scen)) + theme_light() + stat_boxplot_custom(lwd = .25, 
+                                                                                                  fatten = .7,
+                                                                                                  outlier.size = .75)
+  gg = gg + scale_fill_manual(values =  plotColors) + 
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
+    labs(x = "", y = "Annual Flow (million acre-feet)", 
+         title = "Distrubution of Alternative Future Hydrology Scenarios",
+         subtitle = "Colorado River Natural Flow at Lees Ferry Gaging Station, Arizona") + 
+    theme(legend.position = "none") + theme(plot.subtitle = element_text(size = 7.4, color = "grey21")) +
+    theme(plot.title = element_text(size=8.9)) +
+    #theme(plot.title = element_text(hjust = 0.5)) + theme(plot.subtitle = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_text(color = "black")) + theme(axis.text.y = element_text(color = "black")) +
+    theme(axis.text.x = element_text(size=7.2)) + theme(axis.title.y = element_text(size=7.8), 
+                                                      axis.text.y = element_text(size = 6)) +
+    annotate("text", label = "1906-2017",  x= 1, y=16, size = 2.65) + 
+    annotate("text", label = "1988-2017", x=2 , y=14.75, size = 2.65)
+  gg
+  
+  ggsave(file.path(oFigs,'FlowDistBoxplot.png'), width = 3.5, height = 3.5, units = "in", dpi = 600)
 }
 
