@@ -8,6 +8,7 @@ suppressPackageStartupMessages(library(stringr))
 library(RWDataPlyr)
 stopifnot(packageVersion("RWDataPlyr") >= "0.6.0")
 suppressPackageStartupMessages(library(data.table))
+library(CoRiverNF)
 source('code/plot_nameFunctions.r')
 source('code/getScenarioData.R')
 source('code/dataTaggingFunctions.R')
@@ -15,6 +16,7 @@ source('code/getICPEData.R')
 source('code/plottingFunctions.R')
 source('code/getCondProbs.R')
 source('code/plotFirstYearShortCond.R')
+source('code/plotCloudFig.R')
 source("code/compute_dcp_probs.R")
 source("code/system_condition_heat_map.R")
 source("code/crss_res_directory_setup.R")
@@ -33,29 +35,33 @@ source("code/crss_res_directory_setup.R")
 
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
-getSysCondData <- FALSE
-getPeData <- FALSE
-get_crss_short_cond_data <- FALSE
+getSysCondData <- TRUE
+getPeData <- TRUE
+get_crss_short_cond_data <- TRUE
+
 
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
+
 pdf_name <- 'june_v3.pdf'
+
 createSimple5yrTable <- FALSE
 
 # optional figures/tables
 createShortConditions <- FALSE
 computeConditionalProbs <- FALSE
 addPEScatterFig <- FALSE
+
+make_DNF_ST_Boxplot <- FALSE #NOTE:For code to work correctly the main scene group needs to be the DNF dataset.
 should_plot_clouds <- FALSE
 
 # ** make sure CRSS_DIR is set correctly before running
-
-CRSSDIR <- "C:/alan/CRSS/CRSS.2019" #Sys.getenv("CRSS_DIR")
-i_folder <- "//128.138.214.42/bor/Shared/CRSS/2019/Scenario"
+CRSSDIR <- Sys.getenv("CRSS_DIR")
+i_folder <- "M:/Shared/CRSS/2019/Scenario"
 # set crssMonth to the month CRSS was run. data and figures will be saved in 
 # a folder with this name
-crssMonth <- "june2019"
+crssMonth <- "AugustPreliminary"
 # inserted onto some files. Can be ''
 extra_label <- "full_v3_"
 
@@ -93,19 +99,9 @@ jun_st_ensemble <- rw_scen_gen_names(
 )
 
 scens <- list(
-  #"August 2018 - DNF" = "Aug2018_2019,DNF,2007Dems,IG,Most",
-  # "April 2018" = 
-  #   rw_scen_gen_names("Apr2018_2019", "DNF", "2007Dems", "IG", 1981:2015),
-  # "April 2018 - most" = "Apr2018_2019,DNF,2007Dems,IG,MTOM_most",
-  #"August 2018" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
-  #"June 2019 - Most" = "Jun2019_2020,DNF,2007Dems,IG_DCP,MTOM_Most,DCP_Cons",
-  #"January 2019" = jan_ensemble,
-  #"June 2019 - No DCP" = "Jun2019_2020,DNF,NV300,IG,Most,No_DCP_Cons",
-  
-  "June 2019" = jun_ensemble,
-  "June 2019 - Stress Test" = jun_st_ensemble
-  #"June 2019 - Stress Test - No DCP" = 
-  #  "Jun2019_2020,ISM1988_2017,NV300,IG,Most,No_DCP_Cons"
+  "August 2019" = "Aug2019_2020_RW75,DNF,2007Dems,IG_DCP,Most",
+  "June 2019" = 
+    rw_scen_gen_names("Jun2019_2020", "DNF", "2007Dems", "IG_DCP", paste("Trace",4:38, sep=""),"DCP_Cons")
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -124,6 +120,11 @@ jun_path <- file.path(
 )
 
 icList <- list(
+  "June 2019" = file.path(
+    CRSSDIR,
+    "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
+  ),
+  "August 2019" = c(3618.56, 1089.40)
   #"August 2018" = c(3586.55, 1079.50),
   #"January 2019" = c(3581.85, 1081.46)
   # "January 2019 - 110" = file.path(
@@ -133,21 +134,15 @@ icList <- list(
   #"June 2019 - Most" = c(3619.82, 1088.09),
   #"June 2019 - No DCP" = c(3619.56, 1085.88),
   #"January 2019" = jan_path,
-  "June 2019" = jun_path,
-  "June 2019 - Stress Test" = jun_path
+  #"June 2019" = jun_path,
+  #"June 2019 - Stress Test" = jun_path
   #"June 2019 - Stress Test - No DCP" = c(3619.56, 1085.88)
 )
 
 # The month in YY-Mmm format of the intitial condtions for each scenario group
 icMonth <- c(
-  #"August 2018" = "18-Dec",
-  #"January 2019" = "18-Dec",
-  #"June 2019 - Most" = "19-Dec",
-  #"June 2019 - No DCP" = "19-Dec",
-  #"January 2019" = "19-Dec",
-  "June 2019" = "19-Dec",
-  "June 2019 - Stress Test" = "19-Dec"
-  #"June 2019 - Stress Test - No DCP" = "19-Dec"
+  "June 2019" = "19-DEC",
+  "August 2019" = "19-DEC"
 )
 
 # for the 5-year simple table
@@ -157,8 +152,7 @@ icMonth <- c(
 # this is the order they will show up in the table, so list the newest run 
 # second there should only be 2 scenarios
 ss5 <- c(
-  "June 2019" = "June 2019",
-  "June 2019 - Stress Test" = "June 2019 - Stress Test"
+  "June 2019" = "June 2019", "August 2019" = "August 2019"
 )
 
 # use this to select which scenarios are shown in the heat map, and what those
@@ -180,14 +174,15 @@ yy5 <- 2020:2024
 # 5-year table, etc. In the plots, we want to show the previous months runs,
 # but in the tables, we only want the current month run. This should match names
 # in scens and icList
-mainScenGroup <- "June 2019"
+mainScenGroup <- "August 2019"
 names(mainScenGroup) <- mainScenGroup
 
 # text that will be added to figures
-annText <- 'Results from June 2019 CRSS Run' 
+annText <- 'Results from August 2019 CRSS Run' 
 
 # how to label the color scale on the plots
 colorLabel <- 'Scenario'
+
 
 # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
 #plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
@@ -206,9 +201,10 @@ yrs2show <- 2020:2026 # years to show the crit stats figures
 peYrs <- 2019:2026 # years to show the Mead/Powell 10/50/90 figures for
 
 # More descriptive labels for hydrologies used in the cloud plots
-cloudScen <- c("January 2019 DNF","January 2019 ST")
-cloudLabs <-c("January 2019 DNF" = "Jan \"Full\" Hydrology",
-              "January 2019 ST" = "Jan \"Stress Test\" Hydrology")
+cloudScen <- c("June 2019","August 2019")#, "June 2019 Base","June 2019 DCP"
+cloudLabs <-c("June 2019" = "June Full Hydrology",
+              "August 2019" = "August Full Hydrology"
+              )
 
 # mead pe scatter parameters -------------------------------
 # plot a single year of Mead PE
@@ -521,6 +517,14 @@ if (makeFiguresAndTables) {
     legendWrap = legendWrap,
     plot_colors = plot_colors
   )
+  csDNF <- cs %>% dplyr::filter(AggName %in% c('June 2019 DCP_DNF','June 2019 NoDCP_DNF'))
+  csST <- cs %>% dplyr::filter(AggName %in% c('June 2019 DCP_ST','June 2019 NoDCP_ST'))
+  
+  p1020FigDNF <- compareCritStats(csDNF,yrs2show,'meadLt1020','','Mead: Percent of Traces Less than elevation 1,020 ft in Any Month',
+                               colorLabel, legendWrap=legendWrap)
+  p1020FigST <- compareCritStats(csST,yrs2show,'meadLt1020','','Mead: Percent of Traces Less than elevation 1,020 ft in Any Month',
+                                 colorLabel, legendWrap=legendWrap)
+  p1020Fig <- grid.arrange(p1020FigDNF, p1020FigST, nrow = 1)
   
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
   shortFig <- compare_crit_stats(
@@ -806,6 +810,7 @@ if (createShortConditions) {
 
 # 5 year simple table -------------------------
 if (createSimple5yrTable) {
+
   ## create the 5-yr simple table that compares to the previous run
   message("creating 5-year simple table")
   zz <- read_feather(o_files$sys_cond_file) %>%
@@ -858,5 +863,38 @@ if (addPEScatterFig) {
   pdf(tpath, width = 8, height = 6)
   print(gg)
   dev.off()
+}
+
+if (make_DNF_ST_Boxplot){
+  message('starting make_DNF_ST_Boxplot')
+  FullQ = as.data.frame(cyAnnTot$LeesFerry['1906/'])
+  STQ = as.data.frame(cyAnnTot$LeesFerry['1988/'])
+  FullQ$scen = "Full Hydrology"
+  STQ$scen = "Stress Test Hydrology"
+  Q = rbind(FullQ, STQ)
+  Q$LeesFerry = Q$LeesFerry/1000000
+
+  plotColors <- c("#00BFC4", "#F8766D")
+  names(plotColors) <- c("Full Hydrology", "Stress Test Hydrology")
+  
+  gg = ggplot(Q, aes(x = scen, y = LeesFerry, fill = scen)) + theme_light() + stat_boxplot_custom(lwd = .25, 
+                                                                                                  fatten = .7,
+                                                                                                  outlier.size = .75)
+  gg = gg + scale_fill_manual(values =  plotColors) + 
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
+    labs(x = "", y = "Annual Flow (million acre-feet)", 
+         title = "Distrubution of Alternative Future Hydrology Scenarios",
+         subtitle = "Colorado River Natural Flow at Lees Ferry Gaging Station, Arizona") + 
+    theme(legend.position = "none") + theme(plot.subtitle = element_text(size = 7.4, color = "grey21")) +
+    theme(plot.title = element_text(size=8.9)) +
+    #theme(plot.title = element_text(hjust = 0.5)) + theme(plot.subtitle = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_text(color = "black")) + theme(axis.text.y = element_text(color = "black")) +
+    theme(axis.text.x = element_text(size=7.2)) + theme(axis.title.y = element_text(size=7.8), 
+                                                      axis.text.y = element_text(size = 6)) +
+    annotate("text", label = "1906-2017",  x= 1, y=16, size = 2.65) + 
+    annotate("text", label = "1988-2017", x=2 , y=14.75, size = 2.65)
+  gg
+  
+  ggsave(file.path(oFigs,'FlowDistBoxplot.png'), width = 3.5, height = 3.5, units = "in", dpi = 600)
 }
 

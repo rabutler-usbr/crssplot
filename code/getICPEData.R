@@ -42,7 +42,7 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
 #'   within the full scenario name
 getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth, 
                            addAggAttribute = TRUE, aggFunction, traceMap, 
-                           icDimNumber = 5)
+                           icDimNumber = 6)
 {
   res <- read_feather(fileToAppend)
 
