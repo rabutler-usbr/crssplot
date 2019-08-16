@@ -35,16 +35,15 @@ source("code/crss_res_directory_setup.R")
 
 # swtiches to read data. if you've already read the data in from rdfs once, 
 # you may be able to set this to FALSE, so it's faster
-getSysCondData <- TRUE
-getPeData <- TRUE
-get_crss_short_cond_data <- TRUE
-
+getSysCondData <- FALSE
+getPeData <- FALSE
+get_crss_short_cond_data <- FALSE
 
 # "switches" to create/not create different figures
 # typical figures
 makeFiguresAndTables <- TRUE
 
-pdf_name <- 'june_v3.pdf'
+pdf_name <- 'aug_v1.pdf'
 
 createSimple5yrTable <- FALSE
 
@@ -63,7 +62,7 @@ i_folder <- "M:/Shared/CRSS/2019/Scenario"
 # a folder with this name
 crssMonth <- "AugustPreliminary"
 # inserted onto some files. Can be ''
-extra_label <- "full_v3_"
+extra_label <- "full_v1"
 
 # scenarios are orderd model,supply,demand,policy,initial conditions 
 # (if initial conditions are used) scens should be a list, each entry is a 
@@ -100,8 +99,7 @@ jun_st_ensemble <- rw_scen_gen_names(
 
 scens <- list(
   "August 2019" = "Aug2019_2020_RW75,DNF,2007Dems,IG_DCP,Most",
-  "June 2019" = 
-    rw_scen_gen_names("Jun2019_2020", "DNF", "2007Dems", "IG_DCP", paste("Trace",4:38, sep=""),"DCP_Cons")
+  "June 2019" = jun_ensemble
 )
 
 legendWrap <- 20 # setting to NULL will not wrap legend entries at all
@@ -120,10 +118,7 @@ jun_path <- file.path(
 )
 
 icList <- list(
-  "June 2019" = file.path(
-    CRSSDIR,
-    "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
-  ),
+  "June 2019" = jun_path,
   "August 2019" = c(3618.56, 1089.40)
   #"August 2018" = c(3586.55, 1079.50),
   #"January 2019" = c(3581.85, 1081.46)
@@ -159,10 +154,10 @@ ss5 <- c(
 # scenarios should be labeled as in the heatmap. The names should be existing
 # scenario names, and the values are what they will be labeled as in the heatmap
 heatmap_names = c(
-  "June 2019" = "Full Hydrology", 
-  "June 2019 - Stress Test" = "Stresss Test Hydrology"
+  "August 2019" = "August 2019", 
+  "June 2019" = "June 2019"
 )
-heatmap_title <- "June 2019 CRSS"
+heatmap_title <- "August vs. June 2019 CRSS"
 
 # this should either be a footnote corresponding to one of the ss5 names or NA
 tableFootnote <- NA
@@ -187,7 +182,7 @@ colorLabel <- 'Scenario'
 # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
 #plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
 #plot_scenarios <- c("June 2019 - Stress Test", "June 2019 - Stress Test - No DCP")
-plot_scenarios <- c("June 2019 - Stress Test", "June 2019")
+plot_scenarios <- c("June 2019", "August 2019")
 
 # set plotting colors (optional)
 # use scales::hue_pal()(n) to get default ggplot colors
@@ -517,14 +512,6 @@ if (makeFiguresAndTables) {
     legendWrap = legendWrap,
     plot_colors = plot_colors
   )
-  csDNF <- cs %>% dplyr::filter(AggName %in% c('June 2019 DCP_DNF','June 2019 NoDCP_DNF'))
-  csST <- cs %>% dplyr::filter(AggName %in% c('June 2019 DCP_ST','June 2019 NoDCP_ST'))
-  
-  p1020FigDNF <- compareCritStats(csDNF,yrs2show,'meadLt1020','','Mead: Percent of Traces Less than elevation 1,020 ft in Any Month',
-                               colorLabel, legendWrap=legendWrap)
-  p1020FigST <- compareCritStats(csST,yrs2show,'meadLt1020','','Mead: Percent of Traces Less than elevation 1,020 ft in Any Month',
-                                 colorLabel, legendWrap=legendWrap)
-  p1020Fig <- grid.arrange(p1020FigDNF, p1020FigST, nrow = 1)
   
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
   shortFig <- compare_crit_stats(
