@@ -1,0 +1,3 @@
+OpenWorkspace {C:/Users/rrbutler/Documents/crss/crss.offc/Working/RW7.5.1/Jun2019_2020_RW75_DNF_2007Dems_IG_DCP_MTOM_Most/RwModel.mdl}
+StartController !MRM {DNF} firstTrace=103 numTrace=5 {ctlFile=C:/Users/rrbutler/Documents/crss/crss.offc/Working/RW7.5.1/Jun2019_2020_RW75_DNF_2007Dems_IG_DCP_MTOM_Most/rw__018_rrbutler.ctl} distribMode=0
+CloseWorkspace

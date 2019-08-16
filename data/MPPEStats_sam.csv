@@ -1,8 +1,13 @@
 file,slot,period,summary,eval,t_s,variable
-MPPE.rdf,Mead.Pool Elevation,eocy,NA,NA,NA,Mead.Pool Elevation
-MPPE.rdf,Powell.Pool Elevation,eocy,NA,NA,NA,Powell.Pool Elevation
-MPPE.rdf,Mead.Pool Elevation,cy,min,<=,1000,meadLt1000
-MPPE.rdf,Mead.Pool Elevation,cy,min,<=,1020,meadLt1020
-MPPE.rdf,Powell.Pool Elevation,wy,min,<=,3490,powellLt3490
-MPPE.rdf,Powell.Pool Elevation,wy,min,<=,3525,powellLt3525
-MPPE.rdf,Mead.Pool Elevation,cy,min,<=,1025,meadLt1025
+MPPE.rdf,Mead.Pool Elevation,eocy,NA,NA,NA,mead_dec_pe
+MPPE.rdf,Powell.Pool Elevation,eocy,NA,NA,NA,powell_dec_pe
+MPPE.rdf,Mead.Pool Elevation,cy,min,<=,1000,mead_min_lt_1000
+MPPE.rdf,Mead.Pool Elevation,cy,min,<=,1020,mead_min_lt_1020
+MPPE.rdf,Mead.Pool Elevation,eocy,NA,<=,1000,mead_dec_lt_1000
+MPPE.rdf,Mead.Pool Elevation,eocy,NA,<=,1020,mead_dec_lt_1020
+MPPE.rdf,Powell.Pool Elevation,wy,min,<=,3490,powell_wy_min_lt_3490
+MPPE.rdf,Powell.Pool Elevation,wy,min,<=,3525,powell_wy_min_lt_3525
+MPPE.rdf,Powell.Pool Elevation,eocy,NA,<=,3525,powell_dec_lt_3525
+MPPE.rdf,Mead.Pool Elevation,cy,min,<=,1025,mead_min_lt_1025
+MPPE.rdf,Mead.Pool Elevation,eocy,NA,<=,1025,mead_dec_lt_1025
+
