@@ -357,17 +357,22 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 # Assumes that there are only two scenarios to process
 create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
 {
-  if(length(scenNames) != 2){
-    stop(paste0('Invalid number of scenarios passed to create5YrSimpleTable.\n',
-               'Please ensure scenNames have only two scenarios.'))
-  }
+  assert_that(
+    length(scenNames) == 2, 
+    msg = paste0(
+      'Invalid number of scenarios passed to create5YrSimpleTable.\n',
+      'Please ensure scenNames have only two scenarios.'
+    )
+  )
 
-  if(!(all(c('lbShortage','powellLt3490') %in% levels(as.factor(iData$Variable)))))
-    stop("shortage and powell < 3490 variables are not found in iData")
+  assert_that(
+    all(c('lbShortage', 'powell_wy_min_lt_3490') %in% unique(iData$Variable)),
+    msg = "shortage and powell < 3490 variables are not found in iData"
+  )
   
   i1 <- iData %>%
     filter(Year %in% yrs) %>%
-    filter(Variable %in% c('lbShortage','powellLt3490'), 
+    filter(Variable %in% c('lbShortage', 'powell_wy_min_lt_3490'), 
            Agg %in% names(scenNames)) %>%
     mutate(ScenName = scenNames[Agg]) %>%
     group_by(Year, Variable, ScenName) %>%
@@ -390,7 +395,7 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
   shortTable <- formatSimpleTable(shortTable, rns, yrs)
   
   pTable <-  i1 %>%
-    filter(Variable == 'powellLt3490') %>%
+    filter(Variable == 'powell_wy_min_lt_3490') %>%
     ungroup() %>%
     select(-Variable) %>%
     tidyr::spread(Year, PrctTraces) %>%
