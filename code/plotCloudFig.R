@@ -25,9 +25,9 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
   myYLabs <- seq(900,4000,50)
   
   #  Pulling historical Pool Elevation data
-  if(var == 'Powell.Pool Elevation'){
+  if(var == 'powell_dec_pe'){
     hist <- read.csv('data/HistPowellPE.csv')
-    hist$Variable <- 'Powell.Pool Elevation'
+    hist$Variable <- 'powell_dec_pe'
     
     # Adding switch to allow plotting of correct IG important elevations
     Switch <- T
@@ -38,7 +38,7 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
     ##IGProj$Variable <- 'Powell.Pool Elevation'
   }else{
     hist <- read.csv('data/HistMeadPE.csv')  
-    hist$Variable <- 'Mead.Pool Elevation'
+    hist$Variable <- 'mead_dec_pe'
     
     # Adding switch to allow plotting of correct IG important elevations
     Switch <- F
