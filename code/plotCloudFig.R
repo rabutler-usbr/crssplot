@@ -24,8 +24,10 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
   myXLabs <- seq(1990,3000,5)
   myYLabs <- seq(900,4000,50)
   
-  #  Pulling historical Pool Elevation data
-  if(var == 'powell_dec_pe'){
+  #  Pulling historical Pool Elevation data; grepl testing to see if Powell occurs anywhere in the 
+  #  variable name.  Can be upper or lower case.
+  if(grepl("[Pp]owell",zz$Variable[1]) == TRUE){
+    
     hist <- read.csv('data/HistPowellPE.csv')
     hist$Variable <- 'powell_dec_pe'
     
