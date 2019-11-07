@@ -56,7 +56,7 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   if (get_pe_data | get_sys_cond_data) {
     message('Scenario data will be read in from: ', i_folder)
     assert_that(
-      file.exists(i_folder),
+      dir.exists(i_folder),
       msg = paste(
         i_folder, 
         'does not exist. Please ensure iFolder is set correctly.'
@@ -66,7 +66,7 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   
   # folder location to save figures and fully procssed tables
   assert_that(
-    file.exists(CRSSDIR),
+    dir.exists(CRSSDIR),
     msg = paste(
       CRSSDIR, 
       "does not exist.\n",
