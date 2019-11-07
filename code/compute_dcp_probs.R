@@ -46,14 +46,14 @@ compute_powell_dcp_probs <- function(zz, aggs, yrs)
 dcp_tier_names <- function()
 {
   c(
-    "dcp1" = "DCP Contribution - Level 1 (Mead <= 1,090 and > 1,075 ft)",
-    "dcp2" = "DCP Contribution - Level 1 (Mead <= 1,075 and >= 1,050 ft)",
-    "dcp3" = "DCP Contribution - Level 1 (Mead < 1,050 and > 1,045 ft)",
-    "dcp4" = "DCP Contribution - Level 2 (Mead <= 1,045 and > 1,040 ft)",
-    "dcp5" = "DCP Contribution - Level 3 (Mead <= 1,040 and > 1,035 ft)",
-    "dcp6" = "DCP Contribution - Level 4 (Mead <= 1,035 and > 1,030 ft)",
-    "dcp7" = "DCP Contribution - Level 5 (Mead <= 1,030 and >= 1,025 ft)",
-    "dcp8" = "DCP Contribution - Level 5 (Mead < 1,025 ft)",
+    "dcp1" = "DCP Contribution (Mead <= 1,090 and > 1,075 ft)",
+    "dcp2" = "DCP Contribution (Mead <= 1,075 and >= 1,050 ft)",
+    "dcp3" = "DCP Contribution (Mead < 1,050 and > 1,045 ft)",
+    "dcp4" = "DCP Contribution (Mead <= 1,045 and > 1,040 ft)",
+    "dcp5" = "DCP Contribution (Mead <= 1,040 and > 1,035 ft)",
+    "dcp6" = "DCP Contribution (Mead <= 1,035 and > 1,030 ft)",
+    "dcp7" = "DCP Contribution (Mead <= 1,030 and >= 1,025 ft)",
+    "dcp8" = "DCP Contribution (Mead < 1,025 ft)",
     "normal_recovery" = "Normal + Recovery of DCP ICS (Mead <1,145 and > 1,110 ft)",
     "dcp_recovery" = "Recovery of DCP ICS (Mead > 1,110 ft)",
     "powell_wy_min_lt_3490" = "Below Minimum Power Pool (Powell < 3,490 ft)",
