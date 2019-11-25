@@ -90,11 +90,11 @@ mainScenGroup <- names(scens)[1]
 library('tidyverse') #ggplot2,dplyr,tidyr
 library('devtools')
 library(RWDataPlyr)
+library(CRSSIO)
 #see RWDATPlyr Workflow for more information 
 # library(CRSSIO)
 # plotEOCYElev() and csVarNames()
 source('code/Stat_emp_ExcCrv.r')
-source('code/stat-boxplot-custom.r')
 
 # some sanity checks that UI is correct:
 if(!(mainScenGroup %in% names(scens))) 
