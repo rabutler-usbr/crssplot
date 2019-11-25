@@ -39,7 +39,7 @@ mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
     n_yrs, 
     tier_names, 
     my_title,
-    y_title = "Previous Decmeber Elevation"
+    y_title = "Previous Decemeber Elevation"
   ) %>%
     add_logo()
   
