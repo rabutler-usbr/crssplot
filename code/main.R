@@ -38,16 +38,24 @@ ui <- specify_ui()
 
 scens <- ui$scenarios$scens
 icList <- ui$scenarios$ic_list
-icMonth <- ui$scenrios$icMonth
+icMonth <- ui$scenarios$ic_month
 mainScenGroup <- ui$scenarios$mainScenGroup
 yrs2show <- ui$defaults$plot_yrs
 peYrs <- ui$defaults$pe_yrs
 
-crss_res_check_scen_names(scens, icList, icMonth, mainScenGroup, ui$simple_5yr$ss5, ui$heatmap$scenarios)
+crss_res_check_scen_names(
+  scens, 
+  icList, 
+  icMonth, 
+  mainScenGroup, 
+  ui$simple_5yr$ss5, 
+  ui$heatmap$scenarios
+)
+
 folder_paths <- crss_res_directory_setup(
   ui$folders$i_folder, 
   get_pe_data = ui$process_data$pe_data, 
-  get_sys_cond_data = getSysCondData,
+  get_sys_cond_data = ui$process_data$crss_short_cond_data,
   CRSSDIR = ui$folders$CRSSDIR,
   crss_month = ui$folders$crss_month
 )
@@ -107,14 +115,29 @@ if (ui$process_data$pe_data) {
 
 if (ui$process_data$crss_short_cond_data) {
   message("Starting to get CRSS shortage condition data...")
+  assert_that(length(ui$shortage_conditions$scenario) == 1)
+  assert_that(
+    ui$shortage_conditions$scenario %in% names(scens),
+    msg = "Shortage conditions specified scenario does not exist in data."
+  )
   
   get_shortcond_from_rdf(
-    scenario = scens[[mainScenGroup]], 
+    scenario = scens[[ui$shortage_conditions$scenario]], 
     i_folder = ui$folders$i_folder, 
-    oFolder = resFolder
+    oFolder = folder_paths$res_folder
   )
   
   message("Done getting CRSS shortage condition data")
+}
+
+if (ui$create_figures$standard_figures | ui$create_figures$pe_clouds) {
+  pe <- read_feather(o_files$cur_month_pe_file) %>%
+    # The StartMonth column is used as the color variable in plotEOCYElev, and 
+    # the names that should show up in the legend/differentiate scenario groups
+    # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
+    # StartMonth for now
+    dplyr::mutate(StartMonth = Agg) %>%
+    filter(StartMonth %in% ui$plot_group$plot_scenarios)
 }
 
 if (ui$create_figures$standard_figures) {
@@ -167,7 +190,7 @@ if (ui$create_figures$standard_figures) {
  
   m_heat <- mead_system_condition_heatmap(
     filter(lb_dcp, Agg %in% names(ui$heatmap$scenarios)), 
-    yrs2show, 
+    ui$heatmap$years, 
     scen_rename = ui$heatmap$scenarios, 
     my_title = paste("Lake Mead Conditions from", ui$heatmap$title)
   )
@@ -182,7 +205,7 @@ if (ui$create_figures$standard_figures) {
   
   p_heat <- powell_system_condition_heatmap(
     filter(sys_cond, Agg %in% names(ui$heatmap$scenarios)),
-    yrs2show,
+    ui$heatmap$years,
     scen_rename = ui$heatmap$scenarios,
     my_title = paste("Lake Powell Conditions from", ui$heatmap$title)
   )
@@ -199,13 +222,6 @@ if (ui$create_figures$standard_figures) {
   # includes previous month's results too
   # read in current month data
   message("EOCY elevation figures")
-  pe <- read_feather(o_files$cur_month_pe_file) %>%
-    # The StartMonth column is used as the color variable in plotEOCYElev, and 
-    # the names that should show up in the legend/differentiate scenario groups
-    # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
-    # StartMonth for now
-    dplyr::mutate(StartMonth = Agg) %>%
-    filter(StartMonth %in% ui$plot_group$plot_scenarios)
 
   # plot
   powellPE <- plotEOCYElev(
@@ -213,8 +229,8 @@ if (ui$create_figures$standard_figures) {
     peYrs, 
     "powell_dec_pe", 
     'Powell End-of-December Elevation', 
-    colorLabel,
-    legendWrap = legendWrap,
+    ui$defaults$color_label,
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
@@ -223,51 +239,14 @@ if (ui$create_figures$standard_figures) {
     peYrs, 
     "mead_dec_pe", 
     'Mead End-of-December Elevation', 
-    colorLabel, 
-    legendWrap = legendWrap,
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
-  # plot Clouds ----------------
-  if (ui$create_figures$pe_clouds) {
-    powellCloud <- plotCloudFigs(
-      ui$clouds$scenarios, 
-      pe, 
-      peYrs, 
-      "powell_dec_pe",
-      'Powell End-of-December Elevation', 
-      colorLabel,
-      legendWrap = legendWrap
-    )
-    
-    ggsave(
-      o_files$powell_cloud, 
-      width = 9, 
-      height = 6.5, 
-      units = "in", 
-      dpi = 600
-    )
-    
-    meadCloud <- plotCloudFigs(
-      ui$clouds$scenarios, 
-      pe, 
-      peYrs, 
-      "mead_dec_pe", 
-      'Mead End-of-December Elevation', 
-      colorLabel, 
-      legendWrap = legendWrap
-    )
-    ggsave(
-      o_files$mead_cloud,
-      width = 9, 
-      height = 6.5, 
-      units = "in", 
-      dpi = 600
-    )
-  }
-  
-  # 3) Critical elevation thresholds; figures and data table -------
-  # have sysCond for some, and read in crit stats for others
+  # 3) Critical elevation thresholds ------------ 
+  # figures and data table have sysCond for some, and 
+  # read in crit stats for others
   message("starting critical stats")
   
   # compare crit stats for all scenarios
@@ -303,8 +282,8 @@ if (ui$create_figures$standard_figures) {
     'powell_wy_min_lt_3490', 
     '', 
     ptitle, 
-    colorLabel, 
-    legendWrap = legendWrap,
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
@@ -315,8 +294,8 @@ if (ui$create_figures$standard_figures) {
     'lbShortage', 
     '', 
     shortTitle, 
-    colorLabel, 
-    legendWrap = legendWrap,
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
@@ -327,20 +306,21 @@ if (ui$create_figures$standard_figures) {
     'lbSurplus', 
     '', 
     surpTitle, 
-    colorLabel, 
-    legendWrap = legendWrap,
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
-  # compare critical stat figures 1025, 1000, 3490, 3525 -----------------
+  # compare critical stat figures  ---------------------
+  # 1025, 1000, 3490, 3525 
   p_3525_fig <- compare_crit_stats(
     cs, 
     yrs2show, 
     'powell_wy_min_lt_3525', 
     '', 
     "Powell: Percent of Traces Less than elevation 3,525' in Any Water Year", 
-    colorLabel, 
-    legendWrap = legendWrap,
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
@@ -350,9 +330,9 @@ if (ui$create_figures$standard_figures) {
     "mead_dec_lt_1025", 
     '', 
     "Mead: Percent of Traces Less than elevation 1,025' in December", 
-    colorLabel, 
-    legendWrap = legendWrap,
-    plot_colors = plot_colors
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
+    plot_colors = ui$plot_group$plot_colors
   )
   
   m_1000_fig <- compare_crit_stats(
@@ -361,8 +341,8 @@ if (ui$create_figures$standard_figures) {
     "mead_min_lt_1000", 
     '', 
     "Mead: Percent of Traces Less than elevation 1,000' in Any Month", 
-    colorLabel, 
-    legendWrap = legendWrap,
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap,
     plot_colors = ui$plot_group$plot_colors
   )
   
@@ -449,101 +429,67 @@ if (ui$create_figures$standard_figures) {
   data.table::fwrite(cs, o_files$crit_stats_proc, row.names = F)
 }
 
+# plot Clouds ----------------
+if (ui$create_figures$pe_clouds) {
+  assert_that(
+    all(ui$clouds$scenarios %in% names(ui$scenarios$scens)),
+    msg = "Scenarios specified for the clouds to not match those available."
+  )
+  #function(zz, scenario, scen_labs, yrs, var, myTitle, 
+  #         legendTitle, legendWrap = NULL)
+  powellCloud <- plotCloudFigs_solo(
+    pe,
+    ui$clouds$scenarios, 
+    ui$clouds$scen_labs, 
+    peYrs, 
+    "powell_dec_pe",
+    'Powell End-of-December Elevation', 
+    ui$defaults$color_label,
+    legendWrap = ui$defaults$legend_wrap
+  )
+  
+  ggsave(
+    o_files$powell_cloud, 
+    width = 9, 
+    height = 6.5, 
+    units = "in", 
+    dpi = 600
+  )
+  
+  meadCloud <- plotCloudFigs_solo(
+    pe,
+    ui$clouds$scenarios, 
+    ui$clouds$scen_labs, 
+    peYrs, 
+    "mead_dec_pe", 
+    'Mead End-of-December Elevation', 
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap
+  )
+  ggsave(
+    o_files$mead_cloud,
+    width = 9, 
+    height = 6.5, 
+    units = "in", 
+    dpi = 600
+  )
+}
+
+# conditional probabilities ---------------------------
 if(ui$create_figures$conditional_probs){
+  warning(
+    "The conditional probabilities have not been computed for a long time.\n", 
+    "Please carefully review the code and results."
+  )
   ## CONDITIONAL PROBABILITIES
   # use sysCond
   if(is.na(match('sysCond',ls()))){
-    sysCond <- read.table(o_files$sys_cond_file, header = T) 
+    sysCond <- read.table(o_files$sys_cond_file, header = TRUE) 
     sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == 1)
     sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
   }
-  cp1 <- getConditionalProbs(
-    sysCond, 
-    yrs2show[1], 
-    yrs2show[1], 
-    'lbShortage',
-    'mer748'
-  )
-  cp2 <- getConditionalProbs(
-    sysCond, 
-    yrs2show[1], 
-    yrs2show[1], 
-    'lbShortage',
-    'ueb823'
-  )
-  cp3 <- getConditionalProbs(
-    sysCond, 
-    yrs2show[1],
-    yrs2show[1], 
-    'lbShortage',
-    c('eq','uebGt823')
-  )
-  cp4 <- getConditionalProbs(
-    sysCond, 
-    yrs2show[2], 
-    yrs2show[1], 
-    c('lbShortage','lbShortageStep1','lbShortageStep2', 'lbShortageStep3'), 
-    'mer748'
-  )
-  cp5 <- getConditionalProbs(
-    sysCond, 
-    yrs2show[2], 
-    yrs2show[1], 
-    c('lbShortage','lbShortageStep1','lbShortageStep2', 'lbShortageStep3'), 
-    'ueb823'
-  )
-  cp6 <- getConditionalProbs(
-    sysCond, 
-    yrs2show[2], 
-    yrs2show[1], 
-    c('lbShortage','lbShortageStep1','lbShortageStep2', 'lbShortageStep3'), 
-    c('eq','uebGt823')
-  )
   
-  # create data table from the above values
-  cpt1 <- data.frame(
-    'ChanceOf' = c(paste(yrs2show[1],names(cp1)),paste(yrs2show[2],names(cp4))),
-    'PrctChance' = c(cp1,cp4)
-  )
-  rr <- which(
-    rownames(sysTable$fullTable) == 
-      'Mid-Elevation Release Tier - annual release = 7.48 maf'
-  )
-  cc <- which(colnames(sysTable$fullTable) == yrs2show[1])
-  cpt1$PowellWYRel <- paste('7.48 MAF;',sysTable$fullTable[rr,cc])
-  
-  cpt2 <- data.frame(
-    'ChanceOf' = c(paste(yrs2show[1],names(cp2)),paste(yrs2show[2],names(cp5))),
-    'PrctChance' = c(cp2,cp5)
-  )
-  rr <- which(
-    rownames(sysTable$fullTable) == 
-      "Upper Elevation Balancing - annual release = 8.23 maf"
-  )
-  cpt2$PowellWYRel <- paste('8.23 MAF;',sysTable$fullTable[rr,cc])
-  
-  cpt3 <- data.frame(
-    'ChanceOf' = c(paste(yrs2show[1],names(cp3)),paste(yrs2show[2],names(cp6))),
-    'PrctChance' = c(cp3,cp6)
-  )
-  rr <- which(
-    rownames(sysTable$fullTable) == 
-      "Upper Elevation Balancing - annual release > 8.23 maf"
-  )
-  rr2 <- which(
-    rownames(sysTable$fullTable) == "Equalization - annual release > 8.23 maf"
-  )
-  cpt3$PowellWYRel <- paste(
-    '> 8.23 MAF;',
-    sysTable$fullTable[rr,cc] + sysTable$fullTable[rr2,cc]
-  )
-  
-  cpt1 <- rbind(cpt1,cpt2,cpt3)
-  
-  # rearrange columns
-  cpt1 <- cpt1[c('PowellWYRel','ChanceOf','PrctChance')]
-  cpt1$PrctChance <- cpt1$PrctChance*100
-  data.table::fwrite(cpt1, o_files$cond_prob_file, row.names = F)
+  get_all_cond_probs(sysCond, sysTable, yrs2show, o_files$cond_prob_file)
 }
 
 # conditions leading to shortage ---------------------------------
@@ -564,7 +510,7 @@ if (ui$create_figures$short_conditions) {
     iFile = ui$shortage_conditions$res_file, 
     ui$shortage_conditions$scenario, 
     filterOn = 'pe', 
-    ui$shortage_conditions$yearToAnalyze,
+    ui$shortage_conditions$year,
     colorVar = ui$shortage_conditions$color_var
   )
   shortCond <- shortCond + 
@@ -617,17 +563,24 @@ if (ui$create_figures$simple_5yr_table) {
 # mead pe scatter ------------------
 if (ui$create_figures$pe_scatter_fig) {
   message("elevation scatter plot figure")
-  ### This did not properly compile for the January run.
+
   if (ui$mead_pe_scatter$model == "CRSS") {
     pe <- read_feather(o_files$cur_month_pe_file) %>%
-      filter(Agg == mainScenGroup)
+      filter(Agg == ui$mead_pe_scatter$scenario)
+    
   } else if (ui$mead_pe_scatter$model == "MTOM") {
 
     icDim <- 1981:2015
     tmpIcMonth <- paste(str_replace(ui$mead_pe_scatter$year, "20", ""), "Dec", sep = "-")
     decVals <- do.call(
       rbind, 
-      lapply(icDim, get1TraceIc, icList[[mainScenGroup]], tmpIcMonth, traceMap)
+      lapply(
+        icDim, 
+        get1TraceIc, 
+        icList[[ui$mead_pe_scatter$scenario]], 
+        tmpIcMonth, 
+        traceMap
+      )
     )
     traceNum <- traceMap$trace[match(icDim, traceMap$ic)]
     
@@ -636,15 +589,15 @@ if (ui$create_figures$pe_scatter_fig) {
       rename(Value = `Mead.Pool Elevation`) %>%
       mutate(TraceNumber = as.numeric(traceNum), 
              Year = ui$mead_pe_scatter$year,
-             Variable = "Mead.Pool Elevation")
+             Variable = "mead_dec_pe")
     
   } else {
     stop("Invalid peScatterData variable")
   }
-  scatterTitle <- paste('Lake Mead December', ui$mead_pe_scatter$year, 'Elevations from',
-                        ui$mead_pe_scatter$model)
+  scatterTitle <- paste('Lake Mead December', ui$mead_pe_scatter$year, 
+                        'Elevations from', ui$mead_pe_scatter$model)
 
-  gg <- singleYearPEScatter(pe, ui$mead_pe_scatter$year, 'Mead.Pool Elevation', 
+  gg <- singleYearPEScatter(pe, ui$mead_pe_scatter$year, 'mead_dec_pe', 
                           scatterTitle, TRUE)
   
   tpath <- file.path(
@@ -656,6 +609,8 @@ if (ui$create_figures$pe_scatter_fig) {
   dev.off()
 }
 
+# DNF vs. ST boxplot ----------------------------------
+# TODO: remove this, as this is not a "CRSS Result"
 if (ui$create_figures$dnf_st_boxplot){
   message('starting comparison of DNF and ST boxplots')
   FullQ = as.data.frame(cyAnnTot$LeesFerry['1906/'])
@@ -668,24 +623,38 @@ if (ui$create_figures$dnf_st_boxplot){
   plotColors <- c("#00BFC4", "#F8766D")
   names(plotColors) <- c("Full Hydrology", "Stress Test Hydrology")
   
-  gg = ggplot(Q, aes(x = scen, y = LeesFerry, fill = scen)) + theme_light() + stat_boxplot_custom(lwd = .25, 
-                                                                                                  fatten = .7,
-                                                                                                  outlier.size = .75)
-  gg = gg + scale_fill_manual(values =  plotColors) + 
+  gg = ggplot(Q, aes(x = scen, y = LeesFerry, fill = scen)) + 
+    theme_light() + 
+    stat_boxplot_custom(
+      lwd = .25, 
+      fatten = .7,
+      outlier.size = .75
+    )
+  
+  gg <- gg + scale_fill_manual(values =  plotColors) + 
     scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
-    labs(x = "", y = "Annual Flow (million acre-feet)", 
-         title = "Distrubution of Alternative Future Hydrology Scenarios",
-         subtitle = "Colorado River Natural Flow at Lees Ferry Gaging Station, Arizona") + 
-    theme(legend.position = "none") + theme(plot.subtitle = element_text(size = 7.4, color = "grey21")) +
-    theme(plot.title = element_text(size=8.9)) +
-    #theme(plot.title = element_text(hjust = 0.5)) + theme(plot.subtitle = element_text(hjust = 0.5)) +
-    theme(axis.text.x = element_text(color = "black")) + theme(axis.text.y = element_text(color = "black")) +
-    theme(axis.text.x = element_text(size=7.2)) + theme(axis.title.y = element_text(size=7.8), 
-                                                      axis.text.y = element_text(size = 6)) +
+    labs(
+      x = "", y = "Annual Flow (million acre-feet)", 
+      title = "Distrubution of Alternative Future Hydrology Scenarios",
+      subtitle = "Colorado River Natural Flow at Lees Ferry Gaging Station, Arizona"
+    ) + 
+    theme(
+      legend.position = "none",
+      plot.subtitle = element_text(size = 7.4, color = "grey21"),
+      plot.title = element_text(size=8.9),
+      axis.text.x = element_text(color = "black", size = 7.2),
+      axis.text.y = element_text(color = "black", size = 6),
+      axis.title.y = element_text(size=7.8)
+    ) +
     annotate("text", label = "1906-2017",  x= 1, y=16, size = 2.65) + 
     annotate("text", label = "1988-2017", x=2 , y=14.75, size = 2.65)
-  gg
   
-  ggsave(file.path(oFigs,'FlowDistBoxplot.png'), width = 3.5, height = 3.5, units = "in", dpi = 600)
+  ggsave(
+    file.path(folder_paths$png_out,'FlowDistBoxplot.png'), 
+    width = 3.5, 
+    height = 3.5, 
+    units = "in", 
+    dpi = 600
+  )
 }
 

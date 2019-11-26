@@ -1,4 +1,5 @@
 library(assertthat)
+source("code/create_scenario.R")
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
 # store the intermediate data and figures/tables created here
@@ -11,15 +12,15 @@ specify_ui <- function()
   # swtiches to read data. if you've already read the data in from rdfs once, 
   # you may be able to set this to FALSE, so it's faster
   process_data <- list(
-    sys_cond_data = TRUE,
-    pe_data = TRUE,
+    sys_cond_data = FALSE,
+    pe_data = FALSE,
     crss_short_cond_data = FALSE
   )
   
   # "switches" to create/not create different figures
   # typical figures
   create_figures <- list(
-    standard_figures = TRUE,
+    standard_figures = FALSE,
     simple_5yr_table = FALSE,
     
     # optional figures/tables
@@ -27,6 +28,7 @@ specify_ui <- function()
     conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
+    # TODO: what does this mean?
     #NOTE:For code to work correctly the main scene group needs to be the DNF dataset.
     dnf_st_boxplot = FALSE, 
     pe_clouds = FALSE
@@ -34,7 +36,7 @@ specify_ui <- function()
   
   # ** make sure CRSS_DIR is set correctly before running
   folders <- list(
-    i_folder = "M:/Shared/CRSS/",
+    i_folder = "C:/alan/CRSS/tmp_output",
     CRSSDIR = Sys.getenv("CRSS_DIR"),
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
@@ -61,9 +63,9 @@ specify_ui <- function()
     # update if for some reason the scenario naming convention has changed
     ic_dim_number = 5,
     # setting to NULL will not wrap legend entries at all
-    legendWrap = 20,
+    legend_wrap = 20,
     # how to label the color scale on the plots
-    colorLabel = 'Scenario',
+    color_label = 'Scenario',
     # text that will be added to figures
     annText = 'Results from August 2019 CRSS Run',
     end_year = 2060
@@ -78,31 +80,31 @@ specify_ui <- function()
   all_scenarios <- c(
     create_scenario(
       "Aug 2018 - IG",
-      scen_folders = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most", 
+      scen_folders = "2018/Aug2018_2019,DNF,2007Dems,IG,Most", 
       ic = c(3618.56, 1089.40), 
       start_year = 2019
     ),
     create_scenario(
       "Aug 2018 - NA",
-      scen_folders = "2018/Scenario/Aug2018_2019,DNF,2007Dems,NA,Most", 
+      scen_folders = "2018/Aug2018_2019,DNF,2007Dems,NA,Most", 
       ic = c(3618.56, 1089.40), 
       start_year = 2019
     ),
     create_scenario(
       "June Stress Test - IG", 
       scen_folders = rw_scen_gen_names(
-        "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP",
-        paste0("Trace", 4:38),
+        "2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP",
+        paste0("Trace", 4:8),
         "DCP_Cons"
       ), 
       ic = file.path(
-        CRSSDIR, 
+        folders$CRSSDIR, 
         "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
       ), 
       start_year = 2020
     )
   )
-  
+ 
   # old specification of scenarios ------------------ 
   # now handled by scenario_to_vars()
   # scens <- list(
@@ -152,7 +154,7 @@ specify_ui <- function()
   # )
   
   # convert all_scenarios to the different variables --------------------
-  scenarios <- scenario_to_vars(scenarios)
+  scenarios <- scenario_to_vars(all_scenarios)
     
   # for the 5-year simple table
   # value are the scenario group variable names (should be same as above)
@@ -170,6 +172,7 @@ specify_ui <- function()
     yy5 = 2020:2024
   )
   
+  # heatmap ---------------
   # use this to select which scenarios are shown in the heat map, and what those
   # scenarios should be labeled as in the heatmap. The names should be existing
   # scenario names, and the values are what they will be labeled as in the heatmap
@@ -178,14 +181,15 @@ specify_ui <- function()
       "Aug 2018 - IG" = "August 2018 IGs Extend", 
       "Aug 2018 - NA" = "August 2018 No Action"
     ),
-    title = "IG vs. No Action in August 2018"
+    title = "IG vs. No Action in August 2018",
+    years = 2020:2026
   )
   
   # the mainScenGroup is the scenario to use when creating the current month's 
   # 5-year table, etc. In the plots, we want to show the previous months runs,
   # but in the tables, we only want the current month run. This should match names
   # in scens and icList
-  mainScenGroup <- "Aug 2019 - IG"
+  mainScenGroup <- "Aug 2018 - IG"
   names(mainScenGroup) <- mainScenGroup
   scenarios[['mainScenGroup']] = mainScenGroup
   
@@ -209,9 +213,18 @@ specify_ui <- function()
   
   # clouds --------------------------------
   
+  # TODO: update this so that scen_labs does not have to be specified, and if it
+  # isn't, then just the scenarios are used.
   clouds <- list(
     # scenarios to include in cloud
-    scenarios = c("August 2018 - IG", "August 2018 - NA")
+    scenarios = c("Aug 2018 - IG", "Aug 2018 - NA"),
+    scen_labs = c("August 2018 - IG extended", 
+                  "Augsut 2018 - Revert to 2007 NA Alternative")
+  )
+  
+  assert_that(
+    length(clouds$scen_labs) == length(clouds$scenarios),
+    msg = "clouds scen_labs needs to be the same length as the scenarios."
   )
   
   # mead pe scatter parameters -------------------------------
@@ -221,14 +234,15 @@ specify_ui <- function()
     # peScatterData should be set to either MTOM or CRSS
     # if relying on combined run, then this is likely MTOM; if using a CRSS only 
     # run, then likely set to CRSS
-    model = 'CRSS'
+    model = 'MTOM',
+    scenario = "June Stress Test - IG"
   )
   
   # conditions leading to shortage --------------------------- 
   shortage_conditions <- list(
     # string should be either CRSS or MTOM
     model = "CRSS", 
-    scenario = "August 2018 - IG",
+    scenario = "Aug 2018 - IG",
     # yearToAnalyze is used in the plot labeling. This is typically the first year
     # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
     # the first year of shortage for a CRSS run, i.e., it uses the December elev.
@@ -237,7 +251,7 @@ specify_ui <- function()
     color_var = "mwdIcs",
     subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study."
    
-    
+    # TODO: test MTOM still works
     # model = "MTOM",
     # scenario = NA, # should be NA for MTOM
     # year = 2019,
@@ -257,9 +271,9 @@ specify_ui <- function()
       is.null(shortage_conditions$res_file),
       msg = "`res_file` should be null when model is CRSS"
     )
-    
+  
     shortage_conditions[['res_file']] <- file.path(
-      folders$CRSSDIR,'results', folders$crssMonth, 'tempData'
+      folders$CRSSDIR,'results', folders$crss_month, 'tempData'
     )
     
     assert_that(
