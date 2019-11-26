@@ -25,7 +25,7 @@ getMTOMConditionsData <- function(iFile, filterOn)
   zz
 }
 
-get_shortcond_from_rdf <- function(scenario, iFolder, oFolder)
+get_shortcond_from_rdf <- function(scenario, i_folder, oFolder)
 {
   rwd1 <- read_rwd_agg("data/crss_short_cond.csv")
   rwd2 <- rwd_agg(x = data.frame(
@@ -39,10 +39,11 @@ get_shortcond_from_rdf <- function(scenario, iFolder, oFolder)
     stringsAsFactors = FALSE
   ))
   ann_file <- file.path(oFolder, "crssShortCond_ann.feather")
-  rw_scen_aggregate(scenario, agg = rwd1, scen_dir = iFolder, file = ann_file)
+
+  rw_scen_aggregate(scenario, agg = rwd1, scen_dir = i_folder, file = ann_file)
   
   mon_file <- file.path(oFolder, "crssShortCond_mon.feather")
-  rw_scen_aggregate(scenario, agg = rwd2, scen_dir = iFolder, file = mon_file)
+  rw_scen_aggregate(scenario, agg = rwd2, scen_dir = i_folder, file = mon_file)
   invisible(scenario)
 }
 

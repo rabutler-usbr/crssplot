@@ -97,7 +97,7 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   message("pngs will be saved to: ", png_out)
   
   # folder to save procssed text files to (intermediate processed data)
-  resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
+  resFolder <- file.path(CRSSDIR,'results', crss_month, 'tempData')
   if (!file.exists(resFolder)) {
     message(paste('Creating folder:', resFolder))
     dir.create(resFolder)
