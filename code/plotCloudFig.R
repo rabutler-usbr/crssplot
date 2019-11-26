@@ -8,7 +8,8 @@ library(cowplot)
 theme_set(theme_grey())
 library(imager)
 
-plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
+plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle, 
+                               legendTitle, legendWrap = NULL)
 {
   # Used to generate cloud figures.  Commented out are colors used for plots in DCP presentations
   # and the median projections from the 07' Interim Guidelines (shown with double hash ##)
@@ -91,7 +92,7 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
   ##IGLab = "\"2007 Projections\""
   names(histLab) = "Historical Elevation"
   ##names(IGLab) = "\"2007 Projections\""
-  histLab = append(histLab, cloudLabs)
+  histLab = append(histLab, scen_labs)
   ##histLab = append(histLab, IGLab)
   
   # Read in Reclamation logo png
@@ -134,9 +135,9 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
                           alpha = 0.5, linetype = 2, size = 0.5*Medians) +
     scale_fill_manual(name, 
                       values = plotColors, guide = guide_legend(order=1),
-                      labels = str_wrap(cloudLabs, 15)) + scale_color_manual(name,
+                      labels = str_wrap(scen_labs, 15)) + scale_color_manual(name,
                                                                              values = plotColors, guide = guide_legend(order=1),
-                                                                             labels = str_wrap(cloudLabs, 15))  +
+                                                                             labels = str_wrap(scen_labs, 15))  +
     theme(legend.text = element_text(size=LegendText),legend.title = element_text(size=LegendLabText, face="bold"),
           legend.box.margin = margin(0,0,0,0), legend.key = element_rect(), legend.key.size = unit(1.75, 'lines')) 
   legenda <- get_legend(gga)
@@ -174,7 +175,7 @@ plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWr
     geom_line(size=Medians) +
     scale_fill_manual(str_wrap("10th to 90th percentile of full range",20),
                       values = plotColors, guide = FALSE,
-                      labels = str_wrap(cloudLabs, 15)) + 
+                      labels = str_wrap(scen_labs, 15)) + 
     scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
                        values = plotColors, guide = FALSE,
                        labels = str_wrap(histLab, 15)) +
