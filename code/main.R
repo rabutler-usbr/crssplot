@@ -39,6 +39,9 @@ ui <- specify_ui()
 scens <- ui$scenarios$scens
 icList <- ui$scenarios$ic_list
 icMonth <- ui$scenrios$icMonth
+mainScenGroup <- ui$scenarios$mainScenGroup
+yrs2show <- ui$defaults$plot_yrs
+peYrs <- ui$defaults$pe_yrs
 
 crss_res_check_scen_names(scens, icList, icMonth, mainScenGroup, ui$simple_5yr$ss5, ui$heatmap$scenarios)
 folder_paths <- crss_res_directory_setup(
@@ -202,7 +205,7 @@ if (ui$create_figures$standard_figures) {
     # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
     # StartMonth for now
     dplyr::mutate(StartMonth = Agg) %>%
-    filter(StartMonth %in% plot_scenarios)
+    filter(StartMonth %in% ui$plot_group$plot_scenarios)
 
   # plot
   powellPE <- plotEOCYElev(
@@ -212,7 +215,7 @@ if (ui$create_figures$standard_figures) {
     'Powell End-of-December Elevation', 
     colorLabel,
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   meadPE <- plotEOCYElev(
@@ -222,13 +225,13 @@ if (ui$create_figures$standard_figures) {
     'Mead End-of-December Elevation', 
     colorLabel, 
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   # plot Clouds ----------------
   if (ui$create_figures$pe_clouds) {
     powellCloud <- plotCloudFigs(
-      cloudScen, 
+      ui$clouds$scenarios, 
       pe, 
       peYrs, 
       "powell_dec_pe",
@@ -246,7 +249,7 @@ if (ui$create_figures$standard_figures) {
     )
     
     meadCloud <- plotCloudFigs(
-      cloudScen, 
+      ui$clouds$scenarios, 
       pe, 
       peYrs, 
       "mead_dec_pe", 
@@ -286,7 +289,7 @@ if (ui$create_figures$standard_figures) {
     rename(AggName = Agg) %>%
     filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
     rbind(cs) %>%
-    filter(AggName %in% plot_scenarios)
+    filter(AggName %in% ui$plot_group$plot_scenarios)
 
   ptitle <- paste(
     'Powell: Percent of Traces Less than Power Pool', 
@@ -302,7 +305,7 @@ if (ui$create_figures$standard_figures) {
     ptitle, 
     colorLabel, 
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   shortTitle <- 'Lower Basin: Percent of Traces in Shortage Conditions'
@@ -314,7 +317,7 @@ if (ui$create_figures$standard_figures) {
     shortTitle, 
     colorLabel, 
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   surpTitle <- 'Lower Basin: Percent of Traces in Surplus Conditions'
@@ -326,7 +329,7 @@ if (ui$create_figures$standard_figures) {
     surpTitle, 
     colorLabel, 
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   # compare critical stat figures 1025, 1000, 3490, 3525 -----------------
@@ -338,7 +341,7 @@ if (ui$create_figures$standard_figures) {
     "Powell: Percent of Traces Less than elevation 3,525' in Any Water Year", 
     colorLabel, 
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   m_1025_fig <- compare_crit_stats(
@@ -360,7 +363,7 @@ if (ui$create_figures$standard_figures) {
     "Mead: Percent of Traces Less than elevation 1,000' in Any Month", 
     colorLabel, 
     legendWrap = legendWrap,
-    plot_colors = plot_colors
+    plot_colors = ui$plot_group$plot_colors
   )
   
   # now create figures only for the current "main scenario"
@@ -374,7 +377,7 @@ if (ui$create_figures$standard_figures) {
       !(Variable %in% c('mead_min_lt_1020','lbSurplus'))
     ), 
     yrs2show, 
-    annText
+    ui$defaults$annText
   )
   
   critStatsFig2 <- plotCritStats(dplyr::filter(
@@ -383,7 +386,7 @@ if (ui$create_figures$standard_figures) {
       !(Variable %in% c('mead_dec_lt_1025','lbSurplus'))
     ), 
     yrs2show, 
-    annText
+    ui$defaults$annText
   )
 
   csVars <- csVarNames()
@@ -424,7 +427,7 @@ if (ui$create_figures$standard_figures) {
       Agg == mainScenGroup
     ), 
     yrs2show, 
-    annText
+    ui$defaults$annText
   )
 
 # save figures and table
@@ -546,10 +549,10 @@ if(ui$create_figures$conditional_probs){
 # conditions leading to shortage ---------------------------------
 # pulled annotation out of generic function
 if (ui$create_figures$short_conditions) {
-  if (length(resFile) > 1)
-    stop(
-      "conditions leading to shortage is only designed to work with 1 scenario"
-    )
+  assert_that(
+    length(ui$shortage_conditions$res_file) == 1, 
+    msg = "conditions leading to shortage is only designed to work with 1 scenario"
+  )
   
   message(
     'Using hard coded values for the arrow in the shortage conditions figure.',
@@ -557,25 +560,28 @@ if (ui$create_figures$short_conditions) {
   )
   # filterOn being set to pe shows results for traces that are <= 1077
   shortCond <- plotFirstYearShortCond(
-    conditionsFrom, 
-    iFile = resFile, 
-    scenario, 
+    ui$shortage_conditions$model, 
+    iFile = ui$shortage_conditions$res_file, 
+    ui$shortage_conditions$scenario, 
     filterOn = 'pe', 
-    yearToAnalyze,
-    colorVar = short_cond_color_var
+    ui$shortage_conditions$yearToAnalyze,
+    colorVar = ui$shortage_conditions$color_var
   )
   shortCond <- shortCond + 
     annotate('segment', x = 16.9, xend = 14.5, y = 1055, yend = 1056.4, 
-           arrow = grid::arrow(length = unit(.3,'cm')),size = 1) +
+           arrow = grid::arrow(length = unit(.3,'cm')), size = 1) +
     annotate(
       'text', 
       x = 17, 
       y = 1054,
-      label = lbLabel, 
+      label = ui$shortage_conditions$lb_label, 
       size = 4, 
       hjust = 0
     ) +
-    labs(title = shortCondTitle, caption = shortCondSubTitle) +
+    labs(
+      title = ui$shortage_conditions$title, 
+      caption = ui$shortage_conditions$subtitle
+    ) +
     theme(legend.title = element_text(size = 10))
   
   ggsave(
@@ -612,13 +618,13 @@ if (ui$create_figures$simple_5yr_table) {
 if (ui$create_figures$pe_scatter_fig) {
   message("elevation scatter plot figure")
   ### This did not properly compile for the January run.
-  if (peScatterData == "CRSS") {
+  if (ui$mead_pe_scatter$model == "CRSS") {
     pe <- read_feather(o_files$cur_month_pe_file) %>%
       filter(Agg == mainScenGroup)
-  } else if (peScatterData == "MTOM") {
+  } else if (ui$mead_pe_scatter$model == "MTOM") {
 
     icDim <- 1981:2015
-    tmpIcMonth <- paste(str_replace(peScatterYear, "20", ""), "Dec", sep = "-")
+    tmpIcMonth <- paste(str_replace(ui$mead_pe_scatter$year, "20", ""), "Dec", sep = "-")
     decVals <- do.call(
       rbind, 
       lapply(icDim, get1TraceIc, icList[[mainScenGroup]], tmpIcMonth, traceMap)
@@ -629,21 +635,21 @@ if (ui$create_figures$pe_scatter_fig) {
       select(`Mead.Pool Elevation`) %>%
       rename(Value = `Mead.Pool Elevation`) %>%
       mutate(TraceNumber = as.numeric(traceNum), 
-             Year = peScatterYear,
+             Year = ui$mead_pe_scatter$year,
              Variable = "Mead.Pool Elevation")
     
   } else {
     stop("Invalid peScatterData variable")
   }
-  scatterTitle <- paste('Lake Mead December', peScatterYear, 'Elevations from',
-                        peScatterData)
+  scatterTitle <- paste('Lake Mead December', ui$mead_pe_scatter$year, 'Elevations from',
+                        ui$mead_pe_scatter$model)
 
-  gg <- singleYearPEScatter(pe, peScatterYear, 'Mead.Pool Elevation', 
+  gg <- singleYearPEScatter(pe, ui$mead_pe_scatter$year, 'Mead.Pool Elevation', 
                           scatterTitle, TRUE)
   
   tpath <- file.path(
     folder_paths$figs_folder, 
-    paste0('meadScatterFigure_', peScatterYear, '.pdf')
+    paste0('meadScatterFigure_', ui$mead_pe_scatter$year, '.pdf')
   )
   pdf(tpath, width = 8, height = 6)
   print(gg)

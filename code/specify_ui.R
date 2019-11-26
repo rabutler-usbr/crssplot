@@ -1,3 +1,4 @@
+library(assertthat)
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
 # store the intermediate data and figures/tables created here
@@ -53,16 +54,25 @@ specify_ui <- function()
   
   # *** the names of scens, icList, and icMonth should all match.
   
+  # defaults ---------------------------
   defaults <- list(
     # in the comma seperated scenario folder names, currently the 5th entry is  
     # the initial conditions entry
     # update if for some reason the scenario naming convention has changed
     ic_dim_number = 5,
     # setting to NULL will not wrap legend entries at all
-    legendWrap <- 20,
+    legendWrap = 20,
     # how to label the color scale on the plots
-    colorLabel <- 'Scenario'
+    colorLabel = 'Scenario',
+    # text that will be added to figures
+    annText = 'Results from August 2019 CRSS Run',
+    end_year = 2060
   )
+  # TODO: update so that these are computed if not specified
+  # years to show the crit stats figures  
+  defaults[['plot_yrs']] <- 2020:defaults$end_year 
+  # years to show the Mead/Powell 10/50/90 figures for
+  defaults[['pe_yrs']] <- 2019:defaults$end_year
   
   # specify the scenarios -------------------------
   all_scenarios <- c(
@@ -93,7 +103,8 @@ specify_ui <- function()
     )
   )
   
-  # old specification that is now handled by scenario_to_vars()
+  # old specification of scenarios ------------------ 
+  # now handled by scenario_to_vars()
   # scens <- list(
   #   "Aug 2018 - IG" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most",
   #   "Aug 2018 - NA" = "2018/Scenario/Aug2018_2019,DNF,2007Dems,NA,Most",
@@ -176,78 +187,122 @@ specify_ui <- function()
   # in scens and icList
   mainScenGroup <- "Aug 2019 - IG"
   names(mainScenGroup) <- mainScenGroup
+  scenarios[['mainScenGroup']] = mainScenGroup
   
-  # text that will be added to figures
-  annText <- 'Results from August 2019 CRSS Run' 
+  # select which scenarios are plotted ------------- 
+  # and the colors that are used for plotting 
+  plot_group <- list(
+    # the scenarios to show in Mead/Powell 10/50/90 plots
+    # and the crit stats plots
+    plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", 
+                       "June Stress Test - IG"),
+    # set plotting colors (optional)
+    # use scales::hue_pal()(n) to get default ggplot colors
+    #plot_colors <- c("#F8766D", "#00BFC4")
+    plot_colors = scales::hue_pal()(3)
+  )
   
+  #TODO: change so plot_colors does not have to be specified; if it isn't then
+  # what happens?
   
+  names(plot_group$plot_colors) <- plot_group$plot_scenarios
   
+  # clouds --------------------------------
   
-  # the scenarios to show in Mead/Powell 10/50/90 plots, and the crit stats plots
-  #plot_scenarios <- c("June 2019", "January 2019", "June 2019 - No DCP")
-  #plot_scenarios <- c("June 2019 - Stress Test", "June 2019 - Stress Test - No DCP")
-  plot_scenarios <- c("Aug 2019 - IG", "Aug 2018 - IG", "Aug 2019 - NA-9101", 
-                      "Aug 2018 - NA", "NA-9002")
-  
-  # set plotting colors (optional)
-  # use scales::hue_pal()(n) to get default ggplot colors
-  plot_colors <- c("#F8766D", "#00BFC4")
-  plot_colors <- scales::hue_pal()(length(plot_scenarios))
-  #plot_colors <- c("#619CFF", "#F8766D", "#00BA38")
-  names(plot_colors) <- plot_scenarios
-  
-  end_year <- 2060
-  
-  yrs2show <- 2020:2060 # years to show the crit stats figures
-  peYrs <- 2019:2060 # years to show the Mead/Powell 10/50/90 figures for
-  
-  # More descriptive labels for hydrologies used in the cloud plots
-  cloudScen <- c("June 2019","August 2019")#, "June 2019 Base","June 2019 DCP"
-  cloudLabs <-c("June 2019" = "June Full Hydrology",
-                "August 2019" = "August Full Hydrology"
+  clouds <- list(
+    # scenarios to include in cloud
+    scenarios = c("August 2018 - IG", "August 2018 - NA")
   )
   
   # mead pe scatter parameters -------------------------------
   # plot a single year of Mead PE
-  peScatterYear <- 2019
-  # peScatterData should be set to either MTOM or CRSS
-  # if relying on combined run, then this is likely MTOM; if using a CRSS only 
-  # run, then likely set to CRSS
-  peScatterData <- 'CRSS'
+  mead_pe_scatter <- list(
+    year = 2019,
+    # peScatterData should be set to either MTOM or CRSS
+    # if relying on combined run, then this is likely MTOM; if using a CRSS only 
+    # run, then likely set to CRSS
+    model = 'CRSS'
+  )
   
-  conditionsFrom <- "CRSS" # string should be either CRSS or MTOM
-  
-  # yearToAnalyze is used in the plot labeling. This is typically the first year
-  # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
-  # the first year of shortage for a CRSS run, i.e., it uses the December elev.
-  # at MEad for that year, and the OND release from that year from Powell
-  yearToAnalyze <- 2019
-  if (conditionsFrom == "CRSS") {
-    resFile <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
-    # set scenario to NA if using MTOM or 
-    # to the main scenario folder if using CRSS
-    scenario <- scens[[mainScenGroup]]
+  # conditions leading to shortage --------------------------- 
+  shortage_conditions <- list(
+    # string should be either CRSS or MTOM
+    model = "CRSS", 
+    scenario = "August 2018 - IG",
+    # yearToAnalyze is used in the plot labeling. This is typically the first year
+    # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
+    # the first year of shortage for a CRSS run, i.e., it uses the December elev.
+    # at MEad for that year, and the OND release from that year from Powell
+    year = 2019,
+    color_var = "mwdIcs",
+    subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study."
+   
     
-    short_cond_color_var <- "mwdIcs" # WYRelease or mwdIcs
-    
-    # the label for the percent of average
-    lbLabel <- "Total LB natural inflow percent\nof average (1906-2015)"
-    shortCondSubTitle <- "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study."
-  } else if (conditionsFrom == "MTOM") {
+    # model = "MTOM",
+    # scenario = NA, # should be NA for MTOM
+    # year = 2019,
+    # color_var = "WYRelease",
+    # subtitle = 'Results from the January 2018 MTOM run based on the January 3, 2017 CBRFC forecast',
     # see doc/README for instructions for how to create this csv file
-    resFile <- paste0(CRSSDIR,'/MTOM/FirstYearCondMTOM/Jan2018MTOMResults.csv') 
-    scenario <- NA
-    short_cond_color_var <- "WYRelease" #only WYRelease
-    # the label for the percent of average
-    lbLabel <- 'LB total side inflow percent\nof average (1981-2015)'
-    shortCondSubTitle <- 'Results from the January 2018 MTOM run based on the January 3, 2017 CBRFC forecast' 
+    # res_file = paste0(folders$CRSSDIR,'/MTOM/FirstYearCondMTOM/Jan2018MTOMResults.csv') 
+  )
+  
+  assert_that(
+    shortage_conditions$model %in% c("CRSS", "MTOM"), 
+    msg = "The shortage conditions model should either be 'MTOM' or 'CRSS'"
+  )
+  
+  if (shortage_conditions$model == "CRSS") {
+    assert_that(
+      is.null(shortage_conditions$res_file),
+      msg = "`res_file` should be null when model is CRSS"
+    )
     
+    shortage_conditions[['res_file']] <- file.path(
+      folders$CRSSDIR,'results', folders$crssMonth, 'tempData'
+    )
+    
+    assert_that(
+      length(shortage_conditions$scenario) == 1,
+      msg = "Only one scenario should be specified"
+    )
+    
+    assert_that(
+      shortage_conditions$color_var %in% c("mwdIcs", "WYRelease"),
+      msg = paste0(
+        "When using CRSS to determine conditions leading to shortage,\n",
+        "the `color_var` should be either 'mwdIcs', or 'WYRelease'."  
+      )
+    )
+
+    # the label for the percent of average
+    shortage_conditions[['lb_label']] <- "Total LB natural inflow percent\nof average (1906-2015)"
   } else {
-    stop("Invalid `conditionsFrom` value.")
+    # have already determined that it is either CRSS or MTOM,so must be MTOM
+    
+    assert_that(
+      shortage_conditions$color_var %in% c("WYRelease"),
+      msg = paste0(
+        "When using MTOM to determine conditions leading to shortage,\n",
+        "the `color_var` must be 'WYRelease'."  
+      )
+    )
+    
+    assert_that(
+      is.na(shortage_conditions$scenario), 
+      msg = "For MTOM, the scenario should be `NA`"
+    )
+    
+    # the label for the percent of average
+    shortage_conditions[['lb_label']] <- 'LB total side inflow percent\nof average (1981-2015)'
   }
   
-  shortCondTitle <- 'Conditions Leading to a Lower Basin Shortage in 2020'
+  shortage_conditions[['title']] <- paste(
+    'Conditions Leading to a Lower Basin Shortage in',
+    shortage_conditions$year + 1
+  )
   
+  # return ---------------
   list(
     process_data = process_data,
     create_figures = create_figures,
@@ -255,6 +310,10 @@ specify_ui <- function()
     defaults = defaults,
     scenarios = scenarios,
     simple_5yr = simple_5yr,
-    heatmap = heatmap
+    heatmap = heatmap,
+    plot_group = plot_group,
+    clouds = clouds,
+    mead_pe_scatter = mead_pe_scatter,
+    shortage_conditions = shortage_conditions
   )
 }
