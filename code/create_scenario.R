@@ -2,7 +2,7 @@ library(assertthat)
 
 # create a single scenario as a list, that has all important information
 # specified in it
-create_scenario <- funciton(name, scen_folders, ic, start_year)
+create_scenario <- function(name, scen_folders, ic, start_year)
 {
   assert_that(length(name) == 1 & is.character(name))
   assert_that(length(scen_folders) >= 1 & is.character(scen_folders))
@@ -18,7 +18,15 @@ create_scenario <- funciton(name, scen_folders, ic, start_year)
   
   ic_month <- paste(as.character(start_year - 1 - 2000), "DEC", sep = "-")
   
-  list(name = name, scen_folders = scen_folders, ic = ic, ic_month = ic_month)
+  rr <- list()
+  rr[[name]] <- list(
+    name = name, 
+    scen_folders = scen_folders, 
+    ic = ic, 
+    ic_month = ic_month
+  )
+  
+  rr
 }
 
 # converts the list to the different specified variables
@@ -32,7 +40,7 @@ scenario_to_vars <- function(scenarios)
   all_names <- c()
   
   for (i in seq_len(length(scenarios))) {
-    tmp_scen <- scearios[[i]]
+    tmp_scen <- scenarios[[i]]
     assert_that(
       all(names(tmp_scen) %in% c("name", "ic", "scen_folders", "ic_month"))
     )
