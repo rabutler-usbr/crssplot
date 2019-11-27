@@ -1,0 +1,32 @@
+--- # define the CRSS processing for this month's run
+scenarios:
+  - name: Aug 2018 - IG
+    scenario_folders: "2018/Aug2018_2019,DNF,2007Dems,IG,Most"
+    ic:
+      powell: 3618.56
+      mead: 1089.40
+    start_year: 2019
+    std_ind_plots: TRUE
+    shortage_conditions: TRUE
+    pe_scatter: TRUE
+  - name: Aug 2018 - NA
+    scenario_folders: "2018/Aug2018_2019,DNF,2007Dems,NA,Most"
+    ic:
+      powell: 3618.56
+      mead: 1089.40
+    start_year: 2019
+  - name: "June 2019 w/ DCP"
+    scenario_folders: "`r rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
+    ic: "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
+    start_year: 2018
+folders:
+  i_folder: "C:/alan/CRSS/tmp_output"
+  crss_month: "dev"
+  pdf_name: 'ig_vs_na.pdf'
+process_data:
+  sys_cond_data: TRUE
+  pe_data: TRUE
+  crss_short_cond_data: FALSE
+plot_groups: 
+    - ["Aug 2018 - IG", "Aug 2018 - NA"]
+    - ["Aug 2018 - IG", "June 2019 w/ DCP"]
