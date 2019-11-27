@@ -1,5 +1,7 @@
 process_everything <- function(ui)
 {
+  # check and setup --------------------
+  # check and setup the files, directories, scenarios, etc.
   scens <- ui$scenarios$scens
   icList <- ui$scenarios$ic_list
   icMonth <- ui$scenarios$ic_month

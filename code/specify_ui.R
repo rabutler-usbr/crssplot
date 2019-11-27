@@ -29,10 +29,7 @@ specify_ui <- function()
     pe_scatter_fig = FALSE,
     
     pe_clouds = TRUE,
-    heatmap = FALSE,
-    # uses main scen group for now
-    std_ind_tables = FALSE,
-    std_ind_figures = FALSE
+    heatmap = FALSE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
@@ -83,7 +80,9 @@ specify_ui <- function()
       "Aug 2018 - IG",
       scen_folders = "2018/Aug2018_2019,DNF,2007Dems,IG,Most", 
       ic = c(3618.56, 1089.40), 
-      start_year = 2019
+      start_year = 2019,
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE
     ),
     create_scenario(
       "Aug 2018 - NA",
@@ -102,7 +101,9 @@ specify_ui <- function()
         folders$CRSSDIR, 
         "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
       ), 
-      start_year = 2020
+      start_year = 2020,
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE
     )
   )
  
@@ -156,6 +157,17 @@ specify_ui <- function()
   
   # convert all_scenarios to the different variables --------------------
   scenarios <- scenario_to_vars(all_scenarios)
+  
+  # individual plot specification -------------------------
+  # text that will be added to figures
+  std_ind_figures <- list(
+    "Aug 2018 - IG" = 
+      list(ann_text = 'Results from August 2018 CRSS run', end_year = 2060),
+    "June Stress Test - IG" = 
+      list(ann_text = 'Results from June 2019 CRSS run', end_year = 2026)
+  )
+
+  ind_plot <- specify_individual_plots(all_scenarios, std_ind_figures)
     
   # for the 5-year simple table
   # value are the scenario group variable names (should be same as above)
