@@ -246,3 +246,43 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
   gg
 }
 
+plot_both_clouds <- function(pe, peYrs, ui, o_files)
+{
+  powellCloud <- plotCloudFigs(
+    pe,
+    ui$clouds$scenarios, 
+    ui$clouds$scen_labs, 
+    peYrs, 
+    "powell_dec_pe",
+    'Powell End-of-December Elevation', 
+    ui$defaults$color_label,
+    legendWrap = ui$defaults$legend_wrap
+  )
+  
+  ggsave(
+    o_files$powell_cloud, 
+    width = 9, 
+    height = 6.5, 
+    units = "in", 
+    dpi = 600
+  )
+  
+  meadCloud <- plotCloudFigs(
+    pe,
+    ui$clouds$scenarios, 
+    ui$clouds$scen_labs, 
+    peYrs, 
+    "mead_dec_pe", 
+    'Mead End-of-December Elevation', 
+    ui$defaults$color_label, 
+    legendWrap = ui$defaults$legend_wrap
+  )
+  ggsave(
+    o_files$mead_cloud,
+    width = 9, 
+    height = 6.5, 
+    units = "in", 
+    dpi = 600
+  )
+}
+

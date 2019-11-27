@@ -1,5 +1,41 @@
 library(tidyverse)
 
+create_mead_powell_heatmaps <- function(z1, z2, scenarios, heat_ui,
+                                        folder_paths)
+{
+  m_heat <- mead_system_condition_heatmap(
+    filter(z1, Agg %in% names(heat_ui$scenarios)), 
+    heat_ui$years, 
+    scen_rename = heat_ui$scenarios, 
+    my_title = paste("Lake Mead Conditions from", heat_ui$title)
+  )
+  
+  ggsave(
+    file.path(folder_paths$png_out, "mead_heat.png"), 
+    plot = m_heat, 
+    width = 8.91, 
+    height = 5.65, 
+    units = "in"
+  )
+  
+  p_heat <- powell_system_condition_heatmap(
+    filter(z2, Agg %in% names(heat_ui$scenarios)),
+    heat_ui$years,
+    scen_rename = ui$heatmap$scenarios,
+    my_title = paste("Lake Powell Conditions from", ui$heatmap$title)
+  )
+  
+  ggsave(
+    file.path(folder_paths$png_out, "powell_heat.png"), 
+    plot = p_heat, 
+    width = 8.91, 
+    height = 5.65, 
+    units = "in"
+  )
+  
+  invisible(TRUE)
+}
+
 mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
                                           y_wrap = 15)
 {

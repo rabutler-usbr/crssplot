@@ -4,8 +4,11 @@ library(assertthat)
 # specified in. Returns `scens` invisibly, if all checks pass. Otherwise 
 # provides error messages.
 crss_res_check_scen_names <- function(scens, icList, icMonth, mainScenGroup, 
-                                      ss5, heatmap_names)
+                                      ui)
 {
+  ss5 <- ui$simple_5yr$ss5
+  heatmap_names <- ui$heatmap$scenarios
+  
   # some sanity checks that UI is correct
   assert_that(
     mainScenGroup %in% names(scens), 
@@ -40,6 +43,20 @@ crss_res_check_scen_names <- function(scens, icList, icMonth, mainScenGroup,
     all(names(heatmap_names) %in% names(scens)),
     msg = "Scenario group names of `heatmap_names` must match the names found in `scens`"
   )
+  
+  if (ui$create_figures$pe_clouds) {
+    assert_that(
+      all(ui$clouds$scenarios %in% names(ui$scenarios$scens)),
+      msg = "Scenarios specified for the clouds to not match those available."
+    )
+  }
+  
+  if (ui$create_figures$short_conditions) {
+    assert_that(
+      length(ui$shortage_conditions$res_file) == 1, 
+      msg = "conditions leading to shortage is only designed to work with 1 scenario"
+    )
+  }
   
   invisible(scens)
 }

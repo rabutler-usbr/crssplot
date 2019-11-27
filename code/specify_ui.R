@@ -28,10 +28,11 @@ specify_ui <- function()
     conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
-    # TODO: what does this mean?
-    #NOTE:For code to work correctly the main scene group needs to be the DNF dataset.
-    dnf_st_boxplot = FALSE, 
-    pe_clouds = FALSE
+    pe_clouds = TRUE,
+    heatmap = FALSE,
+    # uses main scen group for now
+    std_ind_tables = FALSE,
+    std_ind_figures = FALSE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
@@ -249,8 +250,12 @@ specify_ui <- function()
     # at MEad for that year, and the OND release from that year from Powell
     year = 2019,
     color_var = "mwdIcs",
-    subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study."
-   
+    subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
+    # specify the segment start and stop c(xstart, xend, ystart, yend)
+    segment_locs = c(16.9, 14.5, 1055, 1056.4),
+    # specify the annotation location: c(x, y)
+    annotaion_loc = c(17, 1054)
+    
     # TODO: test MTOM still works
     # model = "MTOM",
     # scenario = NA, # should be NA for MTOM

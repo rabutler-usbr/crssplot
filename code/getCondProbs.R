@@ -39,8 +39,16 @@ getConditionalProbs <- function(res, yr1, yr2, cond1, cond2)
   retVal
 }
 
-get_all_cond_probs <- function(sysCond, sysTable, yrs2show, ofile)
+get_all_cond_probs <- function(sysCond, scenario, yrs2show, ofile)
 {
+  warning(
+    "The conditional probabilities have not been computed for a long time.\n", 
+    "Please carefully review the code and results."
+  )
+  
+  sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == scenario)
+  sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
+  
   cp1 <- getConditionalProbs(
     sysCond, 
     yrs2show[1], 

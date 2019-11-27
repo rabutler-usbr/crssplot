@@ -454,7 +454,11 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
       annotate('text', x = 1.5, y = 3.4, label = addFootnote, hjust = 0, size = 2)
   }
     
-  gg
+  pdf(o_files$simple_5yr_file, width = 8, height = 8)
+  print(gg)
+  dev.off()
+  
+  invisible(iData)
 }
 
 determine_plot_colors <- function(plot_colors, col_vars)
@@ -471,4 +475,51 @@ determine_plot_colors <- function(plot_colors, col_vars)
   }
   
   plot_colors
+}
+
+create_mead_pe_scatter <- function(ui, o_files, traceMap)
+{
+  if (ui$mead_pe_scatter$model == "CRSS") {
+    pe <- read_feather(o_files$cur_month_pe_file) %>%
+      filter(Agg == ui$mead_pe_scatter$scenario)
+    
+  } else if (ui$mead_pe_scatter$model == "MTOM") {
+    
+    icDim <- 1981:2015
+    tmpIcMonth <- paste(str_replace(ui$mead_pe_scatter$year, "20", ""), "Dec", sep = "-")
+    decVals <- do.call(
+      rbind, 
+      lapply(
+        icDim, 
+        get1TraceIc, 
+        icList[[ui$mead_pe_scatter$scenario]], 
+        tmpIcMonth, 
+        traceMap
+      )
+    )
+    traceNum <- traceMap$trace[match(icDim, traceMap$ic)]
+    
+    pe <- decVals %>%
+      select(`Mead.Pool Elevation`) %>%
+      rename(Value = `Mead.Pool Elevation`) %>%
+      mutate(TraceNumber = as.numeric(traceNum), 
+             Year = ui$mead_pe_scatter$year,
+             Variable = "mead_dec_pe")
+    
+  } else {
+    stop("Invalid peScatterData variable")
+  }
+  scatterTitle <- paste('Lake Mead December', ui$mead_pe_scatter$year, 
+                        'Elevations from', ui$mead_pe_scatter$model)
+  
+  gg <- singleYearPEScatter(pe, ui$mead_pe_scatter$year, 'mead_dec_pe', 
+                            scatterTitle, TRUE)
+  
+  tpath <- file.path(
+    folder_paths$figs_folder, 
+    paste0('meadScatterFigure_', ui$mead_pe_scatter$year, '.pdf')
+  )
+  pdf(tpath, width = 8, height = 6)
+  print(gg)
+  dev.off()
 }
