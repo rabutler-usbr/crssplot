@@ -65,7 +65,6 @@ specify_ui <- function()
     # how to label the color scale on the plots
     color_label = 'Scenario',
     # text that will be added to figures
-    annText = 'Results from August 2019 CRSS Run',
     end_year = 2060
   )
   # TODO: update so that these are computed if not specified
@@ -167,7 +166,7 @@ specify_ui <- function()
       list(ann_text = 'Results from June 2019 CRSS run', end_year = 2026)
   )
 
-  ind_plot <- specify_individual_plots(all_scenarios, std_ind_figures)
+  ind_plot <- specify_individual_plots(all_scenarios, std_ind_figures, defaults)
     
   # for the 5-year simple table
   # value are the scenario group variable names (should be same as above)

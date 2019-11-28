@@ -9,7 +9,7 @@
 #   $std_ind_figures[['Scenario']]
 #     $options
 
-specify_individual_plots <- function(scen_list, std_fig_specs)
+specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
 {
   ind_plots <- list(
     "std_ind_figures" = list(),
@@ -28,6 +28,14 @@ specify_individual_plots <- function(scen_list, std_fig_specs)
         end_year = std_fig_specs[[scen_name]]$end_year
       ))
       
+      tmp[['options']][["legend_wrap"]] <- default_or_specified(
+        "legend_wrap", std_fig_specs[[scen_name]], defaults
+      ) 
+      
+      tmp[["options"]][["color_label"]] <- default_or_specified(
+        "color_label", std_fig_specs[[scen_name]], defaults
+      )
+      
       ind_plots$std_ind_figures[[scen_name]] <- tmp
     }
     
@@ -39,7 +47,16 @@ specify_individual_plots <- function(scen_list, std_fig_specs)
     }
   }
   
-  # TODO: check for other options, and if they don't exist use defaults
-  
   ind_plots
+}
+
+default_or_specified <- function(option, specified, defaults) 
+{
+  if (exists(option, where = specified)) {
+    rv <- specified[[option]]
+  } else {
+    rv <- defaults[[option]]
+  }
+  
+  rv
 }
