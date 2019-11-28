@@ -25,6 +25,7 @@ create_scenario <- function(name, scen_folders, ic, start_year,
     scen_folders = scen_folders, 
     ic = ic, 
     ic_month = ic_month,
+    start_year = start_year,
     std_ind_tables = std_ind_tables,
     std_ind_figures = std_ind_figures
   )

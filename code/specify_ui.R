@@ -28,7 +28,7 @@ specify_ui <- function()
     conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
-    pe_clouds = TRUE,
+    pe_clouds = FALSE,
     heatmap = FALSE
   )
   
@@ -166,7 +166,7 @@ specify_ui <- function()
       list(ann_text = 'Results from June 2019 CRSS run', end_year = 2026)
   )
 
-  ind_plot <- specify_individual_plots(all_scenarios, std_ind_figures, defaults)
+  ind_plots <- specify_individual_plots(all_scenarios, std_ind_figures, defaults)
     
   # for the 5-year simple table
   # value are the scenario group variable names (should be same as above)
@@ -344,6 +344,8 @@ specify_ui <- function()
     plot_group = plot_group,
     clouds = clouds,
     mead_pe_scatter = mead_pe_scatter,
-    shortage_conditions = shortage_conditions
+    shortage_conditions = shortage_conditions,
+    ind_plots = ind_plots,
+    scen_tree = all_scenarios
   )
 }

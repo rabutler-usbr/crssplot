@@ -1,21 +1,28 @@
-create_std_ind_figures <- function(cs, sys_cond, mainScenGroup, yrs2show, ui)
+create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
 {
-  critStatsFig1 <- plotCritStats(dplyr::filter(
-    cs, 
-    AggName == mainScenGroup, 
-    !(Variable %in% c('mead_min_lt_1020','lbSurplus'))
-  ), 
-  yrs2show, 
-  ui$defaults$annText
+  sy <- ui[["scen_tree"]][[scenario]][["start_year"]]
+  ey <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["end_year"]]
+  yrs2show <- sy:ey
+  
+  ann_txt <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["ann_text"]]
+  
+  critStatsFig1 <- plotCritStats(
+    dplyr::filter(
+      cs, 
+      AggName == scenario, 
+      !(Variable %in% c('mead_min_lt_1020','lbSurplus'))
+    ), 
+    yrs2show, 
+    ann_txt
   )
   
   critStatsFig2 <- plotCritStats(dplyr::filter(
     cs, 
-    AggName == mainScenGroup, 
+    AggName == scenario, 
     !(Variable %in% c('mead_dec_lt_1025','lbSurplus'))
   ), 
   yrs2show, 
-  ui$defaults$annText
+  ann_txt
   )
   
   # shortage surplus figure
@@ -24,10 +31,10 @@ create_std_ind_figures <- function(cs, sys_cond, mainScenGroup, yrs2show, ui)
     dplyr::filter(
       sys_cond, 
       Variable %in% c('lbShortage', 'lbSurplus'),
-      Agg == mainScenGroup
+      Agg == scenario
     ), 
     yrs2show, 
-    names(mainScenGroup)
+    scenario
   )
   
   # stacked barplot of different shortage tiers
@@ -36,10 +43,10 @@ create_std_ind_figures <- function(cs, sys_cond, mainScenGroup, yrs2show, ui)
     dplyr::filter(
       sys_cond, 
       Variable %in% c('lbShortageStep1','lbShortageStep2','lbShortageStep3'),
-      Agg == mainScenGroup
+      Agg == scenario
     ), 
     yrs2show, 
-    ui$defaults$annText
+    ann_txt
   )
   
   list(

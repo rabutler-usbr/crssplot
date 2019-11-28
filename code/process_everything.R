@@ -117,24 +117,22 @@ process_everything <- function(ui)
     create_dcp_table(lb_dcp, ub_dcp, mainScenGroup, yrs2show, o_files)
   }
   
+  # individual scenario figures -----------------
   ind_figs <- list()
-  if (ui$create_figures$std_ind_figures) {
-    # individual scenario figures -----------------
-    # For now uses mainScenGroup
-    message("... creating individual scenario figures")
-    
-    # now create figures only for the current "main scenario"
+  for (i in seq_along(ui[["ind_plots"]][["std_ind_figures"]])) {
+    if (i == 1) message("... creating individual scenario figures")
+    cur_scen <- names(ui[["ind_plots"]][["std_ind_figures"]])[i]
+    message("   ...", cur_scen)
+    # now create figures only for the current scenario
     # defaults are ok for legendTitle, legLoc, nC, and annSize
     # drop Mead LT 1025 from one plot and Mead LT 1020 from 
     # the other plot
     
-    ind_figs <- create_std_ind_figures(
-      cs, sys_cond, 
-      mainScenGroup, 
-      yrs2show, 
-      ui
-    )
-    create_cs_csv(cs, mainScenGroup, o_files)
+    tmp <- create_std_ind_figures(cs, sys_cond, cur_scen, ui)
+    ind_figs <- c(ind_figs, tmp)
+    
+    # TODO: figure out how to save this file; mostly just need unique name
+    #create_cs_csv(cs, mainScenGroup, o_files)
   }
   
   comp_figs <- list()
