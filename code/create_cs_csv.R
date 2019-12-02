@@ -1,4 +1,4 @@
-create_cs_csv <- function(cs, scenario, o_files)
+create_cs_csv <- function(cs, scenario, o_folders)
 {
   csVars <- csVarNames()
   # create data table to save crit stats
@@ -17,7 +17,12 @@ create_cs_csv <- function(cs, scenario, o_files)
     select(-Variable) %>%
     tidyr::spread(vName, Value)
   
-  data.table::fwrite(cs_out, o_files$crit_stats_proc, row.names = FALSE)
+  o_file <- file.path(
+    o_folders[["figure_data"]], 
+    paste0(str_replace_all(scenario, " ", ""), "_CritStats.csv")
+  )
+  message("      ... saving crit stats figure data")
+  data.table::fwrite(cs_out, o_file, row.names = FALSE)
   
   invisible(cs)
 }

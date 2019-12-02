@@ -121,8 +121,17 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   }
   message('Intermediate data will be saved to: ', resFolder)
   
+  # figure data --------------------
+  fig_data <- file.path(oFigs, "figure_data")
+  if (!file.exists(fig_data)) {
+    message("Creating folder: ", fig_data)
+    dir.create(fig_data)
+  }
+  message("Figure data will be saved to: ", fig_data)
+  
   # return
-  list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out)
+  list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out, 
+       figure_data = fig_data)
 }
 
 # returns a list of all the necessary output file names
@@ -133,7 +142,6 @@ crss_res_get_file_names <- function(extra_label, yrs, main_pdf)
   # file name for the system conditions procssed file
   sysCondTable <- paste0(extra_label, 'SysTableFull', year_lab, '.csv') 
   
-  critStatsProc <- paste0(extra_label, 'CritStats.csv')
   dcp_prob_file <- paste0(extra_label, year_lab, "dcp_probs.csv")
 
   # return
@@ -143,7 +151,6 @@ crss_res_get_file_names <- function(extra_label, yrs, main_pdf)
     # file name of Powell and Mead PE data
     cur_month_pe_file = 'MeadPowellPE.feather',
     sys_cond_table = sysCondTable,
-    crit_stats_proc = critStatsProc,
     cond_prob_file = 'CondProbs.csv',
     dcp_prob_file = dcp_prob_file,
     short_cond_fig = 'shortConditionsFig.pdf',
