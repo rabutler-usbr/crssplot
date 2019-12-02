@@ -129,30 +129,29 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   }
   message("Figure data will be saved to: ", fig_data)
   
+  # tables --------------------------
+  tables <- file.path(oFigs, "tables")
+  if (!file.exists(tables)) {
+    message("Creating folder: ", tables)
+    dir.create(tables)
+  }
+  message("Tables will be saved to: ", tables)
+  
   # return
   list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out, 
-       figure_data = fig_data)
+       figure_data = fig_data, tables = tables)
 }
 
 # returns a list of all the necessary output file names
-crss_res_get_file_names <- function(extra_label, yrs, main_pdf)
+crss_res_get_file_names <- function(main_pdf)
 {
-  year_lab <- paste0(yrs[1], '_', tail(yrs, 1))
-  
-  # file name for the system conditions procssed file
-  sysCondTable <- paste0(extra_label, 'SysTableFull', year_lab, '.csv') 
-  
-  dcp_prob_file <- paste0(extra_label, year_lab, "dcp_probs.csv")
-
   # return
   list(
     sys_cond_file = 'SysCond.feather' ,
     tmp_pe_file = 'tempPE.feather',
     # file name of Powell and Mead PE data
     cur_month_pe_file = 'MeadPowellPE.feather',
-    sys_cond_table = sysCondTable,
     cond_prob_file = 'CondProbs.csv',
-    dcp_prob_file = dcp_prob_file,
     short_cond_fig = 'shortConditionsFig.pdf',
     simple_5yr_file = '5yrSimple.pdf',
     mead_cloud = "Mead.png",
@@ -176,4 +175,16 @@ crss_res_append_file_path <- function(file_names, figs_folder, res_folder)
   }
   
   file_names
+}
+
+construct_table_file_name <- function(table_name, scenario, yrs, extra_label)
+{
+  year_lab <- paste0(yrs[1], '_', tail(yrs, 1))
+  
+  if (extra_label != '') {
+    extra_label <- paste0(extra_label, "_")
+  }
+  
+  str_replace_all(scenario, " ", "") %>%
+    paste0("_", extra_label, table_name, "_", year_lab, ".csv")
 }

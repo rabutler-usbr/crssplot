@@ -25,11 +25,7 @@ process_everything <- function(ui)
     crss_month = ui$folders$crss_month
   )
   
-  o_files <- crss_res_get_file_names(
-    ui$folders$extra_label, 
-    yrs = yrs2show, 
-    main_pdf = ui$folders$pdf_name
-  ) %>%
+  o_files <- crss_res_get_file_names(main_pdf = ui$folders$pdf_name) %>%
     crss_res_append_file_path(
       figs_folder = folder_paths$figs_folder, 
       res_folder = folder_paths$res_folder
@@ -108,17 +104,19 @@ process_everything <- function(ui)
 
   #if (ui$create_figures$std_ind_tables) { 
   for (i in seq_along(ui[["ind_plots"]][["std_ind_tables"]])) {
-    message(".... doing nothing right now")
-    if (FALSE) {
+    
+    if (i == 1) message("... creating individual scenario tables")
+    cur_scen <- names(ui[["ind_plots"]][["std_ind_tables"]])[i]
+    message("   ... ", cur_scen)
+
     # Individual scenario tables ----------------
     # system conditions table 
-    message("... creating system conditions table")
-    create_ig_sys_table(sys_cond, mainScenGroup, yrs2show, o_files)
+    message("      ... creating system conditions table")
+    create_ig_sys_table(sys_cond, cur_scen, yrs2show, folder_paths, ui)
     
     # get the DCP related probabilities
-    message("... DCP Probabilities")
-    create_dcp_table(lb_dcp, ub_dcp, mainScenGroup, yrs2show, o_files)
-    }
+    message("      ... DCP Probabilities")
+    create_dcp_table(lb_dcp, ub_dcp, cur_scen, yrs2show, folder_paths, ui)
   }
   
   # individual scenario figures -----------------
