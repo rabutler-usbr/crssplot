@@ -38,6 +38,9 @@ scenario_to_vars <- function(scenarios)
 {
   assert_that(is.list(scenarios) & length(scenarios) >= 1)
   
+  required_variables <- c("name", "ic", "scen_folders", "ic_month", "start_year")
+  optional_variables <- c("std_ind_tables", "std_ind_figures")
+  
   scens <- list()
   ic_list <- list()
   ic_month <- c()
@@ -46,10 +49,15 @@ scenario_to_vars <- function(scenarios)
   for (i in seq_len(length(scenarios))) {
     tmp_scen <- scenarios[[i]]
     assert_that(
-      all(names(tmp_scen) %in% c("name", "ic", "scen_folders", "ic_month"))
+      all(names(tmp_scen) %in% c(required_variables, optional_variables)),
+      msg = paste(
+        "Names in the scenario are:", paste(names(tmp_scen), collapse = ", "),
+        "\nAll required + optional variables are:", 
+        paste(c(required_variables, optional_variables), collapse = ", ")
+      )
     )
     assert_that(
-      all(c("name", "ic", "scen_folders", "ic_month") %in% names(tmp_scen))
+      all(required_variables %in% names(tmp_scen))
     )
     
     name <- tmp_scen$name

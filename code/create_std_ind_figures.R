@@ -1,10 +1,10 @@
 create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
 {
   sy <- ui[["scen_tree"]][[scenario]][["start_year"]]
-  ey <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["end_year"]]
+  ey <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["options"]][["end_year"]]
   yrs2show <- sy:ey
   
-  ann_txt <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["ann_text"]]
+  ann_txt <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["options"]][["ann_text"]]
   
   critStatsFig1 <- plotCritStats(
     dplyr::filter(
