@@ -40,7 +40,6 @@ process_everything <- function(ui)
   
   # ui$create_figures$standard_figures | ui$create_figures$pe_clouds | 
   # std_ind_figures
-  
   all_plotted_scens <- get_all_plot_scenarios(ui)
   
   if (TRUE) {

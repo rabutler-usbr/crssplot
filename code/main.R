@@ -28,8 +28,13 @@ source("code/create_scenario_comparison_figures.R")
 source("code/create_std_ind_figures.R")
 source("code/process_all_rdfs.R")
 source("code/process_everything.R")
+source("code/access_ui_list.R")
+source("code/specify_individual_plots.R")
 
-ui <- specify_ui()
+source("code/november2019_ui.R")
+
+#ui <- specify_ui()
+ui <- nov2019_ui()
 process_everything(ui)
 
 

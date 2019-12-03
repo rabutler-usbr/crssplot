@@ -8,11 +8,15 @@ library(cowplot)
 theme_set(theme_grey())
 library(imager)
 
-plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle, 
-                               legendTitle, legendWrap = NULL)
+plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
 {
   # Used to generate cloud figures.  Commented out are colors used for plots in DCP presentations
   # and the median projections from the 07' Interim Guidelines (shown with double hash ##)
+  
+  scenario <- ui$clouds$scenarios
+  scen_labs <- ui$clouds$scen_labs
+  legendTitle <- ui$defaults$color_label
+  legendWrap <- ui$defaults$legend_wrap
   
   zz <- zz %>%
     dplyr::filter(StartMonth %in% scenario, Year %in% yrs, Variable == var) %>%
@@ -33,7 +37,7 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
     hist$Variable <- 'powell_dec_pe'
     
     # Adding switch to allow plotting of correct IG important elevations
-    Switch <- T
+    is_powell <- TRUE
     EQLine <- as.data.frame(read.csv('data/EQLine.csv'))
     EQLine$StartMonth <- 'Historical Elevation'
     
@@ -44,7 +48,7 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
     hist$Variable <- 'mead_dec_pe'
     
     # Adding switch to allow plotting of correct IG important elevations
-    Switch <- F
+    is_powell <- FALSE
     
     ##IGProj <- read.csv('C:/RCodes/Process-CRSS-Res-TribalWaterStudy/data/IGMedProjections_Mead.csv')
     ##IGProj$Variable <- 'Mead.Pool Elevation'
@@ -96,8 +100,8 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
   ##histLab = append(histLab, IGLab)
   
   # Read in Reclamation logo png
-  im <- load.image('logo/660LT-TK-flush.png')
-  im_rast <- grid::rasterGrob(im, interpolate = T)
+  im <- load.image('logo/BofR-horiz-cmyk.png')
+  im_rast <- grid::rasterGrob(im, interpolate = TRUE)
   
   # Parameters for cloud plot customization (line thicknesses, text size, etc.)
   # Have been pulled out for convenience
@@ -127,45 +131,67 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
   
   
   # Start making the plot
-  gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +  theme_light()
+  gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +
+    theme_light()
   
   # Generate plot a to make ribbon legend
   name <- str_wrap("10th to 90th percentile of full range",20)
-  gga <- gg + geom_ribbon(data = subset(zz,StartMonth %in% rev(addIC)),aes(ymin=Min, ymax=Max, fill = StartMonth), 
-                          alpha = 0.5, linetype = 2, size = 0.5*Medians) +
-    scale_fill_manual(name, 
-                      values = plotColors, guide = guide_legend(order=1),
-                      labels = str_wrap(scen_labs, 15)) + scale_color_manual(name,
-                                                                             values = plotColors, guide = guide_legend(order=1),
-                                                                             labels = str_wrap(scen_labs, 15))  +
-    theme(legend.text = element_text(size=LegendText),legend.title = element_text(size=LegendLabText, face="bold"),
-          legend.box.margin = margin(0,0,0,0), legend.key = element_rect(), legend.key.size = unit(1.75, 'lines')) 
+  gga <- gg + 
+    geom_ribbon(
+      data = subset(zz,StartMonth %in% rev(addIC)),
+      aes(ymin=Min, ymax=Max, fill = StartMonth), 
+      alpha = 0.5, linetype = 2, size = 0.5*Medians
+    ) +
+    scale_fill_manual(
+      name, 
+      values = plotColors, 
+      guide = guide_legend(order=1),
+      labels = str_wrap(scen_labs, 15)
+    ) + 
+    scale_color_manual(
+      name,
+      values = plotColors,
+      guide = guide_legend(order=1),
+      labels = str_wrap(scen_labs, 15)
+    )  +
+    theme(
+      legend.text = element_text(size=LegendText),
+      legend.title = element_text(size=LegendLabText, face="bold"),
+      legend.box.margin = margin(0,0,0,0), 
+      legend.key = element_rect(), 
+      legend.key.size = unit(1.75, 'lines')
+    ) 
   legenda <- get_legend(gga)
   
   # Generate plot b to take medians legend
-  ggb <- gg + geom_line(size=Medians) + 
-    scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
-                       values = plotColors, labels = str_wrap(histLab, 15)) +
-    theme(legend.text = element_text(size=LegendText),legend.title = element_text(size=LegendLabText, face="bold"),
-          legend.box.margin = margin(0,0,0,0), legend.key = element_rect(), legend.key.size = unit(1.75, 'lines')) 
+  ggb <- gg + 
+    geom_line(size=Medians) + 
+    scale_color_manual(
+      name = str_wrap("Historical and Median Projected Pool Elevation",20),
+      values = plotColors, 
+      labels = str_wrap(histLab, 15)
+    ) +
+    theme(
+      legend.text = element_text(size=LegendText),
+      legend.title = element_text(size=LegendLabText, face="bold"),
+      legend.box.margin = margin(0,0,0,0), 
+      legend.key = element_rect(), 
+      legend.key.size = unit(1.75, 'lines')
+    ) 
   legendb <- get_legend(ggb)
   
-  # Make legend grob.  4 rows used to make legend close together and in the middle with respects to the vertical
+  # Make legend grob.  4 rows used to make legend close together and in the 
+  # middle with respects to the vertical
   gglegend <- plot_grid(NULL, legenda,legendb, NULL, align = 'hv', nrow=4)
-  
+ 
   # Generate plot
   gg <- gg + geom_vline(xintercept=2007, size = IGStartLine, color = '#808080') + 
     annotate("text", x=2007.1, y = yaxmin, 
              label = 'Adoption of the 2007\nInterim Guidelines', size = LabSize, hjust = 0,
              fontface = "bold", color = '#303030') + 
-             {if(Switch)geom_line(data=EQLine, aes(x = Year, y = EQLine), size = OpsLines,
-                                  color = '#808080', linetype = 3)} +  
     geom_vline(xintercept=2019, size = IGStartLine, color = '#808080') +
     annotate("text", x=2019.1, y = yaxmin, label = 'Adoption of the Drought\nContingency Plan', 
              size = LabSize, hjust = 0, fontface = "bold", color = '#303030') +
-    #{if(Switch)annotate("text", x=2020.1, y = yaxmin,
-    #         label = 'Adoption of the Drought\nResponse Operations', size = LabSize, hjust=0,
-    #         fontface = 'bold', color = '#303030')} +
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myXLabs,
                        labels = myXLabs, expand = c(0,0)) +
     scale_y_continuous(minor_breaks = seq(900,4000,25), 
@@ -179,34 +205,77 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
     scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
                        values = plotColors, guide = FALSE,
                        labels = str_wrap(histLab, 15)) +
-    labs(y = 'Elevation (feet msl)\n', title = myTitle, x = '') + 
+    labs(
+      title = myTitle, 
+      x = '', y = 'Elevation (feet msl)\n', 
+      caption = ui$clouds$caption
+    ) + 
     theme(plot.title = element_text(size = TitleSize),
           ## axis.text.x = element_text(size = AxisLab),
           axis.text.y = element_text (size =AxisLab),
           axis.title = element_text(size=AxisText, face = "plain", color = 'grey30'),
           panel.grid.minor = element_line(size = GridMin),
           panel.grid.major = element_line(size = GridMaj)) +
-    guides(fill=FALSE) +
+    guides(fill=FALSE)
+  
+  # Add in lines for Powell or Mead operations
+  if (is_powell) {
+    # Powell
+    gg <- gg +
+      # Adding lines and annotation for Powell ops - plot only if Switch = True
+      geom_line(data=EQLine, aes(x = Year, y = EQLine), size = OpsLines,
+                           color = '#808080', linetype = 3) + 
+      annotate("text", x = 2007.1, y = yaxmax, label = "Equalization Tier", 
+                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
+      ##{if(Switch)geom_segment(x=1998, y=3490, xend =2026, yend = 3490, size = OpsLines, 
+      ##   color ='#808080', linetype = 3)} + 
+      ##{if(Switch)annotate("text", x = 1999.5, y = 3485, label = "Minimum Power Pool", 
+      ##   size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
+     geom_segment(x=2007, y=3525, xend =2026, yend = 3525, size = OpsLines, 
+                              color ='#808080', linetype = 3) + 
+      annotate("text", x = 2007.1, y = 3520, label = "Lower Elevation Balancing Tier", 
+                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +    
+      geom_segment(x=2007, y=3575, xend =2026, yend = 3575, size = OpsLines, 
+                              color ='#808080', linetype = 3) + 
+      annotate("text", x = 2007.1, y = 3570, label = "Mid Elevation Release Tier", 
+                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050') + 
+      annotate("text", x = 2007.1, y = 3582, label = "Upper Elevation Balancing Tier", 
+                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050')
     
-    # Adding lines for Mead ops - plot only if Switch = False
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1075, xend =2026, yend = 1075, size = OpsLines, 
-        color ='#808080', linetype = 3)} + 
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1070, label = "Level 1 Shortage Condition", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1050, xend =2026, yend = 1050, size = OpsLines, 
-        color ='#808080', linetype = 3)} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1045, label = "Level 2 Shortage Condition", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1025, xend =2026, yend = 1025, size = OpsLines, 
-        color ='#808080', linetype = 3)} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1020, label = "Level 3 Shortage Condition", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1145, xend =2026, yend = 1145, size = OpsLines, 
-        color ='#808080', linetype = 3)} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1140, label = "Normal or ICS Surplus Condition", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = yaxmax, label = "Surplus Condition", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
+    #{if(Switch)annotate("text", x=2020.1, y = yaxmin,
+    #         label = 'Adoption of the Drought\nResponse Operations', size = LabSize, hjust=0,
+    #         fontface = 'bold', color = '#303030')} +
+    #Adding Drought Response Ops
+    #{if(Switch)geom_segment(x=2020, y=3525, xend = 2026, yend = 3525, size = OpsLines,
+    #    color = '#808080', linetype = 6)} +
+    #{if(Switch)annotate("text", x = 2020.1, y = 3518, label = "Drought Response Ops\nTarget Elevation",
+    #    size = LabSize, hjust = 0, color = '#505050')} +
+      
+  } else {
+    # Mead
+    gg <- gg +
+      # Adding lines for Mead ops - plot only if Switch = False
+      geom_segment(x=2007, y=1075, xend =2026, yend = 1075, size = OpsLines, 
+                                    color ='#808080', linetype = 3) + 
+      annotate(
+        "text", x = 2007.1, y = 1070, label = "Level 1 Shortage Condition", 
+        size = LabSize, hjust = 0, fontface = "italic", color = '#505050'
+      ) +
+      geom_segment(x=2007, y=1050, xend =2026, yend = 1050, size = OpsLines, 
+                                    color ='#808080', linetype = 3) +
+      annotate("text", x = 2007.1, y = 1045, label = "Level 2 Shortage Condition", 
+                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
+      geom_segment(x=2007, y=1025, xend =2026, yend = 1025, size = OpsLines, 
+                                    color ='#808080', linetype = 3) +
+      annotate("text", x = 2007.1, y = 1020, label = "Level 3 Shortage Condition", 
+                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
+      geom_segment(x=2007, y=1145, xend =2026, yend = 1145, size = OpsLines, 
+                                    color ='#808080', linetype = 3) +
+      annotate("text", x = 2007.1, y = 1140, label = "Normal or ICS Surplus Condition", 
+                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
+      annotate("text", x = 2007.1, y = yaxmax, label = "Surplus Condition", 
+                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050')
+
     #Adding in lines for DCP mead ops
     #{if(Switch!=TRUE)geom_segment(x=2020, y=1090, xend = 2026, yend = 1090, size = OpsLines,
     #    color = '#808080', linetype = 6)} +
@@ -215,74 +284,59 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
     #{if(Switch!=TRUE)geom_segment(x=2020, y=1045, xend = 2026, yend = 1045, size = OpsLines,
     #    color = '#808080', linetype = 6)} +
     #{if(Switch!=TRUE)annotate("text", x=2020.1, y=1040, label = 'Level 2 Contribution',
-    #    size = LabSize, hjust = 0, color = '#505050')} +
-    
-    # Adding lines and annotation for Powell ops - plot only if Switch = True
-    {if(Switch)annotate("text", x = 2007.1, y = yaxmax, label = "Equalization Tier", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-    ##{if(Switch)geom_segment(x=1998, y=3490, xend =2026, yend = 3490, size = OpsLines, 
-    ##   color ='#808080', linetype = 3)} + 
-    ##{if(Switch)annotate("text", x = 1999.5, y = 3485, label = "Minimum Power Pool", 
-    ##   size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-    {if(Switch)geom_segment(x=2007, y=3525, xend =2026, yend = 3525, size = OpsLines, 
-        color ='#808080', linetype = 3)} + 
-    {if(Switch)annotate("text", x = 2007.1, y = 3520, label = "Lower Elevation Balancing Tier", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +    
-    {if(Switch)geom_segment(x=2007, y=3575, xend =2026, yend = 3575, size = OpsLines, 
-        color ='#808080', linetype = 3)} + 
-    {if(Switch)annotate("text", x = 2007.1, y = 3570, label = "Mid Elevation Release Tier", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} + 
-    {if(Switch)annotate("text", x = 2007.1, y = 3582, label = "Upper Elevation Balancing Tier", 
-        size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} + 
-    #Adding Drought Response Ops
-    #{if(Switch)geom_segment(x=2020, y=3525, xend = 2026, yend = 3525, size = OpsLines,
-    #    color = '#808080', linetype = 6)} +
-    #{if(Switch)annotate("text", x = 2020.1, y = 3518, label = "Drought Response Ops\nTarget Elevation",
-    #    size = LabSize, hjust = 0, color = '#505050')} +
-    
-    # Add BOR Logo
-    annotation_custom(im_rast, ymin = yaxmin, ymax = yaxmin + 12, xmin = 1999, xmax = 2006) 
-  gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4))
+    #    size = LabSize, hjust = 0, color = '#505050')} 
+  }
+  
+  # Add BOR Logo
+  gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4)) %>%
+    add_logo_horiz()
   gg
 }
 
 plot_both_clouds <- function(pe, peYrs, ui, o_files)
 {
+  p_title <- 'Powell End-of-December Elevation'
+  m_title <- 'Mead End-of-December Elevation'
+    
+  if (ui$clouds$title_append != '') {
+    p_title <- paste(p_title, ui$clouds$title_append)
+    m_title <- paste(m_title, ui$clouds$title_append)
+  }
+  
   powellCloud <- plotCloudFigs(
     pe,
-    ui$clouds$scenarios, 
-    ui$clouds$scen_labs, 
     peYrs, 
     "powell_dec_pe",
-    'Powell End-of-December Elevation', 
-    ui$defaults$color_label,
-    legendWrap = ui$defaults$legend_wrap
+    p_title,
+    ui
   )
   
   ggsave(
     o_files$powell_cloud, 
+    plot = powellCloud,
     width = 9, 
     height = 6.5, 
     units = "in", 
     dpi = 600
   )
   
+  message("   ... saved ", o_files$powell_cloud)
+  
   meadCloud <- plotCloudFigs(
     pe,
-    ui$clouds$scenarios, 
-    ui$clouds$scen_labs, 
     peYrs, 
     "mead_dec_pe", 
-    'Mead End-of-December Elevation', 
-    ui$defaults$color_label, 
-    legendWrap = ui$defaults$legend_wrap
+    m_title,
+    ui
   )
   ggsave(
     o_files$mead_cloud,
+    plot = meadCloud,
     width = 9, 
     height = 6.5, 
     units = "in", 
     dpi = 600
   )
+  message("   ... saved ", o_files$mead_cloud)
 }
 
