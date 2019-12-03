@@ -8,11 +8,15 @@ library(cowplot)
 theme_set(theme_grey())
 library(imager)
 
-plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle, 
-                               legendTitle, legendWrap = NULL)
+plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
 {
   # Used to generate cloud figures.  Commented out are colors used for plots in DCP presentations
   # and the median projections from the 07' Interim Guidelines (shown with double hash ##)
+  
+  scenario <- ui$clouds$scenarios
+  scen_labs <- ui$clouds$scen_labs
+  legendTitle <- ui$defaults$color_label
+  legendWrap <- ui$defaults$legend_wrap
   
   zz <- zz %>%
     dplyr::filter(StartMonth %in% scenario, Year %in% yrs, Variable == var) %>%
@@ -127,7 +131,8 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
   
   
   # Start making the plot
-  gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +  theme_light()
+  gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +
+    theme_light()
   
   # Generate plot a to make ribbon legend
   name <- str_wrap("10th to 90th percentile of full range",20)
@@ -248,15 +253,20 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
 
 plot_both_clouds <- function(pe, peYrs, ui, o_files)
 {
+  p_title <- 'Powell End-of-December Elevation'
+  m_title <- 'Mead End-of-December Elevation'
+    
+  if (ui$clouds$title_append != '') {
+    p_title <- paste(p_title, ui$clouds$title_append)
+    m_title <- paste(m_title, ui$clouds$title_append)
+  }
+  
   powellCloud <- plotCloudFigs(
     pe,
-    ui$clouds$scenarios, 
-    ui$clouds$scen_labs, 
     peYrs, 
     "powell_dec_pe",
-    'Powell End-of-December Elevation', 
-    ui$defaults$color_label,
-    legendWrap = ui$defaults$legend_wrap
+    p_title,
+    ui
   )
   
   ggsave(
@@ -267,15 +277,14 @@ plot_both_clouds <- function(pe, peYrs, ui, o_files)
     dpi = 600
   )
   
+  message("   ... saved ", o_files$powell_cloud)
+  
   meadCloud <- plotCloudFigs(
     pe,
-    ui$clouds$scenarios, 
-    ui$clouds$scen_labs, 
     peYrs, 
     "mead_dec_pe", 
-    'Mead End-of-December Elevation', 
-    ui$defaults$color_label, 
-    legendWrap = ui$defaults$legend_wrap
+    m_title,
+    ui
   )
   ggsave(
     o_files$mead_cloud,
@@ -284,5 +293,6 @@ plot_both_clouds <- function(pe, peYrs, ui, o_files)
     units = "in", 
     dpi = 600
   )
+  message("   ... saved ", o_files$mead_cloud)
 }
 
