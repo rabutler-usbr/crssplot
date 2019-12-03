@@ -184,7 +184,11 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
     scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
                        values = plotColors, guide = FALSE,
                        labels = str_wrap(histLab, 15)) +
-    labs(y = 'Elevation (feet msl)\n', title = myTitle, x = '') + 
+    labs(
+      title = myTitle, 
+      x = '', y = 'Elevation (feet msl)\n', 
+      caption = ui$clouds$caption
+    ) + 
     theme(plot.title = element_text(size = TitleSize),
           ## axis.text.x = element_text(size = AxisLab),
           axis.text.y = element_text (size =AxisLab),
