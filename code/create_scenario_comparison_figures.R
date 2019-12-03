@@ -1,6 +1,12 @@
 create_scenario_comparison_figures <- function(pe, cs, peYrs, yrs2show, ui, 
                                                o_files)
 {
+  pe <- pe %>%
+    filter(StartMonth %in% ui$plot_group$plot_scenarios)
+  
+  cs <- cs %>%
+    filter(AggName %in% ui$plot_group$plot_scenarios)
+  
   # 10/50/90 ----------------------
   message("  ... 10/50/90s")
   powellPE <- plotEOCYElev(
