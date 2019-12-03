@@ -1,4 +1,5 @@
 library(assertthat)
+library(fs)
 
 # checks that scenario names match in the different variables they are 
 # specified in. Returns `scens` invisibly, if all checks pass. Otherwise 
@@ -186,5 +187,6 @@ construct_table_file_name <- function(table_name, scenario, yrs, extra_label)
   }
   
   str_replace_all(scenario, " ", "") %>%
-    paste0("_", extra_label, table_name, "_", year_lab, ".csv")
+    paste0("_", extra_label, table_name, "_", year_lab, ".csv") %>%
+    path_sanitize()
 }
