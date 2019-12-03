@@ -96,8 +96,8 @@ plotCloudFigs <- function(zz, scenario, scen_labs, yrs, var, myTitle,
   ##histLab = append(histLab, IGLab)
   
   # Read in Reclamation logo png
-  im <- load.image('logo/660LT-TK-flush.png')
-  im_rast <- grid::rasterGrob(im, interpolate = T)
+  im <- load.image('logo/BofR-horiz-cmyk.png')
+  im_rast <- grid::rasterGrob(im, interpolate = TRUE)
   
   # Parameters for cloud plot customization (line thicknesses, text size, etc.)
   # Have been pulled out for convenience
