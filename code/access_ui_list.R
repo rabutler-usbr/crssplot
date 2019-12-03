@@ -5,9 +5,18 @@
 # comparison plot, or have a table created for them
 get_all_plot_scenarios <- function(ui)
 {
-  unique(c(
+  scens <- unique(c(
     names(ui$ind_plots$std_ind_figures),
-    names(ui$ind_plots$std_ind_tables),
-    ui$plot_group$plot_scenarios
+    names(ui$ind_plots$std_ind_tables)
   ))
+  
+  if (ui$create_figures$standard_figures) {
+    scens <- c(scens, ui$plot_group$plot_scenarios)
+  }
+  
+  if (ui$create_figures$pe_clouds) {
+    scens <- c(scens, ui$clouds$scenarios)
+  }
+  
+  scens
 }
