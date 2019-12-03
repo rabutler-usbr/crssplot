@@ -40,6 +40,9 @@ process_everything <- function(ui)
   
   # ui$create_figures$standard_figures | ui$create_figures$pe_clouds | 
   # std_ind_figures
+  
+  all_plotted_scens <- get_all_plot_scenarios(ui)
+  
   if (TRUE) {
     pe <- read_feather(o_files$cur_month_pe_file) %>%
       # The StartMonth column is used as the color variable in plotEOCYElev, and 
@@ -47,7 +50,7 @@ process_everything <- function(ui)
       # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
       # StartMonth for now
       dplyr::mutate(StartMonth = Agg) %>%
-      filter(StartMonth %in% ui$plot_group$plot_scenarios)
+      filter(StartMonth %in% all_plotted_scens)
     
     # compare crit stats for all scenarios
     # call once each for powell LT 3490, shortage, and surplus
@@ -67,18 +70,16 @@ process_everything <- function(ui)
       rename(AggName = Agg) %>%
       filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
       rbind(cs) %>%
-      filter(AggName %in% ui$plot_group$plot_scenarios)
+      filter(AggName %in% all_plotted_scens)
   }
   
   # TODO: switch this to be true if creating heatmap, or dcp table
   if (TRUE) {
     dcp_yrs <- c(min(yrs2show) - 1, yrs2show)
     
-    dcp_scens <- unique(c(mainScenGroup, names(ui$heatmap$scenarios)))
-    
     tmp <- read_feather(o_files$cur_month_pe_file)
-    lb_dcp <- compute_mead_dcp_probs(tmp, dcp_scens, 2019:2026)
-    ub_dcp <- compute_powell_dcp_probs(tmp, dcp_scens, 2019:2026)
+    lb_dcp <- compute_mead_dcp_probs(tmp, all_plotted_scens, 2019:2026)
+    ub_dcp <- compute_powell_dcp_probs(tmp, all_plotted_scens, 2019:2026)
   }
   
   # TODO: heatmap, individual tables, ui$create_figures$conditional_probs
@@ -89,6 +90,7 @@ process_everything <- function(ui)
   # PLOTTING -------------------------------
   message("starting to create figures and tables")
   
+  # TODO: need to see if this filters the scenarios properly
   if (ui$create_figures$heatmap) {
     # system condition heatmap -------------------------
     message("... System conditions heatmap")
@@ -118,7 +120,7 @@ process_everything <- function(ui)
     message("      ... DCP Probabilities")
     create_dcp_table(lb_dcp, ub_dcp, cur_scen, yrs2show, folder_paths, ui)
   }
-  
+
   # individual scenario figures -----------------
   ind_figs <- list()
   for (i in seq_along(ui[["ind_plots"]][["std_ind_figures"]])) {
