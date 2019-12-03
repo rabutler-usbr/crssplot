@@ -77,7 +77,7 @@ mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
     my_title,
     y_title = "Previous Decemeber Elevation"
   ) %>%
-    add_logo()
+    add_logo_horiz()
   
   gg
 }
@@ -127,18 +127,18 @@ powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
     my_title,
     y_title = ''
   ) %>%
-    add_logo()
+    add_logo_horiz()
   
   gg
 }
 
-add_logo <- function(gg)
+add_logo_horiz <- function(gg)
 {
   # arrange all 3 plots together
   gg_grob <- ggplotGrob(gg)
   
   # logo -------------------------------
-  logo <- imager::load.image("logo/660LT-TK-flush.png")
+  logo <- imager::load.image("logo/BofR-horiz-cmyk.png")
   logo <- grid::rasterGrob(logo, interpolate = TRUE)
   
   l2 <- ggplot() +
@@ -151,6 +151,33 @@ add_logo <- function(gg)
     layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
     heights = c(.9, .1),
     widths = c(.8, .2)
+    #bottom = cap_text
+  ))
+  
+  gg
+}
+
+add_logo_shield <- function(gg)
+{
+  # arrange all 3 plots together
+  gg_grob <- ggplotGrob(gg)
+  
+  # logo -------------------------------
+  #saved from the BOR page footer
+  logo <- imager::load.image("code/logo/seal-white.png") 
+  
+  logo <- grid::rasterGrob(logo, interpolate = TRUE)
+  
+  l2 <- ggplot() +
+    geom_blank() + 
+    theme_minimal() +
+    annotation_custom(logo)
+  
+  gg <- grid.arrange(arrangeGrob(
+    gg_grob, nullGrob(), l2,
+    layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
+    heights = c(.9, .1),
+    widths = c(.9, .1)
     #bottom = cap_text
   ))
   
