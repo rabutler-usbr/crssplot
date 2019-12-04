@@ -5,10 +5,10 @@
 # comparison plot, or have a table created for them
 get_all_plot_scenarios <- function(ui)
 {
-  scens <- unique(c(
+  scens <- c(
     names(ui$ind_plots$std_ind_figures),
     names(ui$ind_plots$std_ind_tables)
-  ))
+  )
   
   if (ui$create_figures$standard_figures) {
     scens <- c(scens, ui$plot_group$plot_scenarios)
@@ -18,5 +18,9 @@ get_all_plot_scenarios <- function(ui)
     scens <- c(scens, ui$clouds$scenarios)
   }
   
-  scens
+  if (ui$create_figures$heatmap) {
+    scens <- c(scens, names(ui$heatmap$scenarios))
+  }
+  
+  unique(scens)
 }

@@ -5,8 +5,7 @@ create_mead_powell_heatmaps <- function(z1, z2, scenarios, heat_ui,
 {
   m_heat <- mead_system_condition_heatmap(
     filter(z1, Agg %in% names(heat_ui$scenarios)), 
-    heat_ui$years, 
-    scen_rename = heat_ui$scenarios, 
+    heat_ui,
     my_title = paste("Lake Mead Conditions from", heat_ui$title)
   )
   
@@ -17,11 +16,11 @@ create_mead_powell_heatmaps <- function(z1, z2, scenarios, heat_ui,
     height = 5.65, 
     units = "in"
   )
+  message("   ... saved ", file.path(folder_paths$png_out, "mead_heat.png"))
   
   p_heat <- powell_system_condition_heatmap(
     filter(z2, Agg %in% names(heat_ui$scenarios)),
-    heat_ui$years,
-    scen_rename = ui$heatmap$scenarios,
+    heat_ui,
     my_title = paste("Lake Powell Conditions from", ui$heatmap$title)
   )
   
@@ -32,13 +31,15 @@ create_mead_powell_heatmaps <- function(z1, z2, scenarios, heat_ui,
     height = 5.65, 
     units = "in"
   )
+  message("   ... saved ", file.path(folder_paths$png_out, "powell_heat.png"))
   
   invisible(TRUE)
 }
 
-mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
-                                          y_wrap = 15)
+mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 {
+  yrs <- heat_ui$years
+  scen_rename <- heat_ui$scenarios
   tier_names <- mead_tier_names()
   
   n_yrs <- length(yrs)
@@ -75,16 +76,18 @@ mead_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
     n_yrs, 
     tier_names, 
     my_title,
-    y_title = "Previous Decemeber Elevation"
+    y_title = "Previous Decemeber Elevation",
+    heat_ui
   ) %>%
     add_logo_horiz()
   
   gg
 }
 
-powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title, 
-                                            y_wrap = 15)
+powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 {
+  yrs <- heat_ui$years
+  scen_rename <- heat_ui$scenarios
   tier_names <- powell_tier_names()
   n_yrs <- length(yrs)
 
@@ -125,7 +128,8 @@ powell_system_condition_heatmap <- function(dcp, yrs, scen_rename, my_title,
     n_yrs, 
     tier_names, 
     my_title,
-    y_title = ''
+    y_title = '',
+    heat_ui
   ) %>%
     add_logo_horiz()
   
@@ -184,7 +188,8 @@ add_logo_shield <- function(gg)
   gg
 }
 
-system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title)
+system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
+                                       heat_ui)
 {
   # plot as a side-by-side heatmap
   zz %>%
@@ -220,7 +225,8 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title)
     labs(
       y = y_title, 
       x = NULL, fill = "%", title = my_title,
-      subtitle = "Percent of Traces in each Elevation Range"
+      subtitle = "Percent of Traces in each Elevation Range",
+      caption = heat_ui[['caption']]
     )
 }
 

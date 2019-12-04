@@ -75,7 +75,6 @@ process_everything <- function(ui)
   # TODO: switch this to be true if creating heatmap, or dcp table
   if (TRUE) {
     dcp_yrs <- c(min(yrs2show) - 1, yrs2show)
-    
     tmp <- read_feather(o_files$cur_month_pe_file)
     lb_dcp <- compute_mead_dcp_probs(tmp, all_plotted_scens, 2019:2026)
     ub_dcp <- compute_powell_dcp_probs(tmp, all_plotted_scens, 2019:2026)
@@ -89,7 +88,7 @@ process_everything <- function(ui)
   # PLOTTING -------------------------------
   message("starting to create figures and tables")
   
-  # TODO: need to see if this filters the scenarios properly
+  # heatmap ---------------------------------------------
   if (ui$create_figures$heatmap) {
     # system condition heatmap -------------------------
     message("... System conditions heatmap")
@@ -101,7 +100,6 @@ process_everything <- function(ui)
       folder_paths
     )
   }
-  
 
   #if (ui$create_figures$std_ind_tables) { 
   for (i in seq_along(ui[["ind_plots"]][["std_ind_tables"]])) {

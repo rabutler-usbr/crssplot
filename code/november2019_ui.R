@@ -28,8 +28,8 @@ nov2019_ui <- function()
     conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
-    pe_clouds = TRUE,
-    heatmap = FALSE
+    pe_clouds = FALSE,
+    heatmap = TRUE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
@@ -204,11 +204,12 @@ nov2019_ui <- function()
   # scenario names, and the values are what they will be labeled as in the heatmap
   heatmap <- list(
     scenarios = c(
-      "Aug 2019 - Full - Fixed" = "Updated August 2019 Full Hydrology", 
-      "Aug 2019 - ST - Fixed" = "Updated August 2019 Stress Test Hydrology"
+      "Aug 2019 - Full - Fixed" = "Full Hydrology", 
+      "Aug 2019 - ST - Fixed" = "Stress Test Hydrology"
     ),
-    title = "Updated August 2019 CRSS",
-    years = 2020:2026
+    title = "August 2019 CRSS (v2)*",
+    years = 2020:2026,
+    caption = "*August 2019 CRSS (v2) fixed an error found in the original August 2019 results."
   )
   
   # the mainScenGroup is the scenario to use when creating the current month's 
