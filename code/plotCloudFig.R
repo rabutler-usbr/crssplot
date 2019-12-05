@@ -100,12 +100,17 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
   ##histLab = append(histLab, IGLab)
   
   # Read in Reclamation logo png
-  im <- load.image('logo/BofR-horiz-cmyk.png')
-  im_rast <- grid::rasterGrob(im, interpolate = TRUE)
+  im <- load.image('logo/BofR-vert-cmyk.png')
+  im_rast <- grid::rasterGrob(
+    im, 
+    interpolate = TRUE, 
+    width = unit(.75, "inch"), 
+    height = unit(.75, "inch")
+  )
   
   # Parameters for cloud plot customization (line thicknesses, text size, etc.)
   # Have been pulled out for convenience
-  #Text
+  # Text
   TitleSize = 13
   AxisText = 11
   LegendLabText = 9.5
@@ -114,18 +119,18 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
   LabSize = 2.9
   LegendText = 8
   
-  #Lines
+  # Lines
   IGStartLine = .8
   OpsLines = .6
   Medians = 1
   GridMaj = .25
   GridMin = .25
   
-  #Y axis limits
+  # Y axis limits
   yaxmin = floor(min(zz$Min)/50)*50
   yaxmax = ceiling(max(zz$Max)/50)*50
   
-  #Other
+  # Other
   LegendWidth = 1
   LegendHeight = 2.5
   
@@ -179,10 +184,14 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
       legend.key.size = unit(1.75, 'lines')
     ) 
   legendb <- get_legend(ggb)
-  
+
   # Make legend grob.  4 rows used to make legend close together and in the 
   # middle with respects to the vertical
-  gglegend <- plot_grid(NULL, legenda,legendb, NULL, align = 'hv', nrow=4)
+  gglegend <- plot_grid(
+    NULL, legenda, legendb, NULL, im_rast, NULL, 
+    ncol = 1, 
+    rel_heights = c(.6, 1, 1, .6, .2, .17)
+  )
  
   # Generate plot
   gg <- gg + geom_vline(xintercept=2007, size = IGStartLine, color = '#808080') + 
@@ -288,8 +297,8 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
   }
   
   # Add BOR Logo
-  gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4)) %>%
-    add_logo_horiz()
+  gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4)) #%>%
+    #add_logo_horiz()
   gg
 }
 
