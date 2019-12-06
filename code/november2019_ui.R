@@ -28,7 +28,7 @@ nov2019_ui <- function()
     conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
-    pe_clouds = FALSE,
+    pe_clouds = TRUE,
     heatmap = TRUE
   )
   
@@ -207,9 +207,9 @@ nov2019_ui <- function()
       "Aug 2019 - Full - Fixed" = "Full Hydrology", 
       "Aug 2019 - ST - Fixed" = "Stress Test Hydrology"
     ),
-    title = "August 2019 CRSS (v2)*",
+    title = "August 2019 CRSS (Updated December 2019)",
     years = 2020:2026,
-    caption = "*August 2019 CRSS (v2) fixed an error found in the original August 2019 results."
+    caption = "*August 2019 CRSS updated in December 2019 because a bug was found in the original August 2019 results."
   )
   
   # the mainScenGroup is the scenario to use when creating the current month's 
@@ -255,9 +255,9 @@ nov2019_ui <- function()
     scen_labs = c("Full Hydrology", 
                   "Stress Test Hydrology"),
     # should default to '' if it is not specified
-    title_append = "from August 2019 CRSS (v2)*",
+    title_append = "from August 2019 CRSS (Updated December 2019)",
     # should be NULL if not specified. not ''
-    caption = "*August 2019 CRSS (v2) fixed an error found in the original August 2019 results."
+    caption = "*August 2019 CRSS updated in December 2019 because a bug was found in the original August 2019 results."
   )
   
   assert_that(
