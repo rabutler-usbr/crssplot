@@ -1,4 +1,6 @@
 library(tidyverse)
+library(cowplot)
+library(magick)
 
 create_mead_powell_heatmaps <- function(z1, z2, scenarios, heat_ui,
                                         folder_paths)
@@ -79,7 +81,7 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     y_title = "Previous Decemeber Elevation",
     heat_ui
   ) %>%
-    add_logo_horiz()
+    add_logo_vertical()
   
   gg
 }
@@ -131,9 +133,23 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     y_title = '',
     heat_ui
   ) %>%
-    add_logo_horiz()
+    add_logo_vertical()
   
   gg
+}
+
+add_logo_vertical <- function(gg)
+{
+  # now uses cowplot::draw_image which relies on "magick"
+  logo_path <- "logo/BofR-vert-cmyk.png"
+  
+  ggdraw(gg) +
+    draw_image(
+      logo_path, 
+      x = 1.455, y = .13, 
+      hjust = 1, vjust = 1, 
+      width = 1, height = .12
+    )
 }
 
 add_logo_horiz <- function(gg)
