@@ -11,7 +11,9 @@ get_all_plot_scenarios <- function(ui)
   )
   
   if (ui$create_figures$standard_figures) {
-    scens <- c(scens, ui$plot_group$plot_scenarios)
+    for (i in seq_along(ui[["plot_group"]])) {
+      scens <- c(scens, ui$plot_group[[i]]$plot_scenarios)
+    }
   }
   
   if (ui$create_figures$pe_clouds) {

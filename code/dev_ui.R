@@ -7,7 +7,7 @@ source("code/create_scenario.R")
 # output it could be the same as CRSSDIR, but is allowed to be different so that 
 # you can read model output from the server, but save figures locally.
 
-nov2019_ui <- function()
+dev_ui <- function()
 {
   # swtiches to read data. if you've already read the data in from rdfs once, 
   # you may be able to set this to FALSE, so it's faster
@@ -20,7 +20,7 @@ nov2019_ui <- function()
   # "switches" to create/not create different figures
   # typical figures
   create_figures <- list(
-    standard_figures = FALSE,
+    standard_figures = TRUE,
     simple_5yr_table = FALSE,
     
     # optional figures/tables
@@ -28,18 +28,18 @@ nov2019_ui <- function()
     conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
-    pe_clouds = TRUE,
-    heatmap = TRUE
+    pe_clouds = FALSE,
+    heatmap = FALSE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
   folders <- list(
-    i_folder = "M:/Shared/CRSS/2019/Scenario",
-    CRSSDIR = Sys.getenv("CRSS_DIR"),
+    i_folder = "M:/Shared/CRSS",
+    CRSSDIR = "C:/alan/CRSS/CRSS.Offc_dev", #Sys.getenv("CRSS_DIR"),
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
-    crss_month = "nov2019",
-    pdf_name = 'compare_aug_fix_st.pdf',
+    crss_month = "na_dev",
+    pdf_name = 'all_res.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -64,90 +64,52 @@ nov2019_ui <- function()
     # how to label the color scale on the plots
     color_label = 'Scenario',
     # text that will be added to figures
-    end_year = 2026
+    end_year = 2060
   )
   # TODO: update so that these are computed if not specified
   # years to show the crit stats figures  
-  defaults[['plot_yrs']] <- 2020:defaults$end_year 
+  defaults[['plot_yrs']] <- 2019:defaults$end_year 
   # years to show the Mead/Powell 10/50/90 figures for
-  defaults[['pe_yrs']] <- 2019:defaults$end_year
+  defaults[['pe_yrs']] <- 2018:defaults$end_year
   
   # specify the scenarios -------------------------
   all_scenarios <- c(
     create_scenario(
-      "Aug 2019 - Full - w/Bug",
-      scen_folders = "Aug2019_2020,DNF,2007Dems,IG_DCP,Most", 
+      "Aug 2018 - IG",
+      scen_folders = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most", 
+      ic = c(3586.55, 1079.50), 
+      start_year = 2019,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Aug 2018 - NA",
+      scen_folders = "2018/Scenario/Aug2018_2019,DNF,2007Dems,NA,Most", 
+      ic = c(3586.55, 1079.50), 
+      start_year = 2019,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Aug 2019 Update - IG",
+      scen_folders = "2019/Scenario/Aug2019_2020_v4.1.1,DNF,2007Dems,IG_DCP_v4.2.0,Most", 
       ic = c(3618.56, 1089.40), 
       start_year = 2020,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Aug 2019 - ST - w/Bug",
-      scen_folders = "Aug2019_2020,ISM1988_2017,2007Dems,IG_DCP,Most", 
+      "Aug 2019 - NA",
+      scen_folders = "2019/Scenario_dev/Aug2019_2020_9101,DNF,2007Dems,NA_DCP_v9001,Most", 
       ic = c(3618.56, 1089.40), 
       start_year = 2020,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Aug 2019 - Full - Fixed",
-      scen_folders = "Aug2019_2020_v4.1.1,DNF,2007Dems,IG_DCP_v4.2.0,Most", 
+      "Aug 2019 - IG Dev",
+      scen_folders = "2019/Scenario_dev/Aug2019_2020_9101,DNF,2007Dems,IG_DCP_v4.2.0.9000,Most", 
       ic = c(3618.56, 1089.40), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Aug 2019 - ST - Fixed",
-      scen_folders = "Aug2019_2020_v4.1.1,ISM1988_2017,2007Dems,IG_DCP_v4.2.0,Most", 
-      ic = c(3618.56, 1089.40), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "June 2019 - ST", 
-      scen_folders = rw_scen_gen_names(
-        "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP",
-        paste0("Trace", 4:38),
-        "DCP_Cons"
-      ), 
-      ic = file.path(
-        folders$CRSSDIR, 
-        "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
-      ), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "June 2019 - DNF", 
-      scen_folders = rw_scen_gen_names(
-        "Jun2019_2020,DNF,2007Dems,IG_DCP",
-        paste0("Trace", 4:38),
-        "DCP_Cons"
-      ), 
-      ic = file.path(
-        folders$CRSSDIR, 
-        "dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx"
-      ), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Nov 2019 - DNF",
-      scen_folders = "Nov2019_2020,DNF,2007Dems,IG_DCP,Most", 
-      ic = c(3608.24, 1087.80), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Nov 2019 - ST",
-      scen_folders = "Nov2019_2020,ISM1988_2017,2007Dems,IG_DCP,Most", 
-      ic = c(3608.24, 1087.80), 
       start_year = 2020,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE
@@ -174,15 +136,14 @@ nov2019_ui <- function()
     #     ann_text = "Results from updated August 2019 CRSS run with stress test hydrology",
     #     end_year = 2026
     #   )
-    "Aug 2019 - DNF - w/Bug" = list(
-      ann_text = "Results from the BAD August 2019 CRSS run with full hydrology",
+    "Aug 2018 - IG" = list(
+      ann_text = "Results from the August 2018 IG run",
       end_year = 2026
     )
   )
 
   ind_plots <- specify_individual_plots(all_scenarios, std_ind_figures, defaults)
-  
-  # 5-year simple table --------------------------  
+    
   # for the 5-year simple table
   # value are the scenario group variable names (should be same as above)
   # the names are the new names that should show up in the table in case you need 
@@ -191,7 +152,7 @@ nov2019_ui <- function()
   # second there should only be 2 scenarios
   simple_5yr <- list(
     ss5 = c(
-      "Aug 2019 - Full - Fixed" = "a", "Nov 2019 - DNF" = "b"
+      "Aug 2018 - IG" = "a", "Aug 2019 - NA" = "b"
     ),
     # this should either be a footnote corresponding to one of the ss5 names or NA
     tableFootnote = NA,
@@ -205,20 +166,19 @@ nov2019_ui <- function()
   # scenario names, and the values are what they will be labeled as in the heatmap
   heatmap <- list(
     scenarios = c(
-      "Aug 2019 - Full - Fixed" = "Full Hydrology", 
-      "Aug 2019 - ST - Fixed" = "Stress Test Hydrology"
+      "Aug 2018 - IG" = "Full Hydrology", 
+      "Aug 2018 - IG" = "Stress Test Hydrology"
     ),
     title = "August 2019 CRSS (Updated December 2019)",
     years = 2020:2026,
-    caption = "*August 2019 CRSS updated in December 2019 because a bug was found in the original August 2019 results."
+    caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
   )
   
-  # mainScenGroup ----------------
   # the mainScenGroup is the scenario to use when creating the current month's 
   # 5-year table, etc. In the plots, we want to show the previous months runs,
   # but in the tables, we only want the current month run. This should match names
   # in scens and icList
-  mainScenGroup <- "Aug 2019 - Full - Fixed"
+  mainScenGroup <- "Aug 2018 - IG"
   names(mainScenGroup) <- mainScenGroup
   scenarios[['mainScenGroup']] = mainScenGroup
   
@@ -229,14 +189,15 @@ nov2019_ui <- function()
   # list of lists. each list has one required entry: plot_scenarios and one 
   # optional entry: plot_colors. The list can be named, or unnamed.
   plot_group <- list(
-    list(
-      plot_scenarios = c("Aug 2019 - ST - Fixed", "Aug 2019 - ST - w/Bug")
+    "ig_v_na" = list(
+      plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", "Aug 2019 - IG Dev",
+                         "Aug 2019 - NA")
       # set plotting colors (optional)
       # use scales::hue_pal()(n) to get default ggplot colors
       #plot_colors <- c("#F8766D", "#00BFC4")
     ),
-    "new_aug" = list(
-      plot_scenarios = c("Aug 2019 - Full - Fixed", "Aug 2019 - ST - Fixed"),
+    "ig_comp" = list(
+      plot_scenarios = c("Aug 2019 - IG Dev","Aug 2019 Update - IG"),
       plot_colors = c("#F8766D", "#00BFC4")
     )
   )
@@ -249,13 +210,13 @@ nov2019_ui <- function()
   # isn't, then just the scenarios are used.
   clouds <- list(
     # scenarios to include in cloud
-    scenarios = c("Aug 2019 - Full - Fixed", "Aug 2019 - ST - Fixed"),
+    scenarios = c("Aug 2018 - IG", "Aug 2018 - IG"),
     scen_labs = c("Full Hydrology", 
                   "Stress Test Hydrology"),
     # should default to '' if it is not specified
     title_append = "from August 2019 CRSS (Updated December 2019)",
     # should be NULL if not specified. not ''
-    caption = "*August 2019 CRSS updated in December 2019 because a bug was found in the original August 2019 results."
+    caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
   )
   
   assert_that(
