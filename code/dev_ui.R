@@ -14,13 +14,14 @@ dev_ui <- function()
   process_data <- list(
     sys_cond_data = FALSE,
     pe_data = FALSE,
+    csd_data = TRUE,
     crss_short_cond_data = FALSE
   )
   
   # "switches" to create/not create different figures
   # typical figures
   create_figures <- list(
-    standard_figures = TRUE,
+    standard_figures = FALSE,
     simple_5yr_table = FALSE,
     
     # optional figures/tables

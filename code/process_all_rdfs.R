@@ -1,6 +1,6 @@
 process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
 {
-  # System Conditions Table Data
+  # System Conditions ------------------------
   if (ui$process_data$sys_cond_data) {
     message('starting to get system conditions data')
     
@@ -20,6 +20,7 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
     message('finished geting system conditions data')
   }
   
+  # PE data -------------------------
   if (ui$process_data$pe_data) {
     ## get the Mead and Powel EOCY Data
     message('starting to get PE data')
@@ -40,6 +41,7 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
     message('finished getting PE data')
   }
   
+  # shortage conditions ----------------------
   if (ui$process_data$crss_short_cond_data) {
     message("Starting to get CRSS shortage condition data...")
     assert_that(length(ui$shortage_conditions$scenario) == 1)
@@ -55,6 +57,24 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
     )
     
     message("Done getting CRSS shortage condition data")
+  }
+  
+  # CSD ---------------------------
+  if (ui$process_data$csd_data) {
+    message('starting to get annual computed state depletions data')
+    
+    # system condition rwa
+    sys_rwa <- rwd_agg(rdfs = "CSD_ann.rdf")
+    
+    getScenarioData(
+      ui[["scenarios"]][["scens"]],
+      ui[["folders"]][["i_folder"]], 
+      o_files[["csd_file"]],
+      TRUE,
+      'aggFromScenList', 
+      sys_rwa
+    )
+    message('finished geting annual computed state depletions data')
   }
   
   invisible(sum(unlist(ui$process_data)))

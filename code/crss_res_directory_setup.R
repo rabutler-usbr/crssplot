@@ -157,7 +157,8 @@ crss_res_get_file_names <- function(main_pdf)
     simple_5yr_file = '5yrSimple.pdf',
     mead_cloud = "Mead.png",
     powell_cloud = "Powell.png",
-    main_pdf = main_pdf
+    main_pdf = main_pdf,
+    csd_file = "csd_ann.feather"
   )
 }
 
@@ -165,7 +166,7 @@ crss_res_get_file_names <- function(main_pdf)
 # all are fully specified paths
 crss_res_append_file_path <- function(file_names, figs_folder, res_folder)
 {
-  res <- c("sys_cond_file", "tmp_pe_file", "cur_month_pe_file")
+  res <- c("sys_cond_file", "tmp_pe_file", "cur_month_pe_file", "csd_file")
   
   for (i in names(file_names)) {
     if (i %in% res) {
