@@ -3,7 +3,8 @@ library(assertthat)
 # create a single scenario as a list, that has all important information
 # specified in it
 create_scenario <- function(name, scen_folders, ic, start_year, 
-                            std_ind_tables = FALSE, std_ind_figures = FALSE)
+                            std_ind_tables = FALSE, std_ind_figures = FALSE,
+                            cond_probs = FALSE)
 {
   assert_that(length(name) == 1 & is.character(name))
   assert_that(length(scen_folders) >= 1 & is.character(scen_folders))
@@ -27,7 +28,8 @@ create_scenario <- function(name, scen_folders, ic, start_year,
     ic_month = ic_month,
     start_year = start_year,
     std_ind_tables = std_ind_tables,
-    std_ind_figures = std_ind_figures
+    std_ind_figures = std_ind_figures,
+    cond_probs = cond_probs
   )
   
   rr
@@ -39,7 +41,7 @@ scenario_to_vars <- function(scenarios)
   assert_that(is.list(scenarios) & length(scenarios) >= 1)
   
   required_variables <- c("name", "ic", "scen_folders", "ic_month", "start_year")
-  optional_variables <- c("std_ind_tables", "std_ind_figures")
+  optional_variables <- c("std_ind_tables", "std_ind_figures", "cond_probs")
   
   scens <- list()
   ic_list <- list()

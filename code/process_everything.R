@@ -1,3 +1,6 @@
+source("code/get_plot_flags.R")
+source("code/csd_boxplots.R")
+
 process_everything <- function(ui)
 {
   # check and setup --------------------
@@ -41,7 +44,8 @@ process_everything <- function(ui)
   # ui$create_figures$standard_figures | ui$create_figures$pe_clouds | 
   # std_ind_figures
   all_plotted_scens <- get_all_plot_scenarios(ui)
-  
+  plot_flags <- get_plot_flags(ui)
+
   if (TRUE) {
     pe <- read_feather(o_files$cur_month_pe_file) %>%
       # The StartMonth column is used as the color variable in plotEOCYElev, and 
@@ -148,6 +152,13 @@ process_everything <- function(ui)
     )
   }  
   
+  # csd boxplots ---------------------------
+  if (plot_flags[["csd_flag"]]) {
+    message("... CSD boxplots")
+    csd_ann <- read_feather(o_files[["csd_file"]])
+    comp_figs <- c(comp_figs, create_all_csd_boxplots(csd_ann, ui))
+  }
+  
   # Save figures -----------------------
   if (length(comp_figs) > 0 | length(ind_figs) > 0) {
     # save figures and table
@@ -171,9 +182,10 @@ process_everything <- function(ui)
   }
   
   # conditional probabilities ---------------------------
-  if(ui$create_figures$conditional_probs){
+  if (plot_flags[["cond_probs"]]){
     message("... conditional probabilities")
-    get_all_cond_probs(sysCond, mainScenGroup, yrs2show, o_files$cond_prob_file)
+    cp_scens <- get_cond_prob_scens(ui)
+    get_all_cond_probs(sys_cond, cp_scens, yrs2show, ui)
   }
   
   # conditions leading to shortage ---------------------------------

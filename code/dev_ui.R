@@ -9,12 +9,12 @@ source("code/create_scenario.R")
 
 dev_ui <- function()
 {
-  # swtiches to read data. if you've already read the data in from rdfs once, 
+  # switches to read data. if you've already read the data in from rdfs once, 
   # you may be able to set this to FALSE, so it's faster
   process_data <- list(
     sys_cond_data = FALSE,
     pe_data = FALSE,
-    csd_data = TRUE,
+    csd_data = FALSE,
     crss_short_cond_data = FALSE
   )
   
@@ -26,7 +26,6 @@ dev_ui <- function()
     
     # optional figures/tables
     short_conditions = FALSE,
-    conditional_probs = FALSE,
     pe_scatter_fig = FALSE,
     
     pe_clouds = FALSE,
@@ -81,7 +80,8 @@ dev_ui <- function()
       ic = c(3586.55, 1079.50), 
       start_year = 2019,
       std_ind_tables = FALSE,
-      std_ind_figures = FALSE
+      std_ind_figures = FALSE,
+      cond_probs = TRUE
     ),
     create_scenario(
       "Aug 2018 - NA",
@@ -192,18 +192,29 @@ dev_ui <- function()
   plot_group <- list(
     "ig_v_na" = list(
       plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", "Aug 2019 - IG Dev",
-                         "Aug 2019 - NA")
+                         "Aug 2019 - NA"),
+      csd_ann = list(
+        create = TRUE,
+        years = 2020:2035
+      )
       # set plotting colors (optional)
       # use scales::hue_pal()(n) to get default ggplot colors
       #plot_colors <- c("#F8766D", "#00BFC4")
     ),
     "ig_comp" = list(
       plot_scenarios = c("Aug 2019 - IG Dev","Aug 2019 Update - IG"),
-      plot_colors = c("#F8766D", "#00BFC4")
+      plot_colors = c("#F8766D", "#00BFC4"), 
+      csd_ann = list(
+        create = TRUE,
+        years = 2020:2035
+      )
     )
   )
   
-  plot_group <- check_plot_group_colors(plot_group)
+  plot_group <- list()
+
+  plot_group <- check_plot_group_colors(plot_group) %>%
+    check_plot_group_csd_ann()
   
   # clouds --------------------------------
   

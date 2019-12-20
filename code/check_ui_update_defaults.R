@@ -24,3 +24,15 @@ check_plot_group_colors <- function(pg)
   
   pg
 }
+
+# if csd_ann is not specified, then set it to FALSE
+check_plot_group_csd_ann <- function(pg)
+{
+  for (i in seq_along(pg)) {
+    if (!exists("csd_ann", where = pg[[i]])) {
+      pg[[i]][["csd_ann"]] <- list(create = FALSE)
+    }
+  }
+  
+  pg
+}

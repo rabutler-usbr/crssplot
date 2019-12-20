@@ -152,7 +152,6 @@ crss_res_get_file_names <- function(main_pdf)
     tmp_pe_file = 'tempPE.feather',
     # file name of Powell and Mead PE data
     cur_month_pe_file = 'MeadPowellPE.feather',
-    cond_prob_file = 'CondProbs.csv',
     short_cond_fig = 'shortConditionsFig.pdf',
     simple_5yr_file = '5yrSimple.pdf',
     mead_cloud = "Mead.png",

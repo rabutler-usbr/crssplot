@@ -26,3 +26,16 @@ get_all_plot_scenarios <- function(ui)
   
   unique(scens)
 }
+
+get_cond_prob_scens <- function(ui)
+{
+  ss <- c()
+  
+  for (i in seq_along(ui[["scen_tree"]])) {
+    if (ui[["scen_tree"]][[i]][["cond_probs"]]) {
+      ss <- c(ss, ui[["scen_tree"]][[i]][["name"]])
+    }
+  }
+  
+  ss
+}
