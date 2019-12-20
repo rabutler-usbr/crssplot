@@ -21,7 +21,6 @@ dev_ui <- function()
   # "switches" to create/not create different figures
   # typical figures
   create_figures <- list(
-    standard_figures = FALSE,
     simple_5yr_table = FALSE,
     
     # optional figures/tables
@@ -196,6 +195,10 @@ dev_ui <- function()
       csd_ann = list(
         create = TRUE,
         years = 2020:2035
+      ),
+      std_comparison = list(
+        create = TRUE,
+        years = 2020:2060
       )
       # set plotting colors (optional)
       # use scales::hue_pal()(n) to get default ggplot colors
@@ -207,12 +210,17 @@ dev_ui <- function()
       csd_ann = list(
         create = TRUE,
         years = 2020:2035
+      ),
+      std_comparison = list(
+        create = TRUE,
+        years = 2020:2035
       )
     )
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
-    check_plot_group_csd_ann()
+    check_plot_group_type("std_comparison") %>%
+    check_plot_group_type("csd_ann")
   
   # clouds --------------------------------
   

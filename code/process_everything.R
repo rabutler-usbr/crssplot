@@ -137,8 +137,8 @@ process_everything <- function(ui)
   }
   
   comp_figs <- list()
-  if (ui$create_figures$standard_figures) {
-    # Plot std comparison figures -------------
+  if (plot_flags[["std_comparison"]]) {
+    # std comparison figures -------------
     # includes previous month's results too
     message("... Scenario comparison figures")
     

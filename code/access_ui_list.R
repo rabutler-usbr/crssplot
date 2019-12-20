@@ -10,8 +10,8 @@ get_all_plot_scenarios <- function(ui)
     names(ui$ind_plots$std_ind_tables)
   )
   
-  if (ui$create_figures$standard_figures) {
-    for (i in seq_along(ui[["plot_group"]])) {
+  for (i in seq_along(ui[["plot_group"]])) {
+    if (ui[["plot_group"]][[i]][["std_comparison"]][["create"]]) {
       scens <- c(scens, ui$plot_group[[i]]$plot_scenarios)
     }
   }
