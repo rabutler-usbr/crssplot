@@ -81,7 +81,7 @@ dev_ui <- function()
       start_year = 2019,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE,
-      cond_probs = TRUE
+      cond_probs = FALSE
     ),
     create_scenario(
       "Aug 2018 - NA",
@@ -210,8 +210,6 @@ dev_ui <- function()
       )
     )
   )
-  
-  plot_group <- list()
 
   plot_group <- check_plot_group_colors(plot_group) %>%
     check_plot_group_csd_ann()

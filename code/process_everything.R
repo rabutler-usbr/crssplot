@@ -8,7 +8,6 @@ process_everything <- function(ui)
   scens <- ui$scenarios$scens
   icList <- ui$scenarios$ic_list
   icMonth <- ui$scenarios$ic_month
-  mainScenGroup <- ui$scenarios$mainScenGroup
   yrs2show <- ui$defaults$plot_yrs
   peYrs <- ui$defaults$pe_yrs
   
@@ -16,7 +15,6 @@ process_everything <- function(ui)
     scens, 
     icList, 
     icMonth, 
-    mainScenGroup, 
     ui
   )
   

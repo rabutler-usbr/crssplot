@@ -4,22 +4,10 @@ library(fs)
 # checks that scenario names match in the different variables they are 
 # specified in. Returns `scens` invisibly, if all checks pass. Otherwise 
 # provides error messages.
-crss_res_check_scen_names <- function(scens, icList, icMonth, mainScenGroup, 
-                                      ui)
+crss_res_check_scen_names <- function(scens, icList, icMonth, ui)
 {
   ss5 <- ui$simple_5yr$ss5
   heatmap_names <- ui$heatmap$scenarios
-  
-  # some sanity checks that UI is correct
-  assert_that(
-    mainScenGroup %in% names(scens), 
-    msg = paste(mainScenGroup, ' is not found in scens.')
-  )
-  
-  assert_that(
-    mainScenGroup %in% names(icList), 
-    msg = paste(mainScenGroup, ' is not found in icList')
-  )
   
   # check that the names of scens, icList, and icMonth are all the same; they
   # don't necessarily need to be in the same order, just all exist in one another
