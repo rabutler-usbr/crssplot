@@ -7,7 +7,8 @@ library(fs)
 crss_res_check_scen_names <- function(scens, icList, icMonth, ui)
 {
   ss5 <- ui$simple_5yr$ss5
-  heatmap_names <- ui$heatmap$scenarios
+  
+  check_plot_group_scens(ui, names(scens))
   
   # check that the names of scens, icList, and icMonth are all the same; they
   # don't necessarily need to be in the same order, just all exist in one another
@@ -26,11 +27,6 @@ crss_res_check_scen_names <- function(scens, icList, icMonth, ui)
   assert_that(
     all(names(ss5) %in% names(scens)), 
     msg = "scenario goup names of ss5 must match the names found in scens"
-  )
-  
-  assert_that(
-    all(names(heatmap_names) %in% names(scens)),
-    msg = "Scenario group names of `heatmap_names` must match the names found in `scens`"
   )
   
   if (ui$create_figures$pe_clouds) {
@@ -177,4 +173,30 @@ construct_table_file_name <- function(table_name, scenario, yrs, extra_label)
   str_replace_all(scenario, " ", "") %>%
     paste0("_", extra_label, table_name, "_", year_lab, ".csv") %>%
     path_sanitize()
+}
+
+# checks that all scenarios specified in plot_groups are found in the available
+# scenarios (by name)
+check_plot_group_scens <- function(ui, scen_names)
+{
+  err <- NULL
+  
+  for (i in seq_len(length(ui[["plot_group"]]))) {
+    spec_scens <- ui[["plot_group"]][[i]][["plot_scenarios"]]
+    spec_scens <- spec_scens[!(spec_scens %in% scen_names)]
+    if (length(spec_scens) > 0) {
+      err <- c(
+        err, 
+        paste(
+          "In the", names(ui[["plot_group"]])[i], 
+          "plot_group, the following scenarios do not match the specified scenarios:\n  -",
+          paste(spec_scens, collapse = "\n  -")
+        )
+      )
+    }
+  }
+  
+  assert_that(length(err) == 0, msg = paste(err, collapse = "\n"))
+  
+  invisible(ui)
 }

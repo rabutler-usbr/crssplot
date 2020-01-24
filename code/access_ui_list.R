@@ -11,17 +11,12 @@ get_all_plot_scenarios <- function(ui)
   )
   
   for (i in seq_along(ui[["plot_group"]])) {
-    if (ui[["plot_group"]][[i]][["std_comparison"]][["create"]]) {
-      scens <- c(scens, ui$plot_group[[i]]$plot_scenarios)
-    }
+    # just add all of the scenarios in plot_group
+    scens <- c(scens, ui$plot_group[[i]]$plot_scenarios)
   }
   
   if (ui$create_figures$pe_clouds) {
     scens <- c(scens, ui$clouds$scenarios)
-  }
-  
-  if (ui$create_figures$heatmap) {
-    scens <- c(scens, names(ui$heatmap$scenarios))
   }
   
   unique(scens)

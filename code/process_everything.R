@@ -10,7 +10,7 @@ process_everything <- function(ui)
   icMonth <- ui$scenarios$ic_month
   yrs2show <- ui$defaults$plot_yrs
   peYrs <- ui$defaults$pe_yrs
-  
+
   crss_res_check_scen_names(
     scens, 
     icList, 
@@ -38,7 +38,7 @@ process_everything <- function(ui)
   process_all_rdfs(ui, o_files, folder_paths, traceMap)
   
   # READ IN CORRECT DFs -----------------------
-  
+
   # ui$create_figures$standard_figures | ui$create_figures$pe_clouds | 
   # std_ind_figures
   all_plotted_scens <- get_all_plot_scenarios(ui)
@@ -91,14 +91,13 @@ process_everything <- function(ui)
   message("starting to create figures and tables")
   
   # heatmap ---------------------------------------------
-  if (ui$create_figures$heatmap) {
+  if (plot_flags[["heat"]]) {
     # system condition heatmap -------------------------
     message("... System conditions heatmap")
-    
+
     create_mead_powell_heatmaps(
       lb_dcp, sys_cond, 
-      scenarios, 
-      ui$heatmap,
+      ui,
       folder_paths
     )
   }

@@ -27,18 +27,17 @@ dev_ui <- function()
     short_conditions = FALSE,
     pe_scatter_fig = FALSE,
     
-    pe_clouds = FALSE,
-    heatmap = FALSE
+    pe_clouds = FALSE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
   folders <- list(
     i_folder = "M:/Shared/CRSS",
-    CRSSDIR = "C:/alan/CRSS/CRSS.Offc_dev", #Sys.getenv("CRSS_DIR"),
+    CRSSDIR = "C:/alan/CRSS/CRSS.2020", #Sys.getenv("CRSS_DIR"),
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
-    crss_month = "na_dev",
-    pdf_name = 'all_res.pdf',
+    crss_month = "jan2020_obs",
+    pdf_name = 'jan2020vnov2019.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -73,43 +72,70 @@ dev_ui <- function()
   
   # specify the scenarios -------------------------
   all_scenarios <- c(
+
+    # November scenarios
     create_scenario(
-      "Aug 2018 - IG",
-      scen_folders = "2018/Scenario/Aug2018_2019,DNF,2007Dems,IG,Most", 
-      ic = c(3586.55, 1079.50), 
-      start_year = 2019,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE,
-      cond_probs = FALSE
-    ),
-    create_scenario(
-      "Aug 2018 - NA",
-      scen_folders = "2018/Scenario/Aug2018_2019,DNF,2007Dems,NA,Most", 
-      ic = c(3586.55, 1079.50), 
-      start_year = 2019,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Aug 2019 Update - IG",
-      scen_folders = "2019/Scenario/Aug2019_2020_v4.1.1,DNF,2007Dems,IG_DCP_v4.2.0,Most", 
-      ic = c(3618.56, 1089.40), 
+      "Nov 2019 - IG DNF",
+      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,DNF,2007Dems,IG_DCP_v4.2.0.9000,Most", 
+      ic = c(3608.24, 1087.8), 
       start_year = 2020,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Aug 2019 - NA",
-      scen_folders = "2019/Scenario_dev/Aug2019_2020_9101,DNF,2007Dems,NA_DCP_v9001,Most", 
-      ic = c(3618.56, 1089.40), 
+      "Nov 2019 - NA DNF",
+      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,DNF,2007Dems,NA_v9002,Most", 
+      ic = c(3608.24, 1087.8), 
       start_year = 2020,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Aug 2019 - IG Dev",
-      scen_folders = "2019/Scenario_dev/Aug2019_2020_9101,DNF,2007Dems,IG_DCP_v4.2.0.9000,Most", 
-      ic = c(3618.56, 1089.40), 
+      "Nov 2019 - IG ST",
+      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,ISM1988_2017,2007Dems,IG_DCP_v4.2.0.9000,Most", 
+      ic = c(3608.24, 1087.8), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Nov 2019 - NA ST",
+      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,ISM1988_2017,2007Dems,NA_v9002,Most", 
+      ic = c(3608.24, 1087.8), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    
+    # January 2020 scenarios
+    create_scenario(
+      "Jan 2020 - IG DNF",
+      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,IG_DCP_4.3.0.9000,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Jan 2020 - NA DNF",
+      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,NA_4.3.0.9000,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Jan 2020 - IG ST",
+      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,IG_DCP_4.3.0.9000,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Jan 2020 - NA ST",
+      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,NA_4.3.0.9000,Most", 
+      ic = c(3608.74, 1090.49), 
       start_year = 2020,
       std_ind_tables = FALSE,
       std_ind_figures = FALSE
@@ -152,7 +178,7 @@ dev_ui <- function()
   # second there should only be 2 scenarios
   simple_5yr <- list(
     ss5 = c(
-      "Aug 2018 - IG" = "a", "Aug 2019 - NA" = "b"
+      "Nov 2019 - IG DNF" = "a", "Nov 2019 - IG ST" = "b"
     ),
     # this should either be a footnote corresponding to one of the ss5 names or NA
     tableFootnote = NA,
@@ -160,24 +186,11 @@ dev_ui <- function()
     yy5 = 2020:2024
   )
   
-  # heatmap ---------------
-  # use this to select which scenarios are shown in the heat map, and what those
-  # scenarios should be labeled as in the heatmap. The names should be existing
-  # scenario names, and the values are what they will be labeled as in the heatmap
-  heatmap <- list(
-    scenarios = c(
-      "Aug 2018 - IG" = "Full Hydrology", 
-      "Aug 2018 - IG" = "Stress Test Hydrology"
-    ),
-    title = "August 2019 CRSS (Updated December 2019)",
-    years = 2020:2026,
-    caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
-  )
-  
   # the mainScenGroup is the scenario to use when creating the current month's 
   # 5-year table, etc. In the plots, we want to show the previous months runs,
   # but in the tables, we only want the current month run. This should match names
   # in scens and icList
+  # TODO: remvoe this!!!!!!!!!!!!!!!!!!!!
   mainScenGroup <- "Aug 2018 - IG"
   names(mainScenGroup) <- mainScenGroup
   scenarios[['mainScenGroup']] = mainScenGroup
@@ -189,38 +202,75 @@ dev_ui <- function()
   # list of lists. each list has one required entry: plot_scenarios and one 
   # optional entry: plot_colors. The list can be named, or unnamed.
   plot_group <- list(
-    "ig_v_na" = list(
-      plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", "Aug 2019 - IG Dev",
-                         "Aug 2019 - NA"),
-      csd_ann = list(
-        create = TRUE,
-        years = 2020:2035
-      ),
+    # "ig_v_na" = list(
+    #   plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", "Aug 2019 - IG Dev",
+    #                      "Aug 2019 - NA", "Nov 2019 - IG DNF", "Nov 2019 - NA DNF"),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2020:2035
+    #   ),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   )
+    #   # set plotting colors (optional)
+    #   # use scales::hue_pal()(n) to get default ggplot colors
+    #   #plot_colors <- c("#F8766D", "#00BFC4")
+    # ),
+    
+    "dnf_comp" = list(
+      plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - NA DNF", 
+                         "Jan 2020 - IG DNF", "Jan 2020 - NA DNF"),
       std_comparison = list(
         create = TRUE,
         years = 2020:2060
-      )
-      # set plotting colors (optional)
-      # use scales::hue_pal()(n) to get default ggplot colors
-      #plot_colors <- c("#F8766D", "#00BFC4")
-    ),
-    "ig_comp" = list(
-      plot_scenarios = c("Aug 2019 - IG Dev","Aug 2019 Update - IG"),
-      plot_colors = c("#F8766D", "#00BFC4"), 
+      ),
       csd_ann = list(
         create = TRUE,
-        years = 2020:2035
-      ),
-      std_comparison = list(
+        years = 2020:2040
+      )
+    ),
+    "st_comp" = list(
+      plot_scenarios = c("Nov 2019 - IG ST", "Nov 2019 - NA ST", 
+                         "Jan 2020 - IG ST", "Jan 2020 - NA ST"),
+      csd_ann = list(
         create = TRUE,
-        years = 2020:2035
+        years = 2020:2040
+      )
+    ),
+    "jan_heat" = list(
+      plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG DNF"),
+      
+      heat = list(
+        create = TRUE,
+        scen_names = c(
+          "Jan 2020 - IG DNF" = "Full Hydrology", 
+          "Jan 2020 - IG ST" = "Stress Test Hydrology"
+        ),
+        title = "Jan 2020 CRSS",
+        years = 2020:2026,
+        caption = "This and that"
+      )
+    ),
+    "nov_heat" = list(
+      plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - IG ST"),
+      heat = list(
+        create = TRUE,
+        scen_names = c(
+          "Nov 2019 - IG DNF" = "Full Hydrology", 
+          "Nov 2019 - IG ST" = "Stress Test Hydrology"
+        ),
+        title = "November 2019 CRSS",
+        years = 2020:2026,
+        caption = "This and that"
       )
     )
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
     check_plot_group_type("std_comparison") %>%
-    check_plot_group_type("csd_ann")
+    check_plot_group_type("csd_ann") %>%
+    check_plot_group_type("heat")
   
   # clouds --------------------------------
   

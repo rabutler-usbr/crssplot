@@ -2,46 +2,58 @@ library(tidyverse)
 library(cowplot)
 library(magick)
 
-create_mead_powell_heatmaps <- function(z1, z2, scenarios, heat_ui,
-                                        folder_paths)
+create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
 {
-  m_heat <- mead_system_condition_heatmap(
-    filter(z1, Agg %in% names(heat_ui$scenarios)), 
-    heat_ui,
-    my_title = paste("Lake Mead Conditions from", heat_ui$title)
-  )
+  # loop through all plot_groups, and if create == TRUE, create the heat map
   
-  ggsave(
-    file.path(folder_paths$png_out, "mead_heat.png"), 
-    plot = m_heat, 
-    width = 8.91, 
-    height = 5.65, 
-    units = "in"
-  )
-  message("   ... saved ", file.path(folder_paths$png_out, "mead_heat.png"))
+  for (i in seq_along(ui[["plot_group"]])) {
+    
+    if (ui[["plot_group"]][[i]][["heat"]][["create"]]) {
+      
+      m_file <- paste0(names(ui[["plot_group"]])[i], "_mead_heat.png")
+      p_file <- paste0(names(ui[["plot_group"]])[i], "_powell_heat.png")
   
-  p_heat <- powell_system_condition_heatmap(
-    filter(z2, Agg %in% names(heat_ui$scenarios)),
-    heat_ui,
-    my_title = paste("Lake Powell Conditions from", ui$heatmap$title)
-  )
-  
-  ggsave(
-    file.path(folder_paths$png_out, "powell_heat.png"), 
-    plot = p_heat, 
-    width = 8.91, 
-    height = 5.65, 
-    units = "in"
-  )
-  message("   ... saved ", file.path(folder_paths$png_out, "powell_heat.png"))
-  
+      scen_names <- ui[["plot_group"]][[i]][["plot_scenarios"]]
+      heat_title <- ui[["plot_group"]][[i]][["heat"]][["title"]]
+      
+      m_heat <- mead_system_condition_heatmap(
+        filter(z1, Agg %in% scen_names), 
+        ui[["plot_group"]][[i]][["heat"]],
+        my_title = paste("Lake Mead Conditions from", heat_title)
+      )
+      
+      ggsave(
+        file.path(folder_paths$png_out, m_file), 
+        plot = m_heat, 
+        width = 8.91, 
+        height = 5.65, 
+        units = "in"
+      )
+      message("   ... saved ", file.path(folder_paths$png_out, m_file))
+      
+      p_heat <- powell_system_condition_heatmap(
+        filter(z2, Agg %in% scen_names),
+        ui[["plot_group"]][[i]][["heat"]],
+        my_title = paste("Lake Powell Conditions from", heat_title)
+      )
+      
+      ggsave(
+        file.path(folder_paths$png_out, p_file), 
+        plot = p_heat, 
+        width = 8.91, 
+        height = 5.65, 
+        units = "in"
+      )
+      message("   ... saved ", file.path(folder_paths$png_out, p_file))
+    }
+  }
   invisible(TRUE)
 }
 
 mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 {
   yrs <- heat_ui$years
-  scen_rename <- heat_ui$scenarios
+  scen_rename <- heat_ui$scen_names
   tier_names <- mead_tier_names()
   
   n_yrs <- length(yrs)
@@ -89,7 +101,7 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 {
   yrs <- heat_ui$years
-  scen_rename <- heat_ui$scenarios
+  scen_rename <- heat_ui$scen_names
   tier_names <- powell_tier_names()
   n_yrs <- length(yrs)
 
