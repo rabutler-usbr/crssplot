@@ -3,11 +3,13 @@ get_plot_flags <- function(ui)
   csd_flag <- FALSE
   std_comparison <- FALSE
   heat <- FALSE
+  cloud <- FALSE
   
   for (i in seq_along(ui[["plot_group"]])) {
     csd_flag <- csd_flag | ui[["plot_group"]][[i]][["csd_ann"]][["create"]]
     std_comparison <- std_comparison | ui[["plot_group"]][[i]][["std_comparison"]][["create"]]
     heat <- heat | ui[["plot_group"]][[i]][["heat"]][["create"]]
+    cloud <- cloud | ui[["plot_group"]][[i]][["cloud"]][["create"]]
   }
   
   cond_probs <- FALSE
@@ -21,6 +23,7 @@ get_plot_flags <- function(ui)
     csd_flag = csd_flag, 
     cond_probs = cond_probs, 
     std_comparison = std_comparison,
-    heat = heat
+    heat = heat,
+    cloud = cloud
   )
 }

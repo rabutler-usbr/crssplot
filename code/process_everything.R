@@ -173,9 +173,9 @@ process_everything <- function(ui)
   }
   
   # plot Clouds ----------------
-  if (ui$create_figures$pe_clouds) {
+  if (plot_flags[["cloud"]]) {
     message("... cloud figures")
-    plot_both_clouds(pe, peYrs, ui, o_files)
+    plot_both_clouds(pe, peYrs, ui, folder_paths)
   }
   
   # conditional probabilities ---------------------------

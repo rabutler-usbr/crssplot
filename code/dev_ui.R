@@ -25,9 +25,7 @@ dev_ui <- function()
     
     # optional figures/tables
     short_conditions = FALSE,
-    pe_scatter_fig = FALSE,
-    
-    pe_clouds = FALSE
+    pe_scatter_fig = FALSE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
@@ -217,80 +215,86 @@ dev_ui <- function()
     #   # use scales::hue_pal()(n) to get default ggplot colors
     #   #plot_colors <- c("#F8766D", "#00BFC4")
     # ),
-    
-    "dnf_comp" = list(
-      plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - NA DNF", 
-                         "Jan 2020 - IG DNF", "Jan 2020 - NA DNF"),
-      std_comparison = list(
-        create = TRUE,
-        years = 2020:2060
-      ),
-      csd_ann = list(
-        create = TRUE,
-        years = 2020:2040
-      )
-    ),
-    "st_comp" = list(
-      plot_scenarios = c("Nov 2019 - IG ST", "Nov 2019 - NA ST", 
-                         "Jan 2020 - IG ST", "Jan 2020 - NA ST"),
-      csd_ann = list(
-        create = TRUE,
-        years = 2020:2040
-      )
-    ),
-    "jan_heat" = list(
+    # 
+    # "dnf_comp" = list(
+    #   plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - NA DNF", 
+    #                      "Jan 2020 - IG DNF", "Jan 2020 - NA DNF"),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   ),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2020:2040
+    #   )
+    # ),
+    # "st_comp" = list(
+    #   plot_scenarios = c("Nov 2019 - IG ST", "Nov 2019 - NA ST", 
+    #                      "Jan 2020 - IG ST", "Jan 2020 - NA ST"),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2020:2040
+    #   )
+    # ),
+    "jan_comp" = list(
       plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG DNF"),
-      
-      heat = list(
-        create = TRUE,
-        scen_names = c(
-          "Jan 2020 - IG DNF" = "Full Hydrology", 
-          "Jan 2020 - IG ST" = "Stress Test Hydrology"
-        ),
-        title = "Jan 2020 CRSS",
-        years = 2020:2026,
-        caption = "This and that"
+      # heat = list(
+      #   create = TRUE,
+      #   scen_names = c(
+      #     "Jan 2020 - IG DNF" = "Full Hydrology", 
+      #     "Jan 2020 - IG ST" = "Stress Test Hydrology"
+      #   ),
+      #   title = "Jan 2020 CRSS",
+      #   years = 2020:2026,
+      #   caption = "This and that"
+      # ),
+      cloud = list(
+        create = TRUE, 
+          # scenarios to include in cloud
+          scen_labs = c("Stress Test Hydrology", "Full Hydrology"),
+          # should default to '' if it is not specified
+          title_append = "from January 2020 CRSS",
+          # should be NULL if not specified. not ''
+          caption = "This and that"
       )
-    ),
-    "nov_heat" = list(
-      plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - IG ST"),
-      heat = list(
-        create = TRUE,
-        scen_names = c(
-          "Nov 2019 - IG DNF" = "Full Hydrology", 
-          "Nov 2019 - IG ST" = "Stress Test Hydrology"
-        ),
-        title = "November 2019 CRSS",
-        years = 2020:2026,
-        caption = "This and that"
-      )
-    )
+    )#,
+    # "nov_comp" = list(
+    #   plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - IG ST"),
+    #   heat = list(
+    #     create = TRUE,
+    #     scen_names = c(
+    #       "Nov 2019 - IG DNF" = "Full Hydrology", 
+    #       "Nov 2019 - IG ST" = "Stress Test Hydrology"
+    #     ),
+    #     title = "November 2019 CRSS",
+    #     years = 2020:2026,
+    #     caption = "This and that"
+    #   )
+    # )
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
     check_plot_group_type("std_comparison") %>%
     check_plot_group_type("csd_ann") %>%
-    check_plot_group_type("heat")
+    check_plot_group_type("heat") %>%
+    check_plot_group_type("cloud") %>%
+    check_heat_scen_names() %>%
+    check_cloud_scen_names() 
   
   # clouds --------------------------------
   
   # TODO: update this so that scen_labs does not have to be specified, and if it
   # isn't, then just the scenarios are used.
-  clouds <- list(
-    # scenarios to include in cloud
-    scenarios = c("Aug 2018 - IG", "Aug 2018 - IG"),
-    scen_labs = c("Full Hydrology", 
-                  "Stress Test Hydrology"),
-    # should default to '' if it is not specified
-    title_append = "from August 2019 CRSS (Updated December 2019)",
-    # should be NULL if not specified. not ''
-    caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
-  )
-  
-  assert_that(
-    length(clouds$scen_labs) == length(clouds$scenarios),
-    msg = "clouds scen_labs needs to be the same length as the scenarios."
-  )
+  # clouds <- list(
+  #   # scenarios to include in cloud
+  #   scenarios = c("Aug 2018 - IG", "Aug 2018 - IG"),
+  #   scen_labs = c("Full Hydrology", 
+  #                 "Stress Test Hydrology"),
+  #   # should default to '' if it is not specified
+  #   title_append = "from August 2019 CRSS (Updated December 2019)",
+  #   # should be NULL if not specified. not ''
+  #   caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
+  # )
   
   # mead pe scatter parameters -------------------------------
   # plot a single year of Mead PE
@@ -395,7 +399,6 @@ dev_ui <- function()
     simple_5yr = simple_5yr,
     heatmap = heatmap,
     plot_group = plot_group,
-    clouds = clouds,
     mead_pe_scatter = mead_pe_scatter,
     shortage_conditions = shortage_conditions,
     ind_plots = ind_plots,

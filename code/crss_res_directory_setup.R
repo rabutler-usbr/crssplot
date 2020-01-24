@@ -29,13 +29,6 @@ crss_res_check_scen_names <- function(scens, icList, icMonth, ui)
     msg = "scenario goup names of ss5 must match the names found in scens"
   )
   
-  if (ui$create_figures$pe_clouds) {
-    assert_that(
-      all(ui$clouds$scenarios %in% names(ui$scenarios$scens)),
-      msg = "Scenarios specified for the clouds to not match those available."
-    )
-  }
-  
   if (ui$create_figures$short_conditions) {
     assert_that(
       length(ui$shortage_conditions$res_file) == 1, 
@@ -138,8 +131,6 @@ crss_res_get_file_names <- function(main_pdf)
     cur_month_pe_file = 'MeadPowellPE.feather',
     short_cond_fig = 'shortConditionsFig.pdf',
     simple_5yr_file = '5yrSimple.pdf',
-    mead_cloud = "Mead.png",
-    powell_cloud = "Powell.png",
     main_pdf = main_pdf,
     csd_file = "csd_ann.feather"
   )
@@ -199,4 +190,16 @@ check_plot_group_scens <- function(ui, scen_names)
   assert_that(length(err) == 0, msg = paste(err, collapse = "\n"))
   
   invisible(ui)
+}
+
+# constructs a full file name based on provided info
+# used for files that would otherwise have the same name, but inserts in the 
+# plot_group name to the file
+construct_file_name <- function(ui, folder_paths, group_num, folder_name, 
+                                file_name)
+{
+  file.path(
+    folder_paths[[folder_name]],
+    paste0(names(ui[["plot_group"]])[group_num], "_", file_name)
+  )
 }

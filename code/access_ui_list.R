@@ -15,10 +15,6 @@ get_all_plot_scenarios <- function(ui)
     scens <- c(scens, ui$plot_group[[i]]$plot_scenarios)
   }
   
-  if (ui$create_figures$pe_clouds) {
-    scens <- c(scens, ui$clouds$scenarios)
-  }
-  
   unique(scens)
 }
 

@@ -8,13 +8,13 @@ library(cowplot)
 theme_set(theme_grey())
 library(imager)
 
-plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
+plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
 {
   # Used to generate cloud figures.  Commented out are colors used for plots in DCP presentations
   # and the median projections from the 07' Interim Guidelines (shown with double hash ##)
   
-  scenario <- ui$clouds$scenarios
-  scen_labs <- ui$clouds$scen_labs
+  scenario <- ui[["plot_group"]][[pg_i]][["plot_scenarios"]]
+  scen_labs <- ui[["plot_group"]][[pg_i]][["cloud"]][["scen_labs"]]
   legendTitle <- ui$defaults$color_label
   legendWrap <- ui$defaults$legend_wrap
   
@@ -217,7 +217,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
     labs(
       title = myTitle, 
       x = '', y = 'Elevation (feet msl)\n', 
-      caption = ui$clouds$caption
+      caption = ui[["plot_group"]][[pg_i]][["cloud"]][["caption"]]
     ) + 
     theme(plot.title = element_text(size = TitleSize),
           ## axis.text.x = element_text(size = AxisLab),
@@ -302,50 +302,64 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui)
   gg
 }
 
-plot_both_clouds <- function(pe, peYrs, ui, o_files)
+plot_both_clouds <- function(pe, peYrs, ui, folder_paths)
 {
   p_title <- 'Powell End-of-December Elevation'
   m_title <- 'Mead End-of-December Elevation'
+  
+  # loop through all plot_groups and if create == TRUE, create the cloud figure
     
-  if (ui$clouds$title_append != '') {
-    p_title <- paste(p_title, ui$clouds$title_append)
-    m_title <- paste(m_title, ui$clouds$title_append)
+  for (i in seq_along(ui[["plot_group"]])) {
+    if (ui[["plot_group"]][[i]][["cloud"]][["create"]]) {
+      
+      pg <- ui[["plot_group"]][[i]]
+      
+      if (pg[["cloud"]][["title_append"]] != '') {
+        p_title <- paste(p_title, pg[["cloud"]][["title_append"]])
+        m_title <- paste(m_title, pg[["cloud"]][["title_append"]])
+      }
+      
+      p_file <- construct_file_name(ui, folder_paths, i, "png_out", "Powell.png")
+      m_file <- construct_file_name(ui, folder_paths, i, "png_out", "Mead.png")
+      
+      powellCloud <- plotCloudFigs(
+        pe,
+        peYrs, 
+        "powell_dec_pe",
+        p_title,
+        ui,
+        i
+      )
+      
+      ggsave(
+        p_file, 
+        plot = powellCloud,
+        width = 9, 
+        height = 6.5, 
+        units = "in", 
+        dpi = 600
+      )
+      
+      message("   ... saved ", p_file)
+      
+      meadCloud <- plotCloudFigs(
+        pe,
+        peYrs, 
+        "mead_dec_pe", 
+        m_title,
+        ui,
+        i
+      )
+      ggsave(
+        m_file,
+        plot = meadCloud,
+        width = 9, 
+        height = 6.5, 
+        units = "in", 
+        dpi = 600
+      )
+      message("   ... saved ", m_file)
+    }
   }
-  
-  powellCloud <- plotCloudFigs(
-    pe,
-    peYrs, 
-    "powell_dec_pe",
-    p_title,
-    ui
-  )
-  
-  ggsave(
-    o_files$powell_cloud, 
-    plot = powellCloud,
-    width = 9, 
-    height = 6.5, 
-    units = "in", 
-    dpi = 600
-  )
-  
-  message("   ... saved ", o_files$powell_cloud)
-  
-  meadCloud <- plotCloudFigs(
-    pe,
-    peYrs, 
-    "mead_dec_pe", 
-    m_title,
-    ui
-  )
-  ggsave(
-    o_files$mead_cloud,
-    plot = meadCloud,
-    width = 9, 
-    height = 6.5, 
-    units = "in", 
-    dpi = 600
-  )
-  message("   ... saved ", o_files$mead_cloud)
 }
 

@@ -10,8 +10,8 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
     
     if (ui[["plot_group"]][[i]][["heat"]][["create"]]) {
       
-      m_file <- paste0(names(ui[["plot_group"]])[i], "_mead_heat.png")
-      p_file <- paste0(names(ui[["plot_group"]])[i], "_powell_heat.png")
+      m_file <- construct_file_name(ui, folder_paths, i, "png_out", "mead_heat.png")
+      p_file <-construct_file_name(ui, folder_paths, i, "png_out", "powell_heat.png")
   
       scen_names <- ui[["plot_group"]][[i]][["plot_scenarios"]]
       heat_title <- ui[["plot_group"]][[i]][["heat"]][["title"]]
@@ -23,13 +23,13 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
       )
       
       ggsave(
-        file.path(folder_paths$png_out, m_file), 
+        m_file, 
         plot = m_heat, 
         width = 8.91, 
         height = 5.65, 
         units = "in"
       )
-      message("   ... saved ", file.path(folder_paths$png_out, m_file))
+      message("   ... saved ", m_file)
       
       p_heat <- powell_system_condition_heatmap(
         filter(z2, Agg %in% scen_names),
@@ -38,13 +38,13 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
       )
       
       ggsave(
-        file.path(folder_paths$png_out, p_file), 
+        p_file, 
         plot = p_heat, 
         width = 8.91, 
         height = 5.65, 
         units = "in"
       )
-      message("   ... saved ", file.path(folder_paths$png_out, p_file))
+      message("   ... saved ", p_file)
     }
   }
   invisible(TRUE)
