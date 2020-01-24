@@ -93,7 +93,7 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
   tier_names <- powell_tier_names()
   n_yrs <- length(yrs)
 
-    # convert from all of the different dcp tiers to the simplified number of rows
+  # convert from all of the different dcp tiers to the simplified number of rows
   # then add in labels
   zz <- dcp %>%
     ungroup() %>%
@@ -210,7 +210,12 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
   # plot as a side-by-side heatmap
   zz %>%
     ggplot(aes(as.factor(Year), Variable, fill = Value)) +
-    facet_wrap(~Agg, nrow = 1, strip.position = "top", labeller = label_wrap_gen()) +
+    facet_wrap(
+      ~Agg, 
+      nrow = 1, 
+      strip.position = "top", 
+      labeller = label_wrap_gen()
+    ) +
     geom_tile() +
     # from https://uigradients.com/#HoneyDew
     scale_fill_gradient(
