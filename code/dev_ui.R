@@ -35,7 +35,7 @@ dev_ui <- function()
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
     crss_month = "jan2020_obs",
-    pdf_name = 'jan2020vnov2019.pdf',
+    pdf_name = 'jan2020_NFcompare.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -107,7 +107,7 @@ dev_ui <- function()
     
     # January 2020 scenarios
     create_scenario(
-      "Jan 2020 - IG DNF",
+      "Jan 2020 - IG DNF (2017)",
       scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,IG_DCP_4.3.0.9000,Most", 
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
@@ -115,7 +115,7 @@ dev_ui <- function()
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Jan 2020 - NA DNF",
+      "Jan 2020 - NA DNF (2017)",
       scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,NA_4.3.0.9000,Most", 
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
@@ -123,7 +123,7 @@ dev_ui <- function()
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Jan 2020 - IG ST",
+      "Jan 2020 - IG ST (2017)",
       scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,IG_DCP_4.3.0.9000,Most", 
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
@@ -131,8 +131,42 @@ dev_ui <- function()
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "Jan 2020 - NA ST",
+      "Jan 2020 - NA ST (2017)",
       scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,NA_4.3.0.9000,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    
+    # January 2020 scenarios with 2018 NF
+    create_scenario(
+      "Jan 2020 - IG DNF",
+      scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,IG_DCP,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = TRUE
+    ),
+    create_scenario(
+      "Jan 2020 - NA DNF",
+      scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,NA,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Jan 2020 - IG ST",
+      scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,IG_DCP,Most", 
+      ic = c(3608.74, 1090.49), 
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Jan 2020 - NA ST",
+      scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,NA,Most", 
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
       std_ind_tables = FALSE,
@@ -160,14 +194,14 @@ dev_ui <- function()
     #     ann_text = "Results from updated August 2019 CRSS run with stress test hydrology",
     #     end_year = 2026
     #   )
-    "Aug 2018 - IG" = list(
-      ann_text = "Results from the August 2018 IG run",
+    "Jan 2020 - IG DNF" = list(
+      ann_text = "Results from the January 2020 (observed initial conditions) run",
       end_year = 2026
     )
   )
 
   ind_plots <- specify_individual_plots(all_scenarios, std_ind_figures, defaults)
-    
+
   # for the 5-year simple table
   # value are the scenario group variable names (should be same as above)
   # the names are the new names that should show up in the table in case you need 
@@ -183,15 +217,6 @@ dev_ui <- function()
     # years to use for the simple 5-year table
     yy5 = 2020:2024
   )
-  
-  # the mainScenGroup is the scenario to use when creating the current month's 
-  # 5-year table, etc. In the plots, we want to show the previous months runs,
-  # but in the tables, we only want the current month run. This should match names
-  # in scens and icList
-  # TODO: remvoe this!!!!!!!!!!!!!!!!!!!!
-  mainScenGroup <- "Aug 2018 - IG"
-  names(mainScenGroup) <- mainScenGroup
-  scenarios[['mainScenGroup']] = mainScenGroup
   
   # comparison plots ------------- 
   # and the colors that are used for plotting 
@@ -236,8 +261,8 @@ dev_ui <- function()
     #     years = 2020:2040
     #   )
     # ),
-    "jan_comp" = list(
-      plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG DNF"),
+    #"jan_comp" = list(
+     # plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG DNF"),
       # heat = list(
       #   create = TRUE,
       #   scen_names = c(
@@ -248,16 +273,16 @@ dev_ui <- function()
       #   years = 2020:2026,
       #   caption = "This and that"
       # ),
-      cloud = list(
-        create = TRUE, 
-          # scenarios to include in cloud
-          scen_labs = c("Stress Test Hydrology", "Full Hydrology"),
-          # should default to '' if it is not specified
-          title_append = "from January 2020 CRSS",
-          # should be NULL if not specified. not ''
-          caption = "This and that"
-      )
-    )#,
+    #   cloud = list(
+    #     create = TRUE, 
+    #       # scenarios to include in cloud
+    #       scen_labs = c("Stress Test Hydrology", "Full Hydrology"),
+    #       # should default to '' if it is not specified
+    #       title_append = "from January 2020 CRSS",
+    #       # should be NULL if not specified. not ''
+    #       caption = "This and that"
+    #   )
+    # )#,
     # "nov_comp" = list(
     #   plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - IG ST"),
     #   heat = list(
@@ -271,6 +296,41 @@ dev_ui <- function()
     #     caption = "This and that"
     #   )
     # )
+    ig_hydro = list(
+      plot_scenarios = c("Jan 2020 - IG DNF", "Jan 2020 - IG DNF (2017)"),
+      cloud = list(
+        create = TRUE,
+        scen_labs = c("2018 NF", "2017 NF"),
+        title_append = "from January 2020 (observed) CRSS",
+        caption = NULL
+      ),
+      std_comparison = list(
+        create = TRUE,
+        years = 2020:2060
+      ),
+      csd_ann = list(
+        create = TRUE,
+        years = 2020:2040
+      )
+    ),
+    
+    ig_hydro_st = list(
+      plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG ST (2017)"),
+      cloud = list(
+        create = TRUE,
+        scen_labs = c("2018 ST", "2017 ST"),
+        title_append = "from January 2020 (observed) CRSS",
+        caption = NULL
+      ),
+      std_comparison = list(
+        create = TRUE,
+        years = 2020:2060
+      ),
+      csd_ann = list(
+        create = TRUE,
+        years = 2020:2040
+      )
+    )
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
