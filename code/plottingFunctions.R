@@ -355,7 +355,7 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 #'   names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
+create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
 {
   assert_that(
     length(scenNames) == 2, 
@@ -454,11 +454,31 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
       annotate('text', x = 1.5, y = 3.4, label = addFootnote, hjust = 0, size = 2)
   }
     
-  pdf(o_files$simple_5yr_file, width = 8, height = 8)
+  pdf(ofile, width = 8, height = 8)
   print(gg)
   dev.off()
   
   invisible(iData)
+}
+
+create_all_simple_5yr <- function(zz, ui, folder_paths)
+{
+  for (i in seq_along(ui[["plot_group"]])) {
+    if (ui[["plot_group"]][[i]][["simple_5yr"]][["create"]]) {
+      
+      ofile <- construct_file_name(
+        ui, folder_paths, i, "figs_folder", '5yrSimple.pdf'
+      )
+      
+      create5YrSimpleTable(
+        zz, 
+        ui[["plot_group"]][[i]][["simple_5yr"]][["scen_names"]], 
+        ui[["plot_group"]][[i]][["simple_5yr"]][["years"]], 
+        ui[["plot_group"]][[i]][["simple_5yr"]][["footnote"]],
+        ofile
+      )
+    }
+  }
 }
 
 determine_plot_colors <- function(plot_colors, col_vars)

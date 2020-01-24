@@ -21,8 +21,6 @@ dev_ui <- function()
   # "switches" to create/not create different figures
   # typical figures
   create_figures <- list(
-    simple_5yr_table = FALSE,
-    
     # optional figures/tables
     short_conditions = FALSE,
     pe_scatter_fig = FALSE
@@ -208,15 +206,6 @@ dev_ui <- function()
   # to add a footnote or longer name
   # this is the order they will show up in the table, so list the newest run 
   # second there should only be 2 scenarios
-  simple_5yr <- list(
-    ss5 = c(
-      "Nov 2019 - IG DNF" = "a", "Nov 2019 - IG ST" = "b"
-    ),
-    # this should either be a footnote corresponding to one of the ss5 names or NA
-    tableFootnote = NA,
-    # years to use for the simple 5-year table
-    yy5 = 2020:2024
-  )
   
   # comparison plots ------------- 
   # and the colors that are used for plotting 
@@ -296,39 +285,47 @@ dev_ui <- function()
     #     caption = "This and that"
     #   )
     # )
-    ig_hydro = list(
-      plot_scenarios = c("Jan 2020 - IG DNF", "Jan 2020 - IG DNF (2017)"),
-      cloud = list(
+    # ig_hydro = list(
+    #   plot_scenarios = c("Jan 2020 - IG DNF", "Jan 2020 - IG DNF (2017)"),
+    #   cloud = list(
+    #     create = TRUE,
+    #     scen_labs = c("2018 NF", "2017 NF"),
+    #     title_append = "from January 2020 (observed) CRSS",
+    #     caption = NULL
+    #   ),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   ),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2020:2040
+    #   )
+    # ),
+    nov2Jan = list(
+      plot_scenarios = c("Nov 2019 - IG DNF", "Jan 2020 - IG DNF"),
+      simple_5yr = list(
         create = TRUE,
-        scen_labs = c("2018 NF", "2017 NF"),
-        title_append = "from January 2020 (observed) CRSS",
-        caption = NULL
-      ),
-      std_comparison = list(
-        create = TRUE,
-        years = 2020:2060
-      ),
-      csd_ann = list(
-        create = TRUE,
-        years = 2020:2040
+        scen_names = c(
+          "Nov 2019 - IG DNF" = "Nov 2019", "Jan 2020 - IG DNF" = "Jan 2020"
+        ),
+        # this should either be a footnote corresponding to one of the names or NA
+        footnote = NA,
+        # years to use for the simple 5-year table
+        years = 2020:2024
       )
     ),
-    
-    ig_hydro_st = list(
-      plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG ST (2017)"),
-      cloud = list(
+    dnf_comp = list(
+      plot_scenarios = c("Jan 2020 - IG DNF (2017)", "Jan 2020 - IG DNF"),
+      simple_5yr = list(
         create = TRUE,
-        scen_labs = c("2018 ST", "2017 ST"),
-        title_append = "from January 2020 (observed) CRSS",
-        caption = NULL
-      ),
-      std_comparison = list(
-        create = TRUE,
-        years = 2020:2060
-      ),
-      csd_ann = list(
-        create = TRUE,
-        years = 2020:2040
+        scen_names = c(
+          "Jan 2020 - IG DNF (2017)" = "Jan - 2017 NF*", "Jan 2020 - IG DNF" = "Jan - 2018 NF"
+        ),
+        # this should either be a footnote corresponding to one of the names or NA
+        footnote = NA,
+        # years to use for the simple 5-year table
+        years = 2020:2024
       )
     )
   )
@@ -338,8 +335,10 @@ dev_ui <- function()
     check_plot_group_type("csd_ann") %>%
     check_plot_group_type("heat") %>%
     check_plot_group_type("cloud") %>%
+    check_plot_group_type("simple_5yr") %>%
     check_heat_scen_names() %>%
-    check_cloud_scen_names() 
+    check_cloud_scen_names() %>%
+    check_simple5yr_scen_names()
   
   # clouds --------------------------------
   
@@ -456,7 +455,6 @@ dev_ui <- function()
     folders = folders,
     defaults = defaults,
     scenarios = scenarios,
-    simple_5yr = simple_5yr,
     heatmap = heatmap,
     plot_group = plot_group,
     mead_pe_scatter = mead_pe_scatter,

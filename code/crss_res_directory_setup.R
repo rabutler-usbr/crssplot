@@ -130,7 +130,6 @@ crss_res_get_file_names <- function(main_pdf)
     # file name of Powell and Mead PE data
     cur_month_pe_file = 'MeadPowellPE.feather',
     short_cond_fig = 'shortConditionsFig.pdf',
-    simple_5yr_file = '5yrSimple.pdf',
     main_pdf = main_pdf,
     csd_file = "csd_ann.feather"
   )

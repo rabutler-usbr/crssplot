@@ -194,19 +194,13 @@ process_everything <- function(ui)
   }
   
   # 5 year simple table -------------------------
-  if (ui$create_figures$simple_5yr_table) {
-    
+  if (plot_flags[["simple_5yr"]]) {
     ## create the 5-yr simple table that compares to the previous run
     message("... creating 5-year simple table")
     tmp_data <- read_feather(o_files$sys_cond_file) %>%
       rbind(read_feather(o_files$cur_month_pe_file))
     
-    create5YrSimpleTable(
-      tmp_data, 
-      ui$simple_5yr$ss5, 
-      ui$simple_5yr$yy5, 
-      ui$simple_5yr$tableFootnote
-    )
+    create_all_simple_5yr(tmp_data, ui, folder_paths)
     
     rm(tmp_data)
   }
