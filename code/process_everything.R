@@ -129,10 +129,11 @@ process_everything <- function(ui)
     # defaults are ok for legendTitle, legLoc, nC, and annSize
     # drop Mead LT 1025 from one plot and Mead LT 1020 from 
     # the other plot
+
     tmp <- create_std_ind_figures(cs, sys_cond, cur_scen, ui)
     ind_figs <- c(ind_figs, tmp)
     
-    create_cs_csv(cs, cur_scen, folder_paths)
+    create_cs_csv(cs, cur_scen, folder_paths, ui)
   }
   
   comp_figs <- list()

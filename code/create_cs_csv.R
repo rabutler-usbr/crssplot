@@ -1,5 +1,9 @@
-create_cs_csv <- function(cs, scenario, o_folders)
+create_cs_csv <- function(cs, scenario, o_folders, ui)
 {
+  sy <- ui[["scen_tree"]][[scenario]][["start_year"]]
+  ey <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["options"]][["end_year"]]
+  yrs2show <- sy:ey
+  
   csVars <- csVarNames()
   # create data table to save crit stats
   cs_out <- cs %>%
