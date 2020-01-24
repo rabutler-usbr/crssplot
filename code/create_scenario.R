@@ -40,6 +40,16 @@ scenario_to_vars <- function(scenarios)
 {
   assert_that(is.list(scenarios) & length(scenarios) >= 1)
   
+  # make sure all scenario names are unique
+  dup_scens <- duplicated(names(scenarios))
+  assert_that(
+    !any(dup_scens),
+    msg = paste0(
+      "There should be no duplicated scenario names.\n", 
+      "Duplicate scenario names are:\n  - ",
+      paste(unique(names(scenarios)[dup_scens]), collapse = "\n  - "))
+  )
+  
   required_variables <- c("name", "ic", "scen_folders", "ic_month", "start_year")
   optional_variables <- c("std_ind_tables", "std_ind_figures", "cond_probs")
   
