@@ -163,8 +163,17 @@ process_everything <- function(ui)
     scatter_figs <- create_mead_pe_scatter(ui, o_files, traceMap)
   }
   
+  # conditions leading to shortage ---------------------------------
+  # pulled annotation out of generic function
+  short_cond_figs <- list()
+  if (plot_flags[["shortage_conditions"]]) {
+    message("... conditions leading to shortage")
+    short_cond_figs <- create_short_condition_figure(ui, folder_paths)
+  }
+  
   # Save figures -----------------------
-  if (length(comp_figs) > 0 || length(ind_figs) > 0 || length(scatter_figs) > 0) {
+  if (length(comp_figs) > 0 || length(ind_figs) > 0 || 
+      length(scatter_figs) > 0 || length(short_cond_figs > 0)) {
     # save figures and table
     message("\ncreating pdf: ", o_files$main_pdf, "\n")
     pdf(o_files$main_pdf, width = 8, height = 6)
@@ -180,6 +189,10 @@ process_everything <- function(ui)
     for (i in seq_along(scatter_figs)) {
       print(scatter_figs[[i]])
     }
+    
+    for (i in seq_along(short_cond_figs)) {
+      print(short_cond_figs[[i]])
+    }
     dev.off()
   }
   
@@ -194,13 +207,6 @@ process_everything <- function(ui)
     message("... conditional probabilities")
     cp_scens <- get_cond_prob_scens(ui)
     get_all_cond_probs(sys_cond, cp_scens, yrs2show, ui)
-  }
-  
-  # conditions leading to shortage ---------------------------------
-  # pulled annotation out of generic function
-  if (ui$create_figures$short_conditions) {
-    message("... conditions leading to shortage")
-    create_short_condition_figure(ui, o_files)
   }
   
   # 5 year simple table -------------------------

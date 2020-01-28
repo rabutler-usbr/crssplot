@@ -49,8 +49,9 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
       ind_plots$std_ind_tables[[scen_name]] <- TRUE
     }
     
+    # mead_pe_scatter -------------
     if (!is.null(scen_list[[i]][['mead_pe_scatter']])) {
-      # TODO: any defaults to check for/add? caption?
+    
       tmp <- scen_list[[i]][['mead_pe_scatter']]
       
       if (is.null(tmp[["ann_text"]])) {
@@ -62,6 +63,12 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
       }
       
       ind_plots[["mead_pe_scatter"]][[scen_name]] <- tmp
+    }
+    
+    # shortage_conditions -------------
+    if (!is.null(scen_list[[i]][['shortage_conditions']])) {
+      ind_plots[["shortage_conditions"]][[scen_name]] <- 
+        scen_list[[i]][['shortage_conditions']]
     }
   }
   

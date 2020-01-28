@@ -44,14 +44,9 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
   # shortage conditions ----------------------
   if (ui$process_data$crss_short_cond_data) {
     message("Starting to get CRSS shortage condition data...")
-    assert_that(length(ui$shortage_conditions$scenario) == 1)
-    assert_that(
-      ui$shortage_conditions$scenario %in% names(scens),
-      msg = "Shortage conditions specified scenario does not exist in data."
-    )
-    
+
     get_shortcond_from_rdf(
-      scenario = scens[[ui$shortage_conditions$scenario]], 
+      scenario = ui[["scenarios"]][["scens"]], 
       i_folder = ui$folders$i_folder, 
       oFolder = folder_paths$res_folder
     )

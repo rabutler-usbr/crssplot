@@ -18,13 +18,6 @@ dev_ui <- function()
     crss_short_cond_data = FALSE
   )
   
-  # "switches" to create/not create different figures
-  # typical figures
-  create_figures <- list(
-    # optional figures/tables
-    short_conditions = FALSE
-  )
-  
   # ** make sure CRSS_DIR is set correctly before running
   folders <- list(
     i_folder = "M:/Shared/CRSS",
@@ -69,90 +62,90 @@ dev_ui <- function()
   all_scenarios <- c(
 
     # November scenarios
-    create_scenario(
-      "Nov 2019 - IG DNF",
-      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,DNF,2007Dems,IG_DCP_v4.2.0.9000,Most", 
-      ic = c(3608.24, 1087.8), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Nov 2019 - NA DNF",
-      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,DNF,2007Dems,NA_v9002,Most", 
-      ic = c(3608.24, 1087.8), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Nov 2019 - IG ST",
-      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,ISM1988_2017,2007Dems,IG_DCP_v4.2.0.9000,Most", 
-      ic = c(3608.24, 1087.8), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Nov 2019 - NA ST",
-      scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,ISM1988_2017,2007Dems,NA_v9002,Most", 
-      ic = c(3608.24, 1087.8), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    
-    # January 2020 scenarios
-    create_scenario(
-      "Jan 2020 - IG DNF (2017)",
-      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,IG_DCP_4.3.0.9000,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Jan 2020 - NA DNF (2017)",
-      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,NA_4.3.0.9000,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Jan 2020 - IG ST (2017)",
-      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,IG_DCP_4.3.0.9000,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Jan 2020 - NA ST (2017)",
-      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,NA_4.3.0.9000,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    
-    # January 2020 scenarios with 2018 NF
-    create_scenario(
-      "Jan 2020 - IG DNF",
-      scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,IG_DCP,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Jan 2020 - NA DNF",
-      scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,NA,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
-    ),
+    # create_scenario(
+    #   "Nov 2019 - IG DNF",
+    #   scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,DNF,2007Dems,IG_DCP_v4.2.0.9000,Most", 
+    #   ic = c(3608.24, 1087.8), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Nov 2019 - NA DNF",
+    #   scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,DNF,2007Dems,NA_v9002,Most", 
+    #   ic = c(3608.24, 1087.8), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Nov 2019 - IG ST",
+    #   scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,ISM1988_2017,2007Dems,IG_DCP_v4.2.0.9000,Most", 
+    #   ic = c(3608.24, 1087.8), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Nov 2019 - NA ST",
+    #   scen_folders = "2019/Scenario_dev/Nov2019_2020_9005,ISM1988_2017,2007Dems,NA_v9002,Most", 
+    #   ic = c(3608.24, 1087.8), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # 
+    # # January 2020 scenarios
+    # create_scenario(
+    #   "Jan 2020 - IG DNF (2017)",
+    #   scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,IG_DCP_4.3.0.9000,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Jan 2020 - NA DNF (2017)",
+    #   scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,NA_4.3.0.9000,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Jan 2020 - IG ST (2017)",
+    #   scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,IG_DCP_4.3.0.9000,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Jan 2020 - NA ST (2017)",
+    #   scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,ISM1988_2017,2007Dems,NA_4.3.0.9000,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # 
+    # # January 2020 scenarios with 2018 NF
+    # create_scenario(
+    #   "Jan 2020 - IG DNF",
+    #   scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,IG_DCP,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
+    # create_scenario(
+    #   "Jan 2020 - NA DNF",
+    #   scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,NA,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = FALSE
+    # ),
     create_scenario(
       "Jan 2020 - IG ST",
       scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,IG_DCP,Most", 
@@ -166,6 +159,22 @@ dev_ui <- function()
         # if relying on combined run, then this is likely MTOM; if using a CRSS only 
         # run, then likely set to CRSS
         model = 'CRSS'
+      ),
+      
+      shortage_conditions = list(
+        # string should be either CRSS or MTOM
+        model = "CRSS", 
+        # year is used in the plot labeling. This is typically the first year
+        # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
+        # the first year of shortage for a CRSS run, i.e., it uses the December elev.
+        # at MEad for that year, and the OND release from that year from Powell
+        year = 2020,
+        color_var = "mwdIcs",
+        subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
+        # specify the segment start and stop c(xstart, xend, ystart, yend)
+        segment_locs = c(16.9, 14.5, 1055, 1056.4),
+        # specify the annotation location: c(x, y)
+        annotation_loc = c(2, 1075)
       )
     ),
     create_scenario(
@@ -186,6 +195,22 @@ dev_ui <- function()
         model = 'CRSS',
         ann_text = "These are from the NA - ST run",
         add_threshold_stats = FALSE
+      ),
+      
+      shortage_conditions = list(
+        # string should be either CRSS or MTOM
+        model = "CRSS", 
+        # year is used in the plot labeling. This is typically the first year
+        # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
+        # the first year of shortage for a CRSS run, i.e., it uses the December elev.
+        # at MEad for that year, and the OND release from that year from Powell
+        year = 2020,
+        color_var = "mwdIcs",
+        subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
+        # specify the segment start and stop c(xstart, xend, ystart, yend)
+        segment_locs = c(16.9, 14.5, 1055, 1056.4),
+        # specify the annotation location: c(x, y)
+        annotation_loc = c(17, 1054)
       )
     )
   )
@@ -358,8 +383,7 @@ dev_ui <- function()
     check_cloud_scen_names() %>%
     check_simple5yr_scen_names()
   
-  # clouds --------------------------------
-  
+
   # TODO: update this so that scen_labs does not have to be specified, and if it
   # isn't, then just the scenarios are used.
   # clouds <- list(
@@ -373,98 +397,14 @@ dev_ui <- function()
   #   caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
   # )
   
-  # conditions leading to shortage --------------------------- 
-  shortage_conditions <- list(
-    # string should be either CRSS or MTOM
-    model = "CRSS", 
-    scenario = "Aug 2018 - IG",
-    # yearToAnalyze is used in the plot labeling. This is typically the first year
-    # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
-    # the first year of shortage for a CRSS run, i.e., it uses the December elev.
-    # at MEad for that year, and the OND release from that year from Powell
-    year = 2019,
-    color_var = "mwdIcs",
-    subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
-    # specify the segment start and stop c(xstart, xend, ystart, yend)
-    segment_locs = c(16.9, 14.5, 1055, 1056.4),
-    # specify the annotation location: c(x, y)
-    annotaion_loc = c(17, 1054)
-    
-    # TODO: test MTOM still works
-    # model = "MTOM",
-    # scenario = NA, # should be NA for MTOM
-    # year = 2019,
-    # color_var = "WYRelease",
-    # subtitle = 'Results from the January 2018 MTOM run based on the January 3, 2017 CBRFC forecast',
-    # see doc/README for instructions for how to create this csv file
-    # res_file = paste0(folders$CRSSDIR,'/MTOM/FirstYearCondMTOM/Jan2018MTOMResults.csv') 
-  )
-  
-  assert_that(
-    shortage_conditions$model %in% c("CRSS", "MTOM"), 
-    msg = "The shortage conditions model should either be 'MTOM' or 'CRSS'"
-  )
-  
-  if (shortage_conditions$model == "CRSS") {
-    assert_that(
-      is.null(shortage_conditions$res_file),
-      msg = "`res_file` should be null when model is CRSS"
-    )
-  
-    shortage_conditions[['res_file']] <- file.path(
-      folders$CRSSDIR,'results', folders$crss_month, 'tempData'
-    )
-    
-    assert_that(
-      length(shortage_conditions$scenario) == 1,
-      msg = "Only one scenario should be specified"
-    )
-    
-    assert_that(
-      shortage_conditions$color_var %in% c("mwdIcs", "WYRelease"),
-      msg = paste0(
-        "When using CRSS to determine conditions leading to shortage,\n",
-        "the `color_var` should be either 'mwdIcs', or 'WYRelease'."  
-      )
-    )
-
-    # the label for the percent of average
-    shortage_conditions[['lb_label']] <- "Total LB natural inflow percent\nof average (1906-2015)"
-  } else {
-    # have already determined that it is either CRSS or MTOM,so must be MTOM
-    
-    assert_that(
-      shortage_conditions$color_var %in% c("WYRelease"),
-      msg = paste0(
-        "When using MTOM to determine conditions leading to shortage,\n",
-        "the `color_var` must be 'WYRelease'."  
-      )
-    )
-    
-    assert_that(
-      is.na(shortage_conditions$scenario), 
-      msg = "For MTOM, the scenario should be `NA`"
-    )
-    
-    # the label for the percent of average
-    shortage_conditions[['lb_label']] <- 'LB total side inflow percent\nof average (1981-2015)'
-  }
-  
-  shortage_conditions[['title']] <- paste(
-    'Conditions Leading to a Lower Basin Shortage in',
-    shortage_conditions$year + 1
-  )
-  
   # return ---------------
   list(
     process_data = process_data,
-    create_figures = create_figures,
     folders = folders,
     defaults = defaults,
     scenarios = scenarios,
     heatmap = heatmap,
     plot_group = plot_group,
-    shortage_conditions = shortage_conditions,
     ind_plots = ind_plots,
     scen_tree = all_scenarios
   )

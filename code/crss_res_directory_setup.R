@@ -29,13 +29,6 @@ crss_res_check_scen_names <- function(scens, icList, icMonth, ui)
     msg = "scenario goup names of ss5 must match the names found in scens"
   )
   
-  if (ui$create_figures$short_conditions) {
-    assert_that(
-      length(ui$shortage_conditions$res_file) == 1, 
-      msg = "conditions leading to shortage is only designed to work with 1 scenario"
-    )
-  }
-  
   invisible(scens)
 }
 

@@ -6,6 +6,7 @@ get_plot_flags <- function(ui)
   cloud <- FALSE
   simple_5yr <- FALSE
   mead_pe_scatter <- FALSE
+  shortage_conditions <- FALSE
   
   for (i in seq_along(ui[["plot_group"]])) {
     csd_flag <- csd_flag | ui[["plot_group"]][[i]][["csd_ann"]][["create"]]
@@ -25,6 +26,10 @@ get_plot_flags <- function(ui)
   if (length(ui[["ind_plots"]][["mead_pe_scatter"]]) > 0)
     mead_pe_scatter <- TRUE
   
+  # shortage_conditions
+  if (length(ui[["ind_plots"]][["shortage_conditions"]]) > 0)
+    shortage_conditions <- TRUE
+  
   list(
     csd_flag = csd_flag, 
     cond_probs = cond_probs, 
@@ -32,6 +37,7 @@ get_plot_flags <- function(ui)
     heat = heat,
     cloud = cloud,
     simple_5yr = simple_5yr,
-    mead_pe_scatter = mead_pe_scatter
+    mead_pe_scatter = mead_pe_scatter,
+    shortage_conditions = shortage_conditions
   )
 }

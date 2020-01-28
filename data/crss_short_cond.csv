@@ -3,5 +3,5 @@ KeySlots.rdf,Mead.Pool Elevation,eocy,NA,NA,NA,DecElev
 KeySlots.rdf,PowellOperation.PowellWYRelease,eocy,NA,NA,0.000001,WYRelease
 Check.rdf,TotVal.Mead,cy,sum,NA,NA,nfAbvMead
 Check.rdf,TotVal.BelowMead,cy,sum,NA,NA,nfBelowMead
-BankAnn.rdf,Mead Bank.MWD Take Schedule,asis,NA,NA,0.001,mwdTake
-BankAnn.rdf,Mead Bank.MWD Put Schedule,asis,NA,NA,0.001,mwdPut
+MWDICS.rdf,MWD ICS.ECActualAnnualTake,asis,NA,NA,0.001,mwdTake
+MWDICS.rdf,MWD ICS.ECActualAnnualTake,asis,NA,NA,0.001,mwdPut
