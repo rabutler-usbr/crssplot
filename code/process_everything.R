@@ -129,7 +129,6 @@ process_everything <- function(ui)
     # defaults are ok for legendTitle, legLoc, nC, and annSize
     # drop Mead LT 1025 from one plot and Mead LT 1020 from 
     # the other plot
-
     tmp <- create_std_ind_figures(cs, sys_cond, cur_scen, ui)
     ind_figs <- c(ind_figs, tmp)
     
@@ -157,8 +156,15 @@ process_everything <- function(ui)
     comp_figs <- c(comp_figs, create_all_csd_boxplots(csd_ann, ui))
   }
   
+  # mead pe scatter ------------------
+  scatter_figs <- list()
+  if (plot_flags[["mead_pe_scatter"]]) {
+    message("... Mead elevation scatter plot")
+    scatter_figs <- create_mead_pe_scatter(ui, o_files, traceMap)
+  }
+  
   # Save figures -----------------------
-  if (length(comp_figs) > 0 | length(ind_figs) > 0) {
+  if (length(comp_figs) > 0 || length(ind_figs) > 0 || length(scatter_figs) > 0) {
     # save figures and table
     message("\ncreating pdf: ", o_files$main_pdf, "\n")
     pdf(o_files$main_pdf, width = 8, height = 6)
@@ -169,6 +175,10 @@ process_everything <- function(ui)
     
     for (i in seq_along(ind_figs)) {
       print(ind_figs[[i]])
+    }
+    
+    for (i in seq_along(scatter_figs)) {
+      print(scatter_figs[[i]])
     }
     dev.off()
   }
@@ -205,9 +215,4 @@ process_everything <- function(ui)
     rm(tmp_data)
   }
   
-  # mead pe scatter ------------------
-  if (ui$create_figures$pe_scatter_fig) {
-    message("... Mead elevation scatter plot")
-    create_mead_pe_scatter(ui, o_files, traceMap)
-  }
 }

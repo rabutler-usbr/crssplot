@@ -4,7 +4,7 @@ library(assertthat)
 # specified in it
 create_scenario <- function(name, scen_folders, ic, start_year, 
                             std_ind_tables = FALSE, std_ind_figures = FALSE,
-                            cond_probs = FALSE)
+                            cond_probs = FALSE, mead_pe_scatter = NULL)
 {
   assert_that(length(name) == 1 & is.character(name))
   assert_that(length(scen_folders) >= 1 & is.character(scen_folders))
@@ -29,7 +29,8 @@ create_scenario <- function(name, scen_folders, ic, start_year,
     start_year = start_year,
     std_ind_tables = std_ind_tables,
     std_ind_figures = std_ind_figures,
-    cond_probs = cond_probs
+    cond_probs = cond_probs,
+    mead_pe_scatter = mead_pe_scatter
   )
   
   rr
@@ -51,7 +52,8 @@ scenario_to_vars <- function(scenarios)
   )
   
   required_variables <- c("name", "ic", "scen_folders", "ic_month", "start_year")
-  optional_variables <- c("std_ind_tables", "std_ind_figures", "cond_probs")
+  optional_variables <- c("std_ind_tables", "std_ind_figures", "cond_probs",
+                          "mead_pe_scatter")
   
   scens <- list()
   ic_list <- list()

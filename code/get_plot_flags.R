@@ -5,6 +5,7 @@ get_plot_flags <- function(ui)
   heat <- FALSE
   cloud <- FALSE
   simple_5yr <- FALSE
+  mead_pe_scatter <- FALSE
   
   for (i in seq_along(ui[["plot_group"]])) {
     csd_flag <- csd_flag | ui[["plot_group"]][[i]][["csd_ann"]][["create"]]
@@ -18,8 +19,11 @@ get_plot_flags <- function(ui)
 
   for (i in seq_along(ui[["scen_tree"]])) {
     cond_probs <- cond_probs | ui[["scen_tree"]][[i]][["cond_probs"]]
-    
   }
+  
+  # mead_pe_scatter
+  if (length(ui[["ind_plots"]][["mead_pe_scatter"]]) > 0)
+    mead_pe_scatter <- TRUE
   
   list(
     csd_flag = csd_flag, 
@@ -27,6 +31,7 @@ get_plot_flags <- function(ui)
     std_comparison = std_comparison,
     heat = heat,
     cloud = cloud,
-    simple_5yr = simple_5yr
+    simple_5yr = simple_5yr,
+    mead_pe_scatter = mead_pe_scatter
   )
 }

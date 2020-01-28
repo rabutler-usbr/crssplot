@@ -63,7 +63,8 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
   gg
 }
 
-singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
+singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL, 
+                                addThreshStats)
 {
   zz <- zz %>% filter(Year == yr, Variable == var) %>%
     mutate(TheColor = ifelse(Value <= 1075, '<= 1,075\'', 
@@ -79,7 +80,10 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
   
   gg <- ggplot(zz, aes(TraceNumber, Value, color = TheColor)) + 
     geom_point(size = 3, shape = 18) +
-    labs(x = 'Trace Number', y = 'Pool Elevation [ft]', title = myTitle) + 
+    labs(
+      x = 'Trace Number', y = 'Pool Elevation [ft]', 
+      title = myTitle, caption = caption
+    ) + 
     scale_y_continuous(
       label = scales::comma, 
       minor_breaks = seq(800, 1200, 5)
@@ -87,7 +91,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
     scale_color_manual(values = myCols) +
     theme(legend.title = element_blank())
   
-  if(addThreshStats){
+  if (addThreshStats) {
     nn <- zz %>%
       mutate(lt1075 = ifelse(Value <= 1075, 1, 0),
              lt1076 = ifelse(Value <= 1076 & Value > 1075, 1, 0),
@@ -499,47 +503,68 @@ determine_plot_colors <- function(plot_colors, col_vars)
 
 create_mead_pe_scatter <- function(ui, o_files, traceMap)
 {
-  if (ui$mead_pe_scatter$model == "CRSS") {
-    pe <- read_feather(o_files$cur_month_pe_file) %>%
-      filter(Agg == ui$mead_pe_scatter$scenario)
+  gg_out <- list()
+  for (i in seq_along(ui[["ind_plots"]][["mead_pe_scatter"]])) {
+    message("   ... ", names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
     
-  } else if (ui$mead_pe_scatter$model == "MTOM") {
+    tmp_model <- ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["model"]]
     
-    icDim <- 1981:2015
-    tmpIcMonth <- paste(str_replace(ui$mead_pe_scatter$year, "20", ""), "Dec", sep = "-")
-    decVals <- do.call(
-      rbind, 
-      lapply(
-        icDim, 
-        get1TraceIc, 
-        icList[[ui$mead_pe_scatter$scenario]], 
-        tmpIcMonth, 
-        traceMap
+    if (tmp_model == "CRSS") {
+      pe <- read_feather(o_files$cur_month_pe_file) %>%
+        filter(Agg == names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
+      
+    } else if (tmp_model == "MTOM") {
+      
+      icDim <- 1981:2015
+      tmpIcMonth <- paste(
+        str_replace(
+          ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], "20", ""
+        ), 
+        "Dec", 
+        sep = "-"
       )
+      
+      decVals <- do.call(
+        rbind, 
+        lapply(
+          icDim, 
+          get1TraceIc, 
+          icList[[names(ui[["ind_plots"]][["mead_pe_scatter"]])[i]]], 
+          tmpIcMonth, 
+          traceMap
+        )
+      )
+      traceNum <- traceMap$trace[match(icDim, traceMap$ic)]
+      
+      pe <- decVals %>%
+        select(`Mead.Pool Elevation`) %>%
+        rename(Value = `Mead.Pool Elevation`) %>%
+        mutate(
+          TraceNumber = as.numeric(traceNum), 
+          Year = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]],
+          Variable = "mead_dec_pe"
+        )
+      
+    } else {
+      stop("Invalid peScatterData variable")
+    }
+    scatterTitle <- paste(
+      'Lake Mead December', 
+      ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], 
+      'Elevations from', 
+      ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["model"]]
     )
-    traceNum <- traceMap$trace[match(icDim, traceMap$ic)]
     
-    pe <- decVals %>%
-      select(`Mead.Pool Elevation`) %>%
-      rename(Value = `Mead.Pool Elevation`) %>%
-      mutate(TraceNumber = as.numeric(traceNum), 
-             Year = ui$mead_pe_scatter$year,
-             Variable = "mead_dec_pe")
-    
-  } else {
-    stop("Invalid peScatterData variable")
+    gg <- singleYearPEScatter(
+      pe, 
+      ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], 
+      'mead_dec_pe', 
+      scatterTitle, 
+      caption = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["ann_text"]],
+      addThreshStats = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["add_threshold_stats"]]
+    )
+    gg_out[[i]] <- gg
   }
-  scatterTitle <- paste('Lake Mead December', ui$mead_pe_scatter$year, 
-                        'Elevations from', ui$mead_pe_scatter$model)
   
-  gg <- singleYearPEScatter(pe, ui$mead_pe_scatter$year, 'mead_dec_pe', 
-                            scatterTitle, TRUE)
-  
-  tpath <- file.path(
-    folder_paths$figs_folder, 
-    paste0('meadScatterFigure_', ui$mead_pe_scatter$year, '.pdf')
-  )
-  pdf(tpath, width = 8, height = 6)
-  print(gg)
-  dev.off()
+  gg_out
 }

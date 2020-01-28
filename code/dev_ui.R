@@ -22,8 +22,7 @@ dev_ui <- function()
   # typical figures
   create_figures <- list(
     # optional figures/tables
-    short_conditions = FALSE,
-    pe_scatter_fig = FALSE
+    short_conditions = FALSE
   )
   
   # ** make sure CRSS_DIR is set correctly before running
@@ -33,7 +32,7 @@ dev_ui <- function()
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
     crss_month = "jan2020_obs",
-    pdf_name = 'jan2020_NFcompare.pdf',
+    pdf_name = 'dev.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -144,7 +143,7 @@ dev_ui <- function()
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
       std_ind_tables = FALSE,
-      std_ind_figures = TRUE
+      std_ind_figures = FALSE
     ),
     create_scenario(
       "Jan 2020 - NA DNF",
@@ -160,15 +159,34 @@ dev_ui <- function()
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
       std_ind_tables = FALSE,
-      std_ind_figures = FALSE
+      std_ind_figures = TRUE,
+      mead_pe_scatter = list(
+        year = 2020,
+        # peScatterData should be set to either MTOM or CRSS
+        # if relying on combined run, then this is likely MTOM; if using a CRSS only 
+        # run, then likely set to CRSS
+        model = 'CRSS'
+      )
     ),
     create_scenario(
       "Jan 2020 - NA ST",
       scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,NA,Most", 
       ic = c(3608.74, 1090.49), 
       start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE,
+      # mead pe scatter parameters -------------------------------
+      # plot a single year of Mead PE
+
+      mead_pe_scatter = list(
+        year = 2020,
+        # peScatterData should be set to either MTOM or CRSS
+        # if relying on combined run, then this is likely MTOM; if using a CRSS only 
+        # run, then likely set to CRSS
+        model = 'CRSS',
+        ann_text = "These are from the NA - ST run",
+        add_threshold_stats = FALSE
+      )
     )
   )
 
@@ -302,32 +320,32 @@ dev_ui <- function()
     #     years = 2020:2040
     #   )
     # ),
-    nov2Jan = list(
-      plot_scenarios = c("Nov 2019 - IG DNF", "Jan 2020 - IG DNF"),
-      simple_5yr = list(
-        create = TRUE,
-        scen_names = c(
-          "Nov 2019 - IG DNF" = "Nov 2019", "Jan 2020 - IG DNF" = "Jan 2020"
-        ),
-        # this should either be a footnote corresponding to one of the names or NA
-        footnote = NA,
-        # years to use for the simple 5-year table
-        years = 2020:2024
-      )
-    ),
-    dnf_comp = list(
-      plot_scenarios = c("Jan 2020 - IG DNF (2017)", "Jan 2020 - IG DNF"),
-      simple_5yr = list(
-        create = TRUE,
-        scen_names = c(
-          "Jan 2020 - IG DNF (2017)" = "Jan - 2017 NF*", "Jan 2020 - IG DNF" = "Jan - 2018 NF"
-        ),
-        # this should either be a footnote corresponding to one of the names or NA
-        footnote = NA,
-        # years to use for the simple 5-year table
-        years = 2020:2024
-      )
-    )
+    # nov2Jan = list(
+    #   plot_scenarios = c("Nov 2019 - IG DNF", "Jan 2020 - IG DNF"),
+    #   simple_5yr = list(
+    #     create = TRUE,
+    #     scen_names = c(
+    #       "Nov 2019 - IG DNF" = "Nov 2019", "Jan 2020 - IG DNF" = "Jan 2020"
+    #     ),
+    #     # this should either be a footnote corresponding to one of the names or NA
+    #     footnote = NA,
+    #     # years to use for the simple 5-year table
+    #     years = 2020:2024
+    #   )
+    # ),
+    # dnf_comp = list(
+    #   plot_scenarios = c("Jan 2020 - IG DNF (2017)", "Jan 2020 - IG DNF"),
+    #   simple_5yr = list(
+    #     create = TRUE,
+    #     scen_names = c(
+    #       "Jan 2020 - IG DNF (2017)" = "Jan - 2017 NF*", "Jan 2020 - IG DNF" = "Jan - 2018 NF"
+    #     ),
+    #     # this should either be a footnote corresponding to one of the names or NA
+    #     footnote = NA,
+    #     # years to use for the simple 5-year table
+    #     years = 2020:2024
+    #   )
+    # )
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
@@ -354,17 +372,6 @@ dev_ui <- function()
   #   # should be NULL if not specified. not ''
   #   caption = "*There was an error in the original August 2019 CRSS results. The December 2019 Update fixes the error."
   # )
-  
-  # mead pe scatter parameters -------------------------------
-  # plot a single year of Mead PE
-  mead_pe_scatter <- list(
-    year = 2019,
-    # peScatterData should be set to either MTOM or CRSS
-    # if relying on combined run, then this is likely MTOM; if using a CRSS only 
-    # run, then likely set to CRSS
-    model = 'MTOM',
-    scenario = "June Stress Test - IG"
-  )
   
   # conditions leading to shortage --------------------------- 
   shortage_conditions <- list(
@@ -457,7 +464,6 @@ dev_ui <- function()
     scenarios = scenarios,
     heatmap = heatmap,
     plot_group = plot_group,
-    mead_pe_scatter = mead_pe_scatter,
     shortage_conditions = shortage_conditions,
     ind_plots = ind_plots,
     scen_tree = all_scenarios

@@ -1,9 +1,10 @@
+# See https://github.com/BoulderCodeHub/Process-CRSS-Res/wiki/Individual-Plots-List
 # this will specify the list of individual plots to make
 # ind_plots
 #   $std_ind_figures
 #   $std_ind_tables
 #   $shortage_conditions
-#   $pe_scatter
+#   $mead_pe_scatter
 # each entry in the list, will have multiple lists where the name corresponds
 # to a scenario, and that is a list that has the plot options in it:
 #   $std_ind_figures[['Scenario']]
@@ -15,7 +16,7 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
     "std_ind_figures" = list(),
     "std_ind_tables" = list(),
     "shortage_conditions" = list(),
-    "pe_scatter" = list()
+    "mead_pe_scatter" = list()
   )
  
   # loop through scen_list and find scenarios with XXX = TRUE
@@ -25,7 +26,9 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
       scen_name <- scen_list[[i]]$name
       tmp = list("options" = list(
         ann_text = std_fig_specs[[scen_name]]$ann_text,
-        end_year = std_fig_specs[[scen_name]]$end_year
+        end_year = default_or_specified(
+          "end_year", std_fig_specs[[scen_name]], defaults
+        )
       ))
       
       tmp[['options']][["legend_wrap"]] <- default_or_specified(
@@ -45,6 +48,21 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
       # TODO: are there any table options?
       ind_plots$std_ind_tables[[scen_name]] <- TRUE
     }
+    
+    if (!is.null(scen_list[[i]][['mead_pe_scatter']])) {
+      # TODO: any defaults to check for/add? caption?
+      tmp <- scen_list[[i]][['mead_pe_scatter']]
+      
+      if (is.null(tmp[["ann_text"]])) {
+        tmp[["ann_text"]] <- names(scen_list)[[i]]
+      }
+      
+      if (is.null(tmp[["add_threshold_stats"]])) {
+        tmp[["add_threshold_stats"]] <- TRUE
+      }
+      
+      ind_plots[["mead_pe_scatter"]][[scen_name]] <- tmp
+    }
   }
   
   ind_plots
@@ -52,7 +70,7 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
 
 default_or_specified <- function(option, specified, defaults) 
 {
-  if (exists(option, where = specified)) {
+  if (!is.null(specified) && exists(option, where = specified)) {
     rv <- specified[[option]]
   } else {
     rv <- defaults[[option]]
