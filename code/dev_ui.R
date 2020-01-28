@@ -50,13 +50,14 @@ dev_ui <- function()
     # how to label the color scale on the plots
     color_label = 'Scenario',
     # text that will be added to figures
-    end_year = 2060
+    end_year = 2060,
+    start_year = 2019
   )
   # TODO: update so that these are computed if not specified
   # years to show the crit stats figures  
-  defaults[['plot_yrs']] <- 2019:defaults$end_year 
+  defaults[['plot_yrs']] <- defaults$start_year:defaults$end_year 
   # years to show the Mead/Powell 10/50/90 figures for
-  defaults[['pe_yrs']] <- 2018:defaults$end_year
+  defaults[['pe_yrs']] <- (defaults$start_year - 1):defaults$end_year
   
   # specify the scenarios -------------------------
   all_scenarios <- c(
@@ -403,7 +404,6 @@ dev_ui <- function()
     folders = folders,
     defaults = defaults,
     scenarios = scenarios,
-    heatmap = heatmap,
     plot_group = plot_group,
     ind_plots = ind_plots,
     scen_tree = all_scenarios
