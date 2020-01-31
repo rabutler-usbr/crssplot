@@ -111,14 +111,17 @@ check_simple5yr_scen_names <- function(pg)
   pg
 }
 
-# checks the scen_labs in cloud and ensures that they have the same length
-# as the plot_scenarios
-check_cloud_scen_names <- function(pg)
+# checks cloud specification
+# checks that the scen_labs in cloud have the same length as the plot_scenarios
+# also checks to see if years is specified. If years is not specified, then it
+# goes it goes from 1999 to the maximum of pe_yrs
+check_cloud_specification <- function(pg, defaults)
 {
   err <- NULL
 
   for (i in seq_along(pg)) {
     if (exists("cloud", where = pg[[i]]) & pg[[i]][["cloud"]][["create"]]) {
+      # check the names 
       spec_names <- pg[[i]][["cloud"]][["scen_labs"]]
       
       if (length(spec_names) != length(pg[[i]][["plot_scenarios"]])) {
@@ -130,6 +133,11 @@ check_cloud_scen_names <- function(pg)
             " plot_group, need to have the same length as the specified plot_scenarios:"
           )
         )
+      }
+      
+      # check the years. if it is not specified, set it to the default
+      if (is.null(pg[[i]][["cloud"]][["years"]])) {
+        pg[[i]][["cloud"]][["years"]] <- 1999:max(defaults[["pe_yrs"]])
       }
     }
   }

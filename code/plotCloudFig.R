@@ -76,7 +76,8 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   }
   
   # Appending historical data
-  zz <- bind_rows(hist,zz)
+  zz <- bind_rows(hist,zz) %>%
+    filter(Year %in% yrs)
   ##zz <- bind_rows(zz,IGProj)
   
   # Setting colors for graph- ensures historical data is black on plot
@@ -194,10 +195,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   )
  
   # Generate plot
-  gg <- gg + geom_vline(xintercept=2007, size = IGStartLine, color = '#808080') + 
-    annotate("text", x=2007.1, y = yaxmin, 
-             label = 'Adoption of the 2007\nInterim Guidelines', size = LabSize, hjust = 0,
-             fontface = "bold", color = '#303030') + 
+  gg <- gg +  
     geom_vline(xintercept=2019, size = IGStartLine, color = '#808080') +
     annotate("text", x=2019.1, y = yaxmin, label = 'Adoption of the Drought\nContingency Plan', 
              size = LabSize, hjust = 0, fontface = "bold", color = '#303030') +
@@ -227,29 +225,91 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
           panel.grid.major = element_line(size = GridMaj)) +
     guides(fill=FALSE)
   
-  # Add in lines for Powell or Mead operations
+  # Add in lines for Powell or Mead operations --------------------
+  if (min(yrs) <= 2007) {
+    ig_start <- 2007
+    ig_label <- 2007.1
+    
+    # only add the vertical line if we are showing data in/before 2007
+    gg <- gg +
+      geom_vline(
+        xintercept = ig_start, 
+        size = IGStartLine, 
+        color = '#808080'
+      ) + 
+      annotate(
+        "text", x = ig_label, y = yaxmin, 
+        label = 'Adoption of the 2007\nInterim Guidelines', 
+        size = LabSize, 
+        hjust = 0,
+        fontface = "bold", 
+        color = '#303030'
+      )
+    
+  } else {
+    ig_start <- min(yrs)
+    ig_label <- ig_start + 0.1
+  }
+  
   if (is_powell) {
     # Powell
     gg <- gg +
       # Adding lines and annotation for Powell ops - plot only if Switch = True
-      geom_line(data=EQLine, aes(x = Year, y = EQLine), size = OpsLines,
-                           color = '#808080', linetype = 3) + 
-      annotate("text", x = 2007.1, y = yaxmax, label = "Equalization Tier", 
-                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
+      geom_line(
+        data = filter(EQLine, Year %in% yrs), 
+        aes(x = Year, y = EQLine), 
+        size = OpsLines,
+        color = '#808080', 
+        linetype = 3
+      ) + 
+      annotate(
+        "text", x = ig_label, y = yaxmax, 
+        label = "Equalization Tier", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      ) +
       ##{if(Switch)geom_segment(x=1998, y=3490, xend =2026, yend = 3490, size = OpsLines, 
       ##   color ='#808080', linetype = 3)} + 
       ##{if(Switch)annotate("text", x = 1999.5, y = 3485, label = "Minimum Power Pool", 
       ##   size = LabSize, hjust = 0, fontface = "italic", color = '#505050')} +
-     geom_segment(x=2007, y=3525, xend =2026, yend = 3525, size = OpsLines, 
-                              color ='#808080', linetype = 3) + 
-      annotate("text", x = 2007.1, y = 3520, label = "Lower Elevation Balancing Tier", 
-                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +    
-      geom_segment(x=2007, y=3575, xend =2026, yend = 3575, size = OpsLines, 
-                              color ='#808080', linetype = 3) + 
-      annotate("text", x = 2007.1, y = 3570, label = "Mid Elevation Release Tier", 
-                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050') + 
-      annotate("text", x = 2007.1, y = 3582, label = "Upper Elevation Balancing Tier", 
-                          size = LabSize, hjust = 0, fontface = "italic", color = '#505050')
+     geom_segment(
+       x = ig_start, y = 3525, xend = 2026, yend = 3525, 
+       size = OpsLines, 
+       color ='#808080', 
+       linetype = 3
+      ) + 
+      annotate(
+        "text", x = ig_label, y = 3520, 
+        label = "Lower Elevation Balancing Tier", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      ) +    
+      geom_segment(
+        x = ig_start, y = 3575, xend = 2026, yend = 3575, 
+        size = OpsLines, 
+        color ='#808080', 
+        linetype = 3
+      ) + 
+      annotate(
+        "text", x = ig_label, y = 3570, 
+        label = "Mid Elevation Release Tier", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      ) + 
+      annotate(
+        "text", x = ig_label, y = 3582, 
+        label = "Upper Elevation Balancing Tier", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      )
     
     #{if(Switch)annotate("text", x=2020.1, y = yaxmin,
     #         label = 'Adoption of the Drought\nResponse Operations', size = LabSize, hjust=0,
@@ -264,36 +324,64 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     # Mead
     gg <- gg +
       # Adding lines for Mead ops - plot only if Switch = False
-      geom_segment(x=2007, y=1075, xend =2026, yend = 1075, size = OpsLines, 
-                                    color ='#808080', linetype = 3) + 
+      geom_segment(
+        x = ig_start, y = 1075, xend = 2026, yend = 1075, 
+        size = OpsLines, 
+        color ='#808080', linetype = 3
+      ) + 
       annotate(
-        "text", x = 2007.1, y = 1070, label = "Level 1 Shortage Condition", 
+        "text", x = ig_label, y = 1070, 
+        label = "Level 1 Shortage Condition", 
         size = LabSize, hjust = 0, fontface = "italic", color = '#505050'
       ) +
-      geom_segment(x=2007, y=1050, xend =2026, yend = 1050, size = OpsLines, 
-                                    color ='#808080', linetype = 3) +
-      annotate("text", x = 2007.1, y = 1045, label = "Level 2 Shortage Condition", 
-                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
-      geom_segment(x=2007, y=1025, xend =2026, yend = 1025, size = OpsLines, 
-                                    color ='#808080', linetype = 3) +
-      annotate("text", x = 2007.1, y = 1020, label = "Level 3 Shortage Condition", 
-                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
-      geom_segment(x=2007, y=1145, xend =2026, yend = 1145, size = OpsLines, 
-                                    color ='#808080', linetype = 3) +
-      annotate("text", x = 2007.1, y = 1140, label = "Normal or ICS Surplus Condition", 
-                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050') +
-      annotate("text", x = 2007.1, y = yaxmax, label = "Surplus Condition", 
-                                size = LabSize, hjust = 0, fontface = "italic", color = '#505050')
-
-    #Adding in lines for DCP mead ops
-    #{if(Switch!=TRUE)geom_segment(x=2020, y=1090, xend = 2026, yend = 1090, size = OpsLines,
-    #    color = '#808080', linetype = 6)} +
-    #{if(Switch!=TRUE)annotate("text", x=2020.1, y=1085, label = 'Level 1 Contribution',
-    #    size = LabSize, hjust = 0, color = '#505050')} +
-    #{if(Switch!=TRUE)geom_segment(x=2020, y=1045, xend = 2026, yend = 1045, size = OpsLines,
-    #    color = '#808080', linetype = 6)} +
-    #{if(Switch!=TRUE)annotate("text", x=2020.1, y=1040, label = 'Level 2 Contribution',
-    #    size = LabSize, hjust = 0, color = '#505050')} 
+      geom_segment(
+        x = ig_start, y = 1050, xend = 2026, yend = 1050, 
+        size = OpsLines, 
+        color ='#808080', 
+        linetype = 3
+      ) +
+      annotate(
+        "text", x = ig_label, y = 1045, 
+        label = "Level 2 Shortage Condition", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      ) +
+      geom_segment(
+        x = ig_start, y = 1025, xend = 2026, yend = 1025, 
+        size = OpsLines, 
+        color ='#808080', linetype = 3
+      ) +
+      annotate(
+        "text", x = ig_label, y = 1020, 
+        label = "Level 3 Shortage Condition", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      ) +
+      geom_segment(
+        x = ig_start, y = 1145, xend = 2026, yend = 1145, 
+        size = OpsLines, 
+        color ='#808080', linetype = 3
+      ) +
+      annotate(
+        "text", x = ig_label, y = 1140, 
+        label = "Normal or ICS Surplus Condition", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      ) +
+      annotate(
+        "text", x = ig_label, y = yaxmax, 
+        label = "Surplus Condition", 
+        size = LabSize, 
+        hjust = 0, 
+        fontface = "italic", 
+        color = '#505050'
+      )
   }
   
   # Add BOR Logo
@@ -302,7 +390,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   gg
 }
 
-plot_both_clouds <- function(pe, peYrs, ui, folder_paths)
+plot_both_clouds <- function(pe, ui, folder_paths)
 {
   p_title <- 'Powell End-of-December Elevation'
   m_title <- 'Mead End-of-December Elevation'
@@ -313,6 +401,8 @@ plot_both_clouds <- function(pe, peYrs, ui, folder_paths)
     if (ui[["plot_group"]][[i]][["cloud"]][["create"]]) {
       
       pg <- ui[["plot_group"]][[i]]
+      
+      peYrs <- pg[["cloud"]][["years"]]
       
       if (pg[["cloud"]][["title_append"]] != '') {
         p_title <- paste(p_title, pg[["cloud"]][["title_append"]])

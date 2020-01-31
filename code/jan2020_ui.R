@@ -92,8 +92,8 @@ jan2020_ui <- function()
         "dmi/InitialConditions/jan_2020/MtomToCrss_Monthly.xlsx"
       ),
       start_year = 2021,
-      std_ind_tables = TRUE,
-      std_ind_figures = TRUE
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
     ),
 
     create_scenario(
@@ -116,8 +116,8 @@ jan2020_ui <- function()
       scen_folders = "Jan2020_2021,DNF,2007Dems,IG_DCP,MTOM_Most",
       ic = c(3613.78, 1084.89),
       start_year = 2021,
-      std_ind_tables = TRUE,
-      std_ind_figures = TRUE
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
     ),
 
     create_scenario(
@@ -312,24 +312,80 @@ jan2020_ui <- function()
     #     years = 2020:2024
     #   )
     # )
-    janVAug = list(
-      plot_scenarios = c("Jan 2020 - DNF (MTOM most)",  "Aug 2019 (Update) - DNF"),
-      simple_5yr = list(
+    # janMtomVAug = list(
+    #   plot_scenarios = c("Jan 2020 - DNF (MTOM most)",  "Aug 2019 (Update) - DNF"),
+    #   simple_5yr = list(
+    #     create = TRUE,
+    #     scen_names = c( "Jan 2020 - DNF (MTOM most)" = "Jan 2020 - DNF (MTOM most)", 
+    #                     "Aug 2019 (Update) - DNF" =  "Aug 2019 (Update) - DNF"),
+    #     years = 2020:2025,
+    #     footnote = NA
+    #   ),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   ),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2021:2040
+    #   )
+    # ),
+    # 
+    # janVAug = list(
+    #   plot_scenarios = c("Jan 2020 - DNF",  "Aug 2019 (Update) - DNF"),
+    #   simple_5yr = list(
+    #     create = TRUE,
+    #     scen_names = c( "Jan 2020 - DNF" = "Jan 2020", 
+    #                     "Aug 2019 (Update) - DNF" =  "Aug 2019 (Update)"),
+    #     years = 2021:2025,
+    #     footnote = NA
+    #   ),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   ),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2021:2040
+    #   )
+    # ),
+    
+    janDNF_vs_ST = list(
+      plot_scenarios = c("Jan 2020 - DNF", "Jan 2020 - ST"),
+      cloud = list(
         create = TRUE,
-        scen_names = c( "Jan 2020 - DNF (MTOM most)" = "Jan 2020 - DNF (MTOM most)", 
-                        "Aug 2019 (Update) - DNF" =  "Aug 2019 (Update) - DNF"),
-        years = 2020:2025,
-        footnote = NA
+        scen_labs = c("Full Hydrology", "Stress Test Hydrology"),
+        title_append = "from January 2020 CRSS",
+        caption = NULL,
+        years = 1999:2026
       ),
-      std_comparison = list(
+      heat = list(
         create = TRUE,
-        years = 2020:2060
-      ),
-      csd_ann = list(
-        create = TRUE,
-        years = 2021:2040
+        scen_names = c(
+          "Jan 2020 - DNF" = "Full Hydrology",
+          "Jan 2020 - ST" = "Stress Test Hydrology"
+        ),
+        title = "January 2020 CRSS",
+        years = 2021:2026,
+        caption = NULL
       )
-    )
+    )#,
+    
+    # jan_igVna = list(
+    #   plot_scenarios = c("Jan 2020 - DNF (MTOM most)", "Jan 2020 - DNF (MTOM most) - NA"),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   )
+    # ),
+    # 
+    # jan_st_igVna = list(
+    #   plot_scenarios = c("Jan 2020 - ST (MTOM most)", "Jan 2020 - ST (MTOM most) - NA"),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   )
+    # )
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
@@ -339,7 +395,7 @@ jan2020_ui <- function()
     check_plot_group_type("cloud") %>%
     check_plot_group_type("simple_5yr") %>%
     check_heat_scen_names() %>%
-    check_cloud_scen_names() %>%
+    check_cloud_specification(defaults) %>%
     check_simple5yr_scen_names()
   
 
