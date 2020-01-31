@@ -1,5 +1,4 @@
-create_scenario_comparison_figures <- function(pe, cs, peYrs, yrs2show, ui, 
-                                               o_files)
+create_scenario_comparison_figures <- function(pe, cs, ui, o_files)
 {
   # 1. loop through the multiple plot_groups
   # 2. create temp_pe and temp_cs
@@ -14,6 +13,9 @@ create_scenario_comparison_figures <- function(pe, cs, peYrs, yrs2show, ui,
       message("  ... plot_group: ", i, " ", names(ui[["plot_group"]])[i])
         
       cur_pg <- ui[["plot_group"]][[i]]
+      
+      yrs2show <- cur_pg[["std_comparison"]][["years"]]
+      peYrs <- c(yrs2show[1] - 1, yrs2show)
       
       tmp_pe <- pe %>%
         filter(StartMonth %in% cur_pg[["plot_scenarios"]])

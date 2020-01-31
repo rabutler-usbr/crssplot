@@ -331,24 +331,24 @@ jan2020_ui <- function()
     #   )
     # ),
     # 
-    # janVAug = list(
-    #   plot_scenarios = c("Jan 2020 - DNF",  "Aug 2019 (Update) - DNF"),
-    #   simple_5yr = list(
-    #     create = TRUE,
-    #     scen_names = c( "Jan 2020 - DNF" = "Jan 2020", 
-    #                     "Aug 2019 (Update) - DNF" =  "Aug 2019 (Update)"),
-    #     years = 2021:2025,
-    #     footnote = NA
-    #   ),
-    #   std_comparison = list(
-    #     create = TRUE,
-    #     years = 2020:2060
-    #   ),
-    #   csd_ann = list(
-    #     create = TRUE,
-    #     years = 2021:2040
-    #   )
-    # ),
+    janVAug = list(
+      plot_scenarios = c("Aug 2019 (Update) - DNF", "Jan 2020 - DNF"),
+      simple_5yr = list(
+        create = TRUE,
+        scen_names = c("Aug 2019 (Update) - DNF" =  "Aug 2019 (Update)",
+                       "Jan 2020 - DNF" = "Jan 2020"),
+        years = 2021:2025,
+        footnote = NA
+      ),
+      std_comparison = list(
+        create = TRUE,
+        years = 2019:2026
+      ),
+      csd_ann = list(
+        create = TRUE,
+        years = 2021:2040
+      )
+    ),
     
     janDNF_vs_ST = list(
       plot_scenarios = c("Jan 2020 - DNF", "Jan 2020 - ST"),
@@ -389,11 +389,11 @@ jan2020_ui <- function()
   )
 
   plot_group <- check_plot_group_colors(plot_group) %>%
-    check_plot_group_type("std_comparison") %>%
-    check_plot_group_type("csd_ann") %>%
-    check_plot_group_type("heat") %>%
-    check_plot_group_type("cloud") %>%
-    check_plot_group_type("simple_5yr") %>%
+    check_plot_type_specifications("std_comparison", defaults) %>%
+    check_plot_type_specifications("csd_ann", defaults) %>%
+    check_plot_type_specifications("heat", defaults) %>%
+    check_plot_type_specifications("cloud", defaults) %>%
+    check_plot_type_specifications("simple_5yr", defaults) %>%
     check_heat_scen_names() %>%
     check_cloud_specification(defaults) %>%
     check_simple5yr_scen_names()

@@ -143,7 +143,6 @@ process_everything <- function(ui)
     
     comp_figs <- create_scenario_comparison_figures(
       pe, cs, 
-      peYrs, yrs2show, 
       ui, 
       o_files
     )

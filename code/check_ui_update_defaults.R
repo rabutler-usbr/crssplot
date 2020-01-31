@@ -25,12 +25,24 @@ check_plot_group_colors <- function(pg)
   pg
 }
 
-# if csd_ann is not specified, then set it to FALSE
-check_plot_group_type <- function(pg, plot_type)
+# check the specifications, and set values to defaults if they do not exist
+# if plot_stype is not specified, then set it to FALSE
+check_plot_type_specifications <- function(pg, plot_type, defaults)
 {
   for (i in seq_along(pg)) {
     if (!exists(plot_type, where = pg[[i]])) {
       pg[[i]][[plot_type]] <- list(create = FALSE)
+    } else{
+      # if it does exist, then check defaults. Right now, that is just years
+      if (is.null(pg[[i]][[plot_type]][['years']])) {
+        
+        if (plot_type == "cloud") {
+          # check the years. if it is not specified, set it to the default
+            pg[[i]][["cloud"]][["years"]] <- 1999:max(defaults[["plot_yrs"]])
+        } else {
+          pg[[i]][[plot_type]][['years']] <- defaults[["plot_yrs"]]
+        }
+      }
     }
   }
   
@@ -133,11 +145,6 @@ check_cloud_specification <- function(pg, defaults)
             " plot_group, need to have the same length as the specified plot_scenarios:"
           )
         )
-      }
-      
-      # check the years. if it is not specified, set it to the default
-      if (is.null(pg[[i]][["cloud"]][["years"]])) {
-        pg[[i]][["cloud"]][["years"]] <- 1999:max(defaults[["pe_yrs"]])
       }
     }
   }
