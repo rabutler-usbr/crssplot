@@ -25,7 +25,7 @@ dev_ui <- function()
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
     crss_month = "jan2020_obs",
-    pdf_name = 'dev.pdf',
+    pdf_name = 'Jan2020_NFcompare.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -96,15 +96,15 @@ dev_ui <- function()
     #   std_ind_figures = FALSE
     # ),
     # 
-    # # January 2020 scenarios
-    # create_scenario(
-    #   "Jan 2020 - IG DNF (2017)",
-    #   scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,IG_DCP_4.3.0.9000,Most", 
-    #   ic = c(3608.74, 1090.49), 
-    #   start_year = 2020,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # ),
+    # January 2020 scenarios
+    create_scenario(
+      "Jan 2020 (Observed) - IG 2017-DNF",
+      scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,IG_DCP_4.3.0.9000,Most",
+      ic = c(3608.74, 1090.49),
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
     # create_scenario(
     #   "Jan 2020 - NA DNF (2017)",
     #   scen_folders = "2020/Scenario_dev/Jan2020_2020_v4.2.0.9000,DNF,2007Dems,NA_4.3.0.9000,Most", 
@@ -130,15 +130,27 @@ dev_ui <- function()
     #   std_ind_figures = FALSE
     # ),
     # 
-    # # January 2020 scenarios with 2018 NF
+    # January 2020 scenarios with 2018 NF
+    create_scenario(
+      "Jan 2020 (Observed) - IG 2018-DNF",
+      scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,IG_DCP,Most",
+      ic = c(3608.74, 1090.49),
+      start_year = 2020,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    create_scenario(
+      "Aug 2019 (Update) - IG 2017-DNF",
+      scen_folders = "2019/Scenario/Aug2019_2020_v4.1.1,DNF,2007Dems,IG_DCP_v4.2.0,Most",
+      ic = c(3618, 1089),
+      start_year = 2020
+    )#,
     # create_scenario(
-    #   "Jan 2020 - IG DNF",
-    #   scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,IG_DCP,Most", 
-    #   ic = c(3608.74, 1090.49), 
-    #   start_year = 2020,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # ),
+    #   "Jan 2020 - IG DNF (MTOM Most)",
+    #   scen_folders = "2020/Scenario/Jan2020_2021,DNF,2007Dems,IG_DCP,MTOM_Most",
+    #   ic = c(3613, 1084),
+    #   start_year = 2021
+    # )
     # create_scenario(
     #   "Jan 2020 - NA DNF",
     #   scen_folders = "2020/Scenario/Jan2020_2020,DNF,2007Dems,NA,Most", 
@@ -147,73 +159,73 @@ dev_ui <- function()
     #   std_ind_tables = FALSE,
     #   std_ind_figures = FALSE
     # ),
-    create_scenario(
-      "Jan 2020 - IG ST",
-      scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,IG_DCP,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = FALSE,
-      std_ind_figures = TRUE,
-      mead_pe_scatter = list(
-        year = 2020,
-        # peScatterData should be set to either MTOM or CRSS
-        # if relying on combined run, then this is likely MTOM; if using a CRSS only 
-        # run, then likely set to CRSS
-        model = 'CRSS'
-      ),
-      
-      shortage_conditions = list(
-        # string should be either CRSS or MTOM
-        model = "CRSS", 
-        # year is used in the plot labeling. This is typically the first year
-        # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
-        # the first year of shortage for a CRSS run, i.e., it uses the December elev.
-        # at MEad for that year, and the OND release from that year from Powell
-        year = 2020,
-        color_var = "mwdIcs",
-        subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
-        # specify the segment start and stop c(xstart, xend, ystart, yend)
-        segment_locs = c(16.9, 14.5, 1055, 1056.4),
-        # specify the annotation location: c(x, y)
-        annotation_loc = c(2, 1075)
-      )
-    ),
-    create_scenario(
-      "Jan 2020 - NA ST",
-      scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,NA,Most", 
-      ic = c(3608.74, 1090.49), 
-      start_year = 2020,
-      std_ind_tables = TRUE,
-      std_ind_figures = TRUE,
-      # mead pe scatter parameters -------------------------------
-      # plot a single year of Mead PE
-
-      mead_pe_scatter = list(
-        year = 2020,
-        # peScatterData should be set to either MTOM or CRSS
-        # if relying on combined run, then this is likely MTOM; if using a CRSS only 
-        # run, then likely set to CRSS
-        model = 'CRSS',
-        ann_text = "These are from the NA - ST run",
-        add_threshold_stats = FALSE
-      ),
-      
-      shortage_conditions = list(
-        # string should be either CRSS or MTOM
-        model = "CRSS", 
-        # year is used in the plot labeling. This is typically the first year
-        # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
-        # the first year of shortage for a CRSS run, i.e., it uses the December elev.
-        # at MEad for that year, and the OND release from that year from Powell
-        year = 2020,
-        color_var = "mwdIcs",
-        subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
-        # specify the segment start and stop c(xstart, xend, ystart, yend)
-        segment_locs = c(16.9, 14.5, 1055, 1056.4),
-        # specify the annotation location: c(x, y)
-        annotation_loc = c(17, 1054)
-      )
-    )
+    # create_scenario(
+    #   "Jan 2020 - IG ST",
+    #   scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,IG_DCP,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = FALSE,
+    #   std_ind_figures = TRUE,
+    #   mead_pe_scatter = list(
+    #     year = 2020,
+    #     # peScatterData should be set to either MTOM or CRSS
+    #     # if relying on combined run, then this is likely MTOM; if using a CRSS only 
+    #     # run, then likely set to CRSS
+    #     model = 'CRSS'
+    #   ),
+    #   
+    #   shortage_conditions = list(
+    #     # string should be either CRSS or MTOM
+    #     model = "CRSS", 
+    #     # year is used in the plot labeling. This is typically the first year
+    #     # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
+    #     # the first year of shortage for a CRSS run, i.e., it uses the December elev.
+    #     # at MEad for that year, and the OND release from that year from Powell
+    #     year = 2020,
+    #     color_var = "mwdIcs",
+    #     subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
+    #     # specify the segment start and stop c(xstart, xend, ystart, yend)
+    #     segment_locs = c(16.9, 14.5, 1055, 1056.4),
+    #     # specify the annotation location: c(x, y)
+    #     annotation_loc = c(2, 1075)
+    #   )
+    # ),
+    # create_scenario(
+    #   "Jan 2020 - NA ST",
+    #   scen_folders = "2020/Scenario/Jan2020_2020,ISM1988_2018,2007Dems,NA,Most", 
+    #   ic = c(3608.74, 1090.49), 
+    #   start_year = 2020,
+    #   std_ind_tables = TRUE,
+    #   std_ind_figures = TRUE,
+    #   # mead pe scatter parameters -------------------------------
+    #   # plot a single year of Mead PE
+    # 
+    #   mead_pe_scatter = list(
+    #     year = 2020,
+    #     # peScatterData should be set to either MTOM or CRSS
+    #     # if relying on combined run, then this is likely MTOM; if using a CRSS only 
+    #     # run, then likely set to CRSS
+    #     model = 'CRSS',
+    #     ann_text = "These are from the NA - ST run",
+    #     add_threshold_stats = FALSE
+    #   ),
+    #   
+    #   shortage_conditions = list(
+    #     # string should be either CRSS or MTOM
+    #     model = "CRSS", 
+    #     # year is used in the plot labeling. This is typically the first year
+    #     # of the MTOM run, e.g., 2017 for a January 2017 MTOM run, or the year before
+    #     # the first year of shortage for a CRSS run, i.e., it uses the December elev.
+    #     # at MEad for that year, and the OND release from that year from Powell
+    #     year = 2020,
+    #     color_var = "mwdIcs",
+    #     subtitle = "Results from the August 2018 CRSS run, based on projected December 31, 2018 conditions from the August 2018 24-Month Study.",
+    #     # specify the segment start and stop c(xstart, xend, ystart, yend)
+    #     segment_locs = c(16.9, 14.5, 1055, 1056.4),
+    #     # specify the annotation location: c(x, y)
+    #     annotation_loc = c(17, 1054)
+    #   )
+    #)
   )
 
   # convert all_scenarios to the different variables --------------------
@@ -258,6 +270,45 @@ dev_ui <- function()
   # list of lists. each list has one required entry: plot_scenarios and one 
   # optional entry: plot_colors. The list can be named, or unnamed.
   plot_group <- list(
+    # nf_compare = list(
+    #   plot_scenarios = c("Jan 2020 - IG DNF (2017)", "Jan 2020 - IG DNF"),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2060
+    #   )
+    # ),
+    aug2obs = list(
+      plot_scenarios = c("Aug 2019 (Update) - IG 2017-DNF", 
+                         "Jan 2020 (Observed) - IG 2018-DNF", 
+                         "Jan 2020 (Observed) - IG 2017-DNF"),
+      std_comparison = list(
+        create = TRUE,
+        years = 2020:2060
+      ),
+      csd_ann = list(
+        create = TRUE,
+        years = 2020:2035
+      )
+    )#,
+    # aug2obs = list(
+    #   plot_scenarios = c("Aug 2019 (Update) - IG DNF", "Jan 2020 - IG DNF (MTOM Most)", 
+    #                      "Jan 2020 - IG DNF (Observed)"),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2036:2050
+    #   )
+    # ),
+    # "jan_comp" = list(
+    #   plot_scenarios = c("Jan 2020 - IG DNF (MTOM Most)"),
+    #   heat = list(
+    #     create = TRUE,
+    #     scen_names = c(
+    #       "Jan 2020 - IG DNF (MTOM Most)" = "Jan 2020 - IG DNF (MTOM Most)"
+    #     ),
+    #     title = "Jan 2020 CRSS",
+    #     years = 2021:2026,
+    #     caption = NULL
+    #   ))
     # "ig_v_na" = list(
     #   plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", "Aug 2019 - IG Dev",
     #                      "Aug 2019 - NA", "Nov 2019 - IG DNF", "Nov 2019 - NA DNF"),
