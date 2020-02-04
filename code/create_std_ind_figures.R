@@ -5,7 +5,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   yrs2show <- sy:ey
   
   ann_txt <- ui[["ind_plots"]][["std_ind_figures"]][[scenario]][["options"]][["ann_text"]]
-  
+ 
   critStatsFig1 <- plotCritStats(
     dplyr::filter(
       cs, 

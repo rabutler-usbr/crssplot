@@ -187,7 +187,8 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
 # legLoc is the location of the legend
 # nC is number of columns in legend
 # annSize is the size of the annotation
-plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4)
+plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', 
+                          nC = 4)
 {
   varName <- stringr::str_wrap(csVarNames(), 14)
   names(varName) <- names(csVarNames())
