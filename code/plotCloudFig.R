@@ -70,9 +70,15 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   addIC <- unique(zz$StartMonth)
   
   # Appending last historical year pool elevation for each scenario
-  for(i in 1:length(addIC)){
-    zz <- bind_rows(zz, hist[length(hist[,1]),])
-    zz$StartMonth[length(zz$StartMonth)] <- addIC[i]
+  # Must figure out the last year of model projections, and then select the
+  # historical year before that
+  for (tmp_scen in addIC) {
+    first_mod_year <- min(filter(zz, StartMonth == tmp_scen)$Year)
+    tmp_hist <- hist %>%
+      filter(Year == first_mod_year - 1) %>%
+      # add in the Scenario name
+      mutate(StartMonth = tmp_scen)
+    zz <- bind_rows(zz, tmp_hist)
   }
   
   # Appending historical data
@@ -81,11 +87,12 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   ##zz <- bind_rows(zz,IGProj)
   
   # Setting colors for graph- ensures historical data is black on plot
+  historical_color <- "#000000"
   colorNames <- unique(zz$StartMonth)
   #DCP colors (to match AZ Big Bang slides)"#54FF9F","#F4A460"
   #Grey for Interim Guidelines Projections (if included) #8B8682. Add to end.
   #plotColors <- c("#000000","#F8766D", "#00BFC4") #Conor's reverted colors
-  plotColors <- c("#000000", "#00BFC4","#F8766D") #Stress test vs DNF colors  NORMAL CLOUD COLORS
+  plotColors <- c(historical_color, "#00BFC4","#F8766D") #Stress test vs DNF colors  NORMAL CLOUD COLORS
   #plotColors <- c("#000000", "#F8766D") #, "#00BA38", "#619CFF" - multiple comparisons
   names(plotColors) <- colorNames
   
@@ -197,21 +204,40 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   # Generate plot
   gg <- gg +  
     geom_vline(xintercept=2019, size = IGStartLine, color = '#808080') +
-    annotate("text", x=2019.1, y = yaxmin, label = 'Adoption of the Drought\nContingency Plan', 
-             size = LabSize, hjust = 0, fontface = "bold", color = '#303030') +
+    annotate(
+      "text", 
+      x = 2019.1, y = yaxmin, 
+      label = 'Adoption of the Drought\nContingency Plan', 
+      size = LabSize, hjust = 0, fontface = "bold", color = '#303030'
+    ) +
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myXLabs,
                        labels = myXLabs, expand = c(0,0)) +
-    scale_y_continuous(minor_breaks = seq(900,4000,25), 
-                       breaks = myYLabs, labels = comma, limits = c(yaxmin, yaxmax)) +
-    geom_ribbon(data = subset(zz,StartMonth %in% addIC),aes(ymin=Min, ymax=Max, fill = StartMonth), 
-                alpha = 0.5, linetype = 2, size = 0.5*Medians) + #, colour = NA) + #Orig alpha =0.3
+    scale_y_continuous(
+      minor_breaks = seq(900,4000,25), 
+      breaks = myYLabs, 
+      labels = comma, 
+      limits = c(yaxmin, yaxmax)
+    ) +
+    geom_ribbon(
+      data = subset(zz,StartMonth %in% addIC),
+      aes(ymin = Min, ymax = Max, fill = StartMonth), 
+      alpha = 0.5, linetype = 2, size = 0.5 * Medians
+    ) +
     geom_line(size=Medians) +
+    # add in the historical elevation on top of other lines
+    geom_line(
+      data = filter(zz, StartMonth == "Historical Elevation"), 
+      aes(Year, Med), 
+      size = Medians, color = historical_color
+    ) +
     scale_fill_manual(str_wrap("10th to 90th percentile of full range",20),
                       values = plotColors, guide = FALSE,
                       labels = str_wrap(scen_labs, 15)) + 
-    scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
-                       values = plotColors, guide = FALSE,
-                       labels = str_wrap(histLab, 15)) +
+    scale_color_manual(
+      name = str_wrap("Historical and Median Projected Pool Elevation",20),
+      values = plotColors, guide = FALSE,
+      labels = str_wrap(histLab, 15)
+    ) +
     labs(
       title = myTitle, 
       x = '', y = 'Elevation (feet msl)\n', 
