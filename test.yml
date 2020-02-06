@@ -1,5 +1,6 @@
---- # define the CRSS processing for this month's run
---- # note that for list, they need to be same data types, e..g, ints or floats
+# define the CRSS processing for this month's run
+# note that for list, they need to be same data types, e..g, ints or floats
+---
 process_data:
   sys_cond_data: TRUE
   pe_data: TRUE
@@ -28,7 +29,7 @@ scenarios:
       color_var: mwdICS
       subtitle: Results from August 2018 CRSS
       segment_locs: [16.9, 14.5, 1055.0, 1056.4]
-      annotation_loc: [2, 1075]
+      annotation_loc: [2.0, 1075.0]
     pe_scatter:
       year: 2020
       model: CRSS
@@ -36,10 +37,9 @@ scenarios:
       add_threshold_stats: TRUE
   - name: Aug 2018 - NA
     folder: "2018/Aug2018_2019,DNF,2007Dems,NA,Most"
-    ic:
-      powell: 3618.56
-      mead: 1089.40
+    ic: {powell: 3618.56, mead: 1089.40}
     start_year: 2019
+    std_ind_figures: TRUE
   - name: "June 2019 w/ DCP"
     folder: "`r rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
     ic: "dmi/june_2019/MtomToCrss_Monthly.xlsx"
@@ -47,9 +47,7 @@ scenarios:
 plot_groups: 
     - aug2obs:
         scenarios: ["Aug 2018 - IG", "Aug 2018 - NA"]
-        plot_colors: ["#F8766D", "#00BFC4"]
-        std_comparison:
-          years: [2018, 2060]
+        std_comparison: TRUE
         csd_ann:
           years: [2018, 2030]
         heat:
@@ -59,9 +57,16 @@ plot_groups:
           caption: NULL
         cloud:
           scen_labs: ["IG", "NA"]
+          plot_colors: ["#F8766D", "#00BFC4"]
           title_append: from August 2018 CRSS
           caption: "This and that"
+          years: [1999,2026]
     - aug2june:  
         scenarios: ["Aug 2018 - IG", "June 2019 w/ DCP"]
-        std_comparison:
-          years: [2018, 2036]
+        plot_colors: ["#F8766D", "#00BFC4"]
+        years: [2018, 2036]
+        plots: [std_comparison, heat]
+# can also specify
+# plots:
+#  - std_comparison
+#  - heat
