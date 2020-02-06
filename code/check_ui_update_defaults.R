@@ -130,12 +130,14 @@ check_simple5yr_scen_names <- function(pg)
 check_cloud_specification <- function(pg, defaults)
 {
   err <- NULL
+  e2 <- NULL
 
   for (i in seq_along(pg)) {
     if (exists("cloud", where = pg[[i]]) & pg[[i]][["cloud"]][["create"]]) {
-      # check the names 
+      
       spec_names <- pg[[i]][["cloud"]][["scen_labs"]]
       
+      # check the names (scen_labs) ---------
       if (length(spec_names) != length(pg[[i]][["plot_scenarios"]])) {
         err <- c(
           err, 
@@ -146,9 +148,27 @@ check_cloud_specification <- function(pg, defaults)
           )
         )
       }
+      
+      # check the color specifications -----
+      if (!is.null(pg[[i]][["cloud"]][["plot_colors"]])) {
+        # colors should be specified for the existing scenarios
+        nn <- names(pg[[i]][["cloud"]][["plot_colors"]])
+        in_names <- all(nn %in% pg[[i]][["plot_scenarios"]])
+        if (!all(in_names)) {
+          e2 <- c(
+            e2, 
+            paste0(
+              "The specified color for ", paste(nn[!in_names], collapse = " & "), 
+              " are not found in the specifed `plot_scenarios` of the ",
+              names(pg)[[i]], " `plot_group`"
+            )
+          )
+        }
+      }
     }
   }
-
+  
+  err <- c(err, e2)
   assert_that(length(err) == 0, msg = paste(err, collapse = "\n"))
   
   pg

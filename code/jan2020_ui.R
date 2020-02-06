@@ -26,7 +26,7 @@ jan2020_ui <- function()
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
     crss_month = "jan2020",
-    pdf_name = 'jan2020vsAug2019.pdf',
+    pdf_name = 'tmp.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -170,11 +170,11 @@ jan2020_ui <- function()
     #   )
     "Jan 2020 - DNF" = list(
       ann_text = "Results from the January 2020 full hydrology run",
-      end_year = 2060
+      end_year = 2026
     ),
     "Jan 2020 - ST" = list(
       ann_text = "Results from the January 2020 stress test run", 
-      end_year = 2051
+      end_year = 2026
     ),
     "Jan 2020 - DNF (MTOM most)" = list(
       ann_text = "Results from Jan 2020 MTOM Most full hydrology",
@@ -234,28 +234,56 @@ jan2020_ui <- function()
     #     years = 2020:2040
     #   )
     # ),
-    #"jan_comp" = list(
-     # plot_scenarios = c("Jan 2020 - IG ST", "Jan 2020 - IG DNF"),
-      # heat = list(
-      #   create = TRUE,
-      #   scen_names = c(
-      #     "Jan 2020 - IG DNF" = "Full Hydrology", 
-      #     "Jan 2020 - IG ST" = "Stress Test Hydrology"
-      #   ),
-      #   title = "Jan 2020 CRSS",
-      #   years = 2020:2026,
-      #   caption = "This and that"
-      # ),
+    "jan_comp" = list(
+      plot_scenarios = c("Jan 2020 - ST", "Jan 2020 - DNF"),
+    # heat = list(
+    #   create = TRUE,
+    #   scen_names = c(
+    #     "Jan 2020 - IG DNF" = "Full Hydrology",
+    #     "Jan 2020 - IG ST" = "Stress Test Hydrology"
+    #   ),
+    #   title = "Jan 2020 CRSS",
+    #   years = 2020:2026,
+    #   caption = "This and that"
+    # ),
+      cloud = list(
+        create = TRUE,
+        # scenarios to include in cloud
+        scen_labs = c("Stress Test Hydrology", "Full Hydrology"),
+        # should default to '' if it is not specified
+        title_append = "from January 2020 CRSS",
+        # should be NULL if not specified. not ''
+        caption = NULL,
+        plot_colors = c(
+          "Jan 2020 - ST" = "#f1c40f",#"#7570b3", 
+          "Jan 2020 - DNF" = "#138d75"#"#1b9e77"
+        ),
+        years = 1999:2026
+      )
+    )#,
+    
+    # jan2aug_dnf_cloud = list(
+    #   plot_scenarios = c("Aug 2019 (Update) - DNF", "Jan 2020 - DNF"),
     #   cloud = list(
-    #     create = TRUE, 
-    #       # scenarios to include in cloud
-    #       scen_labs = c("Stress Test Hydrology", "Full Hydrology"),
-    #       # should default to '' if it is not specified
-    #       title_append = "from January 2020 CRSS",
-    #       # should be NULL if not specified. not ''
-    #       caption = "This and that"
+    #     create = TRUE,
+    #     scen_labs = c("August 2019 Full Hydrology", "January 2020 Full Hydrology"),
+    #     title_append = "",
+    #     caption = NULL,
+    #     years = 1999:2026
     #   )
-    # )#,
+    # ),
+    # jan2aug_st_cloud = list(
+    #   plot_scenarios = c("Aug 2019 (Update) - ST", "Jan 2020 - ST"),
+    #   cloud = list(
+    #     create = TRUE,
+    #     scen_labs = c("August 2019 Stress Test Hydrology", 
+    #                   "January 2020 Stress Test Hydrology"),
+    #     title_append = "",
+    #     caption = NULL, 
+    #     years = 1999:2026
+    #   )
+    # )
+    # 
     # "nov_comp" = list(
     #   plot_scenarios = c("Nov 2019 - IG DNF", "Nov 2019 - IG ST"),
     #   heat = list(
@@ -331,45 +359,48 @@ jan2020_ui <- function()
     #   )
     # ),
     # 
-    janVAug = list(
-      plot_scenarios = c("Aug 2019 (Update) - DNF", "Jan 2020 - DNF"),
-      simple_5yr = list(
-        create = TRUE,
-        scen_names = c("Aug 2019 (Update) - DNF" =  "Aug 2019 (Update)",
-                       "Jan 2020 - DNF" = "Jan 2020"),
-        years = 2021:2025,
-        footnote = NA
-      ),
-      std_comparison = list(
-        create = TRUE,
-        years = 2019:2026
-      ),
-      csd_ann = list(
-        create = TRUE,
-        years = 2021:2040
-      )
-    ),
-    
-    janDNF_vs_ST = list(
-      plot_scenarios = c("Jan 2020 - DNF", "Jan 2020 - ST"),
-      cloud = list(
-        create = TRUE,
-        scen_labs = c("Full Hydrology", "Stress Test Hydrology"),
-        title_append = "from January 2020 CRSS",
-        caption = NULL,
-        years = 1999:2026
-      ),
-      heat = list(
-        create = TRUE,
-        scen_names = c(
-          "Jan 2020 - DNF" = "Full Hydrology",
-          "Jan 2020 - ST" = "Stress Test Hydrology"
-        ),
-        title = "January 2020 CRSS",
-        years = 2021:2026,
-        caption = NULL
-      )
-    )#,
+    # janVAug = list(
+    #   plot_scenarios = c("Aug 2019 (Update) - DNF", "Jan 2020 - DNF"),
+    #   simple_5yr = list(
+    #     create = TRUE,
+    #     scen_names = c("Aug 2019 (Update) - DNF" =  "Aug 2019 (Update)",
+    #                    "Jan 2020 - DNF" = "Jan 2020"),
+    #     years = 2021:2025,
+    #     footnote = NA
+    #   ),
+    #   std_comparison = list(
+    #     create = TRUE,
+    #     years = 2020:2026
+    #   ),
+    #   csd_ann = list(
+    #     create = TRUE,
+    #     years = 2021:2040
+    #   )
+    # ),
+    # janVAug = list(
+    #   plot_scenarios = c("Aug 2019 (Update) - ST", "Jan 2020 - ST"),
+    #   std_comparison = list(create = TRUE, years = 2020:2026)
+    # ),
+    # janDNF_vs_ST = list(
+    #   plot_scenarios = c("Jan 2020 - DNF", "Jan 2020 - ST"),
+    #   cloud = list(
+    #     create = TRUE,
+    #     scen_labs = c("Full Hydrology", "Stress Test Hydrology"),
+    #     title_append = "from January 2020 CRSS",
+    #     caption = NULL,
+    #     years = 1999:2026
+    #   ),
+    #   heat = list(
+    #     create = TRUE,
+    #     scen_names = c(
+    #       "Jan 2020 - DNF" = "Full Hydrology",
+    #       "Jan 2020 - ST" = "Stress Test Hydrology"
+    #     ),
+    #     title = "January 2020 CRSS",
+    #     years = 2021:2026,
+    #     caption = NULL
+    #   )
+    # )#,
     
     # jan_igVna = list(
     #   plot_scenarios = c("Jan 2020 - DNF (MTOM most)", "Jan 2020 - DNF (MTOM most) - NA"),
@@ -385,6 +416,17 @@ jan2020_ui <- function()
     #     create = TRUE,
     #     years = 2020:2060
     #   )
+    # )
+    
+    # st = list(
+    #   plot_scenarios = c("Jan 2020 - ST (MTOM most)", "Jan 2020 - ST", 
+    #                      "Aug 2019 (Update) - ST"),
+    #   std_comparison = list(create = TRUE, years = 2020:2026)
+    # ), 
+    # st2 = list(
+    #   plot_scenarios = c("Jan 2020 - ST (MTOM most)", "Jan 2020 - ST", 
+    #                      "Aug 2019 (Update) - ST"),
+    #   std_comparison = list(create = TRUE, years = 2020:2051)
     # )
   )
 

@@ -85,19 +85,21 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   zz <- bind_rows(hist,zz) %>%
     filter(Year %in% yrs)
   ##zz <- bind_rows(zz,IGProj)
-  
-  # Setting colors for graph- ensures historical data is black on plot
-  historical_color <- "#000000"
-  colorNames <- unique(zz$StartMonth)
-  #DCP colors (to match AZ Big Bang slides)"#54FF9F","#F4A460"
-  #Grey for Interim Guidelines Projections (if included) #8B8682. Add to end.
-  #plotColors <- c("#000000","#F8766D", "#00BFC4") #Conor's reverted colors
-  plotColors <- c(historical_color, "#00BFC4","#F8766D") #Stress test vs DNF colors  NORMAL CLOUD COLORS
-  #plotColors <- c("#000000", "#F8766D") #, "#00BA38", "#619CFF" - multiple comparisons
-  names(plotColors) <- colorNames
+ 
+  # setup colors --------------
+  # # Setting colors for graph- ensures historical data is black on plot
+  # historical_color <- "#000000"
+  # colorNames <- unique(zz$StartMonth)
+  # #DCP colors (to match AZ Big Bang slides)"#54FF9F","#F4A460"
+  # #Grey for Interim Guidelines Projections (if included) #8B8682. Add to end.
+  # #plotColors <- c("#000000","#F8766D", "#00BFC4") #Conor's reverted colors
+  # plotColors <- c(historical_color, "#00BFC4","#F8766D") #Stress test vs DNF colors  NORMAL CLOUD COLORS
+  # #plotColors <- c("#000000", "#F8766D") #, "#00BA38", "#619CFF" - multiple comparisons
+  # names(plotColors) <- colorNames
+  plotColors <- get_cloud_colors(ui, pg_i)
   
   # Adding factors so ggplot does not alphebetize legend
-  zz$StartMonth = factor(zz$StartMonth, levels=colorNames)
+  zz$StartMonth = factor(zz$StartMonth, levels = names(plotColors))
   
   # Generating labels for the lines in ggplot
   histLab = "Historical Elevation"
@@ -228,7 +230,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     geom_line(
       data = filter(zz, StartMonth == "Historical Elevation"), 
       aes(Year, Med), 
-      size = Medians, color = historical_color
+      size = Medians, color = plotColors["Historical Elevation"]
     ) +
     scale_fill_manual(str_wrap("10th to 90th percentile of full range",20),
                       values = plotColors, guide = FALSE,
@@ -477,5 +479,22 @@ plot_both_clouds <- function(pe, ui, folder_paths)
       message("   ... saved ", m_file)
     }
   }
+}
+
+get_cloud_colors <- function(ui, pg_i)
+{
+  if (is.null(ui[["plot_group"]][[pg_i]][["cloud"]][["plot_colors"]])) {
+    # use default colors
+    ns <- length(ui[["plot_group"]][[pg_i]][["plot_scenarios"]])
+    plot_colors <- scales::hue_pal()(ns)
+    names(plot_colors) <- ui[["plot_group"]][[pg_i]][["plot_scenarios"]]
+  } else {
+    plot_colors <- ui[["plot_group"]][[pg_i]][["cloud"]][["plot_colors"]]
+  }
+  
+  # combine the historical, add it first
+  plot_colors <- c('Historical Elevation' = "#000000", plot_colors)
+  
+  plot_colors
 }
 
