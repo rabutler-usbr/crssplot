@@ -1,11 +1,7 @@
 # define the CRSS processing for this month's run
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
-process_data:
-  sys_cond_data: TRUE
-  pe_data: TRUE
-  csd_data: TRUE
-  crss_short_cond_data: FALSE
+process_data: FALSE
 defaults:
   end_year: 2026
 folders:
@@ -13,7 +9,6 @@ folders:
   CRSSDIR: "C:/alan/CRSS/tmp_output"
   crss_month: "dev"
   pdf_name: 'ig_vs_na.pdf'
-  extra_label: ""
 scenarios:
   - name: Aug 2018 - IG
     folder: "2018/Aug2018_2019,DNF,2007Dems,IG,Most"
