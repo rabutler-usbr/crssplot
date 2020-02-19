@@ -22,11 +22,11 @@ jan2020_ui <- function()
   # ** make sure CRSS_DIR is set correctly before running
   folders <- list(
     i_folder = "M:/Shared/CRSS/2020/Scenario",
-    CRSSDIR = "C:/alan/CRSS/CRSS.2020", #Sys.getenv("CRSS_DIR"), #"C:/alan/CRSS/CRSS.2020"
+    CRSSDIR = Sys.getenv("CRSS_DIR"), #"C:/alan/CRSS/CRSS.2020"
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
     crss_month = "feb2020",
-    pdf_name = 'most_prob_check.pdf',
+    pdf_name = 'feb_jan_aug.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -81,35 +81,65 @@ jan2020_ui <- function()
       std_ind_figures = FALSE
     ),
 
-    # create_scenario(
-    #   "Jan 2020 - DNF",
-    #   scen_folders = rw_scen_gen_names(
-    #     "Jan2020_2021,DNF,2007Dems,IG_DCP",
-    #     paste0("Trace", 4:38)
-    #   ),
-    #   ic = file.path(
-    #     folders$CRSSDIR,
-    #     "dmi/InitialConditions/jan_2020/MtomToCrss_Monthly.xlsx"
-    #   ),
-    #   start_year = 2021,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # ),
+    create_scenario(
+      "Jan 2020 - DNF",
+      scen_folders = rw_scen_gen_names(
+        "Jan2020_2021,DNF,2007Dems,IG_DCP",
+        paste0("Trace", 4:38)
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/jan_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    
+    create_scenario(
+      "Feb 2020 - DNF",
+      scen_folders = rw_scen_gen_names(
+        "Feb2020_2021,DNF,2007Dems,IG_DCP",
+        paste0("Trace", 4:38)
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/feb_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE
+    ),
 
-    # create_scenario(
-    #   "Jan 2020 - ST",
-    #   scen_folders = rw_scen_gen_names(
-    #     "Jan2020_2021,ISM1988_2018,2007Dems,IG_DCP",
-    #     paste0("Trace", 4:38)
-    #   ),
-    #   ic = file.path(
-    #     folders$CRSSDIR,
-    #     "dmi/InitialConditions/jan_2020/MtomToCrss_Monthly.xlsx"
-    #   ),
-    #   start_year = 2021,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # ),
+    create_scenario(
+      "Jan 2020 - ST",
+      scen_folders = rw_scen_gen_names(
+        "Jan2020_2021,ISM1988_2018,2007Dems,IG_DCP",
+        paste0("Trace", 4:38)
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/jan_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE
+    ),
+    
+    create_scenario(
+      "Feb 2020 - ST",
+      scen_folders = rw_scen_gen_names(
+        "feb2020_2021,ISM1988_2018,2007Dems,IG_DCP",
+        paste0("Trace", 4:38)
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/Feb_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
 
     create_scenario(
       "Jan 2020 - DNF (MTOM most)",
@@ -126,17 +156,26 @@ jan2020_ui <- function()
       ic = c(3611.29, 1084.82),
       start_year = 2021,
       std_ind_tables = FALSE,
-      std_ind_figures = TRUE
+      std_ind_figures = FALSE
     ),
 
-    # create_scenario(
-    #   "Jan 2020 - DNF (MTOM most) - NA",
-    #   scen_folders = "Jan2020_2021,DNF,2007Dems,NA,MTOM_Most",
-    #   ic = c(3613.78, 1084.89),
-    #   start_year = 2021,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # ),
+    create_scenario(
+      "Jan 2020 - DNF (MTOM most) - NA",
+      scen_folders = "Jan2020_2021,DNF,2007Dems,NA,MTOM_Most",
+      ic = c(3613.78, 1084.89),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    
+    create_scenario(
+      "Feb 2020 - DNF (MTOM most) - NA",
+      scen_folders = "Feb2020_2021,DNF,2007Dems,NA,MTOM_Most",
+      ic = c(3611.29, 1084.82),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
 
     create_scenario(
       "Jan 2020 - ST (MTOM most)",
@@ -147,14 +186,23 @@ jan2020_ui <- function()
       std_ind_figures = FALSE
     ),
 
-    # create_scenario(
-    #   "Jan 2020 - ST (MTOM most) - NA",
-    #   scen_folders = "Jan2020_2021,ISM1988_2018,2007Dems,NA,MTOM_Most",
-    #   ic = c(3613.78, 1084.89),
-    #   start_year = 2021,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # )
+    create_scenario(
+      "Jan 2020 - ST (MTOM most) - NA",
+      scen_folders = "Jan2020_2021,ISM1988_2018,2007Dems,NA,MTOM_Most",
+      ic = c(3613.78, 1084.89),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    
+    create_scenario(
+      "Feb 2020 - ST (MTOM most) - NA",
+      scen_folders = "Feb2020_2021,ISM1988_2018,2007Dems,NA,MTOM_Most",
+      ic = c(3611.29, 1084.82),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
     
     create_scenario(
       "Feb 2020 - ST (MTOM most)",
@@ -162,7 +210,7 @@ jan2020_ui <- function()
       ic = c(3611.29, 1084.82),
       start_year = 2021,
       std_ind_tables = FALSE,
-      std_ind_figures = TRUE
+      std_ind_figures = FALSE
     )
   )
 
@@ -454,8 +502,90 @@ jan2020_ui <- function()
     #                      "Aug 2019 (Update) - ST"),
     #   std_comparison = list(create = TRUE, years = 2020:2051)
     # )
+    feb_jan_aug_dnf = list(
+      plot_scenarios = c(
+        "Feb 2020 - DNF",
+        "Jan 2020 - DNF",
+        "Aug 2019 (Update) - DNF"
+      ),
+      std_comparison =list(create = TRUE, years = 2020:2060),
+      csd_ann = list(create = TRUE, years = 2021:2041)
+    ),
     
-    feb_jan_aug_dnf_most <- list(
+    feb_aug_dnf = list(
+      plot_scenarios = c(
+        "Feb 2020 - DNF",
+        "Aug 2019 (Update) - DNF"
+      ),
+      std_comparison =list(create = TRUE, years = 2020:2026),
+      simple_5yr = list(
+        create = TRUE,
+        scen_names = c("Feb 2020 - DNF" = "Feb 2020 - DNF",
+                      "Aug 2019 (Update) - DNF" =  "Aug 2019 (Update) - DNF"),
+        years = 2020:2025,
+        footnote = NA
+      ),
+      cloud = list(
+        create = TRUE,
+        scen_labs = c("February 2020 - DNF", "August 2019 - DNF"),
+        title_append = "",
+        caption = NULL,
+        years = 1999:2026
+      )
+    ),
+    
+    feb_aug_st = list(
+      plot_scenarios = c(
+        "Feb 2020 - ST",
+        "Aug 2019 (Update) - ST"
+      ),
+      std_comparison =list(create = TRUE, years = 2020:2026),
+
+      cloud = list(
+        create = TRUE,
+        scen_labs = c("February 2020 - ST", "August 2019 - ST"),
+        title_append = "",
+        caption = NULL,
+        years = 1999:2026
+      )
+    ),
+    
+    feb = list(
+      plot_scenarios = c(
+        "Feb 2020 - DNF",
+        "Feb 2020 - ST"
+      ),
+      
+      cloud = list(
+        create = TRUE,
+        scen_labs = c("Full Hydrology", "Stress Test Hydrology"),
+        title_append = "from the February 2020 CRSS",
+        caption = NULL,
+        years = 1999:2026
+      ),
+      heat = list(
+        create = TRUE,
+        scen_names = c(
+          "Feb 2020 - DNF" = "Full Hydrology",
+          "Feb 2020 - ST" = "Stress Test Hydrology"
+        ),
+        title = "February 2020 CRSS",
+        years = 2021:2026,
+        caption = NULL
+      )
+    ),
+    
+    feb_jan_aug_st = list(
+      plot_scenarios = c(
+        "Feb 2020 - ST",
+        "Jan 2020 - ST",
+        "Aug 2019 (Update) - ST"
+      ),
+      std_comparison = list(create = TRUE, years = 2020:2060),
+      csd_ann = list(create = TRUE, years = 2021:2041)
+    ),
+    
+    feb_jan_aug_dnf_most = list(
       plot_scenarios = c(
         "Feb 2020 - DNF (MTOM most)",
         "Jan 2020 - DNF (MTOM most)",
@@ -464,7 +594,7 @@ jan2020_ui <- function()
       std_comparison =list(create = TRUE, years = 2020:2060),
       csd_ann = list(create = TRUE, years = 2021:2041)
     ),
-    feb_jan_aug_st_most <- list(
+    feb_jan_aug_st_most = list(
       plot_scenarios = c(
         "Feb 2020 - ST (MTOM most)",
         "Jan 2020 - ST (MTOM most)",
@@ -473,21 +603,14 @@ jan2020_ui <- function()
       std_comparison = list(create = TRUE, years = 2020:2060),
       csd_ann = list(create = TRUE, years = 2021:2041)
     ),
-    feb_most <- list(
+    
+    feb_jan_dnf_most_na = list(
       plot_scenarios = c(
-        "Feb 2020 - ST (MTOM most)",
-        "Feb 2020 - DNF (MTOM most)"
+        "Feb 2020 - DNF (MTOM most) - NA",
+        "Jan 2020 - DNF (MTOM most) - NA"
       ),
-      heat = list(
-        create = TRUE,
-        scen_names = c(
-          "Feb 2020 - DNF (MTOM most)" = "Full Hydrology",
-          "Feb 2020 - ST (MTOM most)" = "Stress Test Hydrology"
-        ),
-        title = "February 2020 CRSS",
-        years = 2021:2026,
-        caption = "Results from CRSS initialized with only the most probable MTOM run."
-      )
+      std_comparison =list(create = TRUE, years = 2020:2060),
+      csd_ann = list(create = TRUE, years = 2021:2041)
     )
   )
 
