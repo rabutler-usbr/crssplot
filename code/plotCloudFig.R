@@ -14,7 +14,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   # and the median projections from the 07' Interim Guidelines (shown with double hash ##)
   
   scenario <- ui[["plot_group"]][[pg_i]][["plot_scenarios"]]
-  scen_labs <- ui[["plot_group"]][[pg_i]][["cloud"]][["scen_labs"]]
+  scen_labs <- ui[["plot_group"]][[pg_i]][["cloud"]][["scen_names"]]
   legendTitle <- ui$defaults$color_label
   legendWrap <- ui$defaults$legend_wrap
   
@@ -101,6 +101,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   # Adding factors so ggplot does not alphebetize legend
   zz$StartMonth = factor(zz$StartMonth, levels = names(plotColors))
   
+  # labels ---------------
   # Generating labels for the lines in ggplot
   histLab = "Historical Elevation"
   ##IGLab = "\"2007 Projections\""
@@ -108,6 +109,13 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   ##names(IGLab) = "\"2007 Projections\""
   histLab = append(histLab, scen_labs)
   ##histLab = append(histLab, IGLab)
+  n1 <- names(histLab)
+  n2 <- names(scen_labs)
+  
+  histLab <- str_wrap(histLab, 15)
+  scen_labs <- str_wrap(scen_labs, 15)
+  names(histLab) <- n1
+  names(scen_labs) <- n2
   
   # Read in Reclamation logo png
   im <- load.image('logo/BofR-vert-cmyk.png')
@@ -161,13 +169,13 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
       name, 
       values = plotColors, 
       guide = guide_legend(order=1),
-      labels = str_wrap(scen_labs, 15)
+      labels = scen_labs
     ) + 
     scale_color_manual(
       name,
       values = plotColors,
       guide = guide_legend(order=1),
-      labels = str_wrap(scen_labs, 15)
+      labels = scen_labs
     )  +
     theme(
       legend.text = element_text(size=LegendText),
@@ -184,7 +192,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     scale_color_manual(
       name = str_wrap("Historical and Median Projected Pool Elevation",20),
       values = plotColors, 
-      labels = str_wrap(histLab, 15)
+      labels = histLab
     ) +
     theme(
       legend.text = element_text(size=LegendText),
@@ -234,11 +242,11 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     ) +
     scale_fill_manual(str_wrap("10th to 90th percentile of full range",20),
                       values = plotColors, guide = FALSE,
-                      labels = str_wrap(scen_labs, 15)) + 
+                      labels = scen_labs) + 
     scale_color_manual(
       name = str_wrap("Historical and Median Projected Pool Elevation",20),
       values = plotColors, guide = FALSE,
-      labels = str_wrap(histLab, 15)
+      labels = histLab
     ) +
     labs(
       title = myTitle, 

@@ -135,14 +135,14 @@ check_cloud_specification <- function(pg, defaults)
   for (i in seq_along(pg)) {
     if (exists("cloud", where = pg[[i]]) & pg[[i]][["cloud"]][["create"]]) {
       
-      spec_names <- pg[[i]][["cloud"]][["scen_labs"]]
+      spec_names <- pg[[i]][["cloud"]][["scen_names"]]
       
       # check the names (scen_labs) ---------
       if (length(spec_names) != length(pg[[i]][["plot_scenarios"]])) {
         err <- c(
           err, 
           paste0(
-            "The scen_labs in the ", 
+            "The scen_names in the ", 
             names(pg)[[i]], 
             " plot_group, need to have the same length as the specified plot_scenarios:"
           )
