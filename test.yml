@@ -65,9 +65,11 @@ plot_groups:
           years: [1999,2026]
     - aug2june:  
         scenarios: ["Aug 2018 - IG", "June 2019 w/ DCP"]
-        plot_colors: ["#F8766D", "#00BFC4"]
+        scen_names: ["Aug 2018", "June 2019 DCP"]
+        plot_colors: ["#DEEBF7", "#9ECAE1"]
         years: [2018, 2036]
         plots: [std_comparison, heat]
+        caption: Every plot gets this
 # can also specify
 # plots:
 #  - std_comparison

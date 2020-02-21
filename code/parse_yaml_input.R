@@ -2,6 +2,8 @@ library(yaml)
 #library(fs) # for is_absolute_path()
 library(assertthat)
 library(purrr)
+source("code/plot_group.R")
+source("code/plot_spec.R")
 
 parse_yaml_input <- function(file)
 {
@@ -13,7 +15,8 @@ parse_yaml_input <- function(file)
     set_defaults() %>%
     set_process_data() %>%
     set_folders() %>%
-    set_scenarios()
+    set_scenarios() %>%
+    set_plot_groups()
   
   zz
 }
@@ -38,7 +41,8 @@ set_defaults <- function(ui)
   # from old specification code:
   # # TODO: update so that these are computed if not specified
   # # years to show the crit stats figures  
-  # defaults[['plot_yrs']] <- defaults$start_year:defaults$end_year 
+  ui[["defaults"]][['plot_years']] <- 
+    ui[["defaults"]][["start_year"]]:ui[["defaults"]][["end_year"]]
   # # years to show the Mead/Powell 10/50/90 figures for
   # defaults[['pe_yrs']] <- (defaults$start_year - 1):defaults$end_year
   
@@ -341,4 +345,33 @@ check_std_ind_tables <- function(scen)
   }
   
   scen
+}
+
+set_plot_groups <- function(ui)
+{
+  # 0 - pg can be unspecified. If it is, then can skip everything
+  if (exists("plot_groups", where = ui)) {
+    # 1 fully expand the specified plot_groups, inheritiing from defaults
+    # caption, years, colors, scen_names can all be specified at the plot_group
+    # or individual plot level 
+    # expand years out rather than just end points
+    plot_groups <- list()
+    
+    for (pg in ui[["plot_groups"]]) {
+      plot_groups[[names(pg)]] <- plot_group(pg[[1]], ui[["defaults"]])
+    }
+    
+    # 2 convert to expected list structure
+    ui[["plot_groups"]] <- plot_groups
+  }
+  
+  ui
+}
+
+#' Takes one plot_group, and fully expands it, inheriting defaults from defaults
+#' plot_group (`pg`) will have scenarios, scen_names, plot_colors, years, 
+#' caption entries after it is expanded
+expand_plot_group <- function(pg, defaults)
+{
+  
 }

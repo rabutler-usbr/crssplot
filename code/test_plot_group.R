@@ -5,6 +5,7 @@ tst <- yaml.load_file("test.yml")
 
 ui <- set_defaults(tst)
 defaults <- ui[["defaults"]]
+ui <- parse_yaml_input("test.yml")
 
 test_that("plot_group is properly created", {
   expect_s3_class(
@@ -38,4 +39,7 @@ test_that("plot_group is properly created", {
     t2[["plot_colors"]],
     c("Aug 2018 - IG" = "#DEEBF7", "June 2019 w/ DCP" = "#9ECAE1")
   )
+  
+  expect_equal(ui[["plot_groups"]][["aug2obs"]], t1)
+  expect_equal(ui[["plot_groups"]][["aug2june"]], t2)
 })
