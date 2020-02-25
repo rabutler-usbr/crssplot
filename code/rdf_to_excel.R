@@ -1,14 +1,11 @@
 # Input -----------------------------------
 
-fpath <- "M:/Shared/CRSS/2019/ModelOutput.Jun2019/"
-rdf2excel <- "C:/Program Files/CADSWES/RiverWare 7.5/RDFToExcel/RdfToExcelExecutable.exe"
+fpath <- "M:/Shared/CRSS/2020/Scenario/Feb2020_2021,DNF,2007Dems,IG_DCP"
+rdf2excel <- "C:/Program Files/CADSWES/RiverWare 7.5.2/RDFToExcel/RdfToExcelExecutable.exe"
 
-rdfs <- c(
-  "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP,1981_2015-MWDICS",
-  "Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP,1981_2015-MWDICS_mon",
-  "Jun2019_2020,DNF,2007Dems,IG_DCP,1981_2015-MWDICS",
-  "Jun2019_2020,DNF,2007Dems,IG_DCP,1981_2015-MWDICS_mon"
-)
+rdfs <- c('KeySlots','Flags','SystemConditions','OWDAnn','Res','xtraRes', 
+          "CRSPPowerData", "LBEnergy", "LBDCP", "UBDO")
+
 xlsx <- rdfs
 
 rdfs <- paste0(rdfs, ".rdf")
@@ -33,3 +30,6 @@ for (i in seq_along(rdfs)) {
     system2(rdf2excel, args = cmd)
   }
 }
+
+# TODO: parse the log file. Delete it if it ends in 
+# "RdfToExcel: Workbook write successfully completed", otherwise keep it.
