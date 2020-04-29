@@ -21,3 +21,11 @@ rules:
   description: |
     Equalization Above 823 should never be NA
   in_file: SystemConditions.rdf
+-
+  expr: '!is.na(PowellOperation.PowellWYRelease)'
+  name: Powell WY Release is valid
+  in_file: KeySlots.rdf
+- 
+  expr: '!is.na(PowellOperation.Powell10YearWYRelease)'
+  name: 10-year Powell WY release is valid
+  in_file: KeySlots.rdf

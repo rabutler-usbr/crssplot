@@ -6,10 +6,12 @@ scenario_dir <- "~/crss/crss.offc/Scenario"
 output_dir <- "~/crss/crss.offc/results/apr2020/rwcheck"
 yaml_dir <- "data/"
 
-check_rw_output(
+x <- check_rw_output(
   scenarios,
   yaml_rule_files,
   scenario_dir,
   output_dir,
   yaml_dir
 )
+
+
