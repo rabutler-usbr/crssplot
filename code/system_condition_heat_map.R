@@ -229,13 +229,33 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
       labeller = label_wrap_gen()
     ) +
     geom_tile() +
-    # from https://uigradients.com/#HoneyDew
+    # # from https://uigradients.com/#HoneyDew
+    # scale_fill_gradient(
+    #   low = "#F8FFAE", 
+    #   high = "#43C6AC", 
+    #   na.value = "grey90", 
+    #   trans = "sqrt"
+    # ) + 
     scale_fill_gradient(
-      low = "#F8FFAE", 
-      high = "#43C6AC", 
-      na.value = "grey90", 
+      low = "#D1BDA2",
+      high = "#006699",
+      na.value = "grey90",
       trans = "sqrt"
-    ) + 
+    ) +
+    # scale_fill_got(
+    #   #low = "",
+    #   #high = "",
+    #   option = "margaery",
+    #   na.value = "grey90",
+    #   trans = "sqrt"
+    # ) +
+    # scale_fill_hp(
+    #   #low = "",
+    #   #high = "",
+    #   option = "LunaLovegood",
+    #   na.value = "grey90",
+    #   trans = "sqrt"
+    # ) +
     geom_vline(xintercept = seq(1.5, n_yrs, 1), color = "white", size = 1) +
     geom_hline(
       yintercept = seq(0.5, length(tier_names) + 0.5), 
