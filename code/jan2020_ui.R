@@ -1,6 +1,7 @@
 library(assertthat)
 library(RWDataPlyr)
 source("code/create_scenario.R")
+source("code/global_colors.R")
 # script should create everything necessary for the results in order
 # CRSSDIR is the CRSS_DIR environment variable that will tell the code where to
 # store the intermediate data and figures/tables created here
@@ -25,8 +26,8 @@ jan2020_ui <- function()
     CRSSDIR = "~/crss/crss.offc", #Sys.getenv("CRSS_DIR"),
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
-    crss_month = "udall_temp_adj",
-    pdf_name = 'udal_2.pdf',
+    crss_month = "apr2020",
+    pdf_name = 'April2020.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -63,94 +64,114 @@ jan2020_ui <- function()
   # specify the scenarios -------------------------
   all_scenarios <- c(
     create_scenario(
-      "RCP 4.5 - 0%",
-      "Jan2020_2021,UTA_45_000,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Feb 2020 - DNF most",
+      "Feb2020_2021,DNF,2007Dems,IG_DCP,MTOM_Most",
+      ic = c(3612.42, 1084.71),
       start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "RCP 4.5 - 3%",
-      "Jan2020_2021,UTA_45_030,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Apr 2020 - DNF most",
+      scen_folders = "Apr2020_2021,DNF,2007Dems,IG_DCP,MTOM_Most",
+      ic = c(3610.24, 1084.7),
       start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "RCP 4.5 - 6.5%",
-      "Jan2020_2021,UTA_45_065,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Feb 2020 - DNF",
+      scen_folders = rw_scen_gen_names(
+        "Feb2020_2021,DNF,2007Dems,IG_DCP",
+        paste0("Trace", 4:38)
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/feb_2020/MtomToCrss_Monthly.xlsx"
+      ),
       start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+
+    create_scenario(
+      "Feb 2020 - ST",
+      scen_folders = rw_scen_gen_names(
+        "Feb2020_2021,ISM1988_2018,2007Dems,IG_DCP",
+        paste0("Trace", 4:38)
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/feb_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+
+    create_scenario(
+      "Apr 2020 - DNF",
+      scen_folders = rw_scen_gen_names(
+        "Apr2020_2021,DNF,2007Dems,IG_DCP",
+        paste0("Trace", sprintf("%02d", 4:38))
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/apr_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = FALSE,
+      std_ind_figures = FALSE
+    ),
+    
+    create_scenario(
+      "Apr 2020 - ST",
+      scen_folders = rw_scen_gen_names(
+        "Apr2020_2021,ISM1988_2018,2007Dems,IG_DCP",
+        paste0("Trace", sprintf("%02d", 4:38))
+      ),
+      ic = file.path(
+        folders$CRSSDIR,
+        "dmi/InitialConditions/apr_2020/MtomToCrss_Monthly.xlsx"
+      ),
+      start_year = 2021,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "RCP 4.5 - 10%",
-      "Jan2020_2021,UTA_45_100,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Feb 2020 - DNF NA most",
+      "Feb2020_2021,DNF,2007Dems,NA,MTOM_Most",
+      ic = c(3612.42, 1084.71),
       start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "RCP 8.5 - 0%",
-      "Jan2020_2021,UTA_85_000,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Apr 2020 - DNF NA most",
+      "Apr2020_2021,DNF,2007Dems,NA,MTOM_Most",
+      ic = c(3610.24, 1084.7),
       start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "RCP 8.5 - 3%",
-      "Jan2020_2021,UTA_85_030,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Feb 2020 - ST NA most",
+      "Feb2020_2021,ISM1988_2018,2007Dems,NA,MTOM_Most",
+      ic = c(3612.42, 1084.71),
       start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     ),
     create_scenario(
-      "RCP 8.5 - 6.5%",
-      "Jan2020_2021,UTA_85_065,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
+      "Apr 2020 - ST NA most",
+      "Apr2020_2021,ISM1988_2018,2007Dems,NA,MTOM_Most",
+      ic = c(3610.24, 1084.7),
       start_year = 2021,
-      std_ind_table = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "RCP 8.5 - 10%",
-      "Jan2020_2021,UTA_85_100,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
-      start_year = 2021,
-      std_ind_table = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Jan 2020 - DNF",
-      "Jan2020_2021,DNF,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
-      start_year = 2021,
-      std_ind_table = FALSE,
-      std_ind_figures = FALSE
-    ),
-    create_scenario(
-      "Jan 2020 - ST",
-      "Jan2020_2021,ISM1988_2018,2007Dems,IG_DCP,MTOM_Most",
-      ic = c(3590.55, 1084.07),
-      start_year = 2021,
-      std_ind_table = FALSE,
+      std_ind_tables = FALSE,
       std_ind_figures = FALSE
     )
-    # create_scenario(
-    #   "Aug 2019 (Update) - DNF",
-    #   scen_folders = "Aug2019_2020_v4.1.1,DNF,2007Dems,IG_DCP_v4.2.0,Most",
-    #   ic = c(3618.56, 1089.4),
-    #   start_year = 2020,
-    #   std_ind_tables = FALSE,
-    #   std_ind_figures = FALSE
-    # ),
-    # 
+    
+    # -------------------------------------------------------------
     # create_scenario(
     #   "Aug 2019 (Update) - ST",
     #   scen_folders = "Aug2019_2020_v4.1.1,ISM1988_2017,2007Dems,IG_DCP_v4.2.0,Most",
@@ -362,42 +383,89 @@ jan2020_ui <- function()
     "Jan 2020 - DNF" = "#984ea3",
     "Jan 2020 - ST" =	"#ff7f00"
   )
+  
   plot_group <- list(
-    comp_rcp = list(
-      plot_scenarios = names(all_colors)[1:8],
+    feb2apr_dnf = list(
+      plot_scenarios = c("Feb 2020 - DNF", "Apr 2020 - DNF"),
       std_comparison = list(
-        create = TRUE,
+        create = FALSE,
         years = 2020:2060
       ),
       csd_ann = list(
         create = FALSE,
         years = 2020:2035
       ),
-      plot_colors = all_colors[1:8]
+      cloud = list(
+        create = FALSE,
+        # scenarios to include in cloud
+        # should default to '' if it is not specified
+        title_append = "from February and April 2020 CRSS with Full Hydrology",
+        # should be NULL if not specified. not ''
+        caption = NULL,
+        years = 1999:2026,
+        scen_names = c("Feb 2020 - DNF" = "Feb 2020 - DNF",
+                       "Apr 2020 - DNF" = "Apr 2020 - DNF")
+      )
     ),
-    rcp45 = list(
-      plot_scenarios = names(all_colors)[c(1,3,5,7,9,10)],
+    feb2apr_st = list(
+      plot_scenarios = c("Feb 2020 - ST", "Apr 2020 - ST"),
       std_comparison = list(
-        create = TRUE,
+        create = FALSE,
         years = 2020:2060
       ),
       csd_ann = list(
         create = FALSE,
         years = 2020:2035
       ),
-      plot_colors = all_colors[c(1,3,5,7,9,10)]
+      cloud = list(
+        create = FALSE,
+        # scenarios to include in cloud
+        # should default to '' if it is not specified
+        title_append = "from February and April 2020 CRSS with Stress Test Hydrology",
+        # should be NULL if not specified. not ''
+        caption = NULL,
+        years = 1999:2026,
+        scen_names = c(
+          "Feb 2020 - ST" = "Feb 2020 - ST", "Apr 2020 - ST" = "Apr 2020 - ST"
+        )
+      )
     ),
-    rcp85 = list(
-      plot_scenarios = names(all_colors)[c(2,4,6,8,9,10)],
+    apr_dnf2st = list(
+      plot_scenarios = c("Apr 2020 - DNF", "Apr 2020 - ST"),
+      plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST"),
       std_comparison = list(
-        create = TRUE,
+        create = FALSE,
         years = 2020:2060
+        #plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST")
       ),
       csd_ann = list(
         create = FALSE,
         years = 2020:2035
       ),
-      plot_colors = all_colors[c(2,4,6,8,9,10)]
+      heat = list(
+        create = TRUE,
+        scen_names = c(
+          "Apr 2020 - DNF" = "Full Hydrology",
+          "Apr 2020 - ST" = "Stress Test Hydrology"
+        ),
+        title = "April 2020 CRSS",
+        years = 2021:2026
+        #plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST")
+      ),
+      cloud = list(
+        create = FALSE,
+        # scenarios to include in cloud
+        scen_names = c(
+          "Apr 2020 - DNF" = "Full Hydrology",
+          "Apr 2020 - ST" = "Stress Test Hydrology"
+        ),
+        # should default to '' if it is not specified
+        title_append = "from April 2020 CRSS",
+        # should be NULL if not specified. not ''
+        caption = NULL,
+        years = 1999:2026
+        #plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST")
+      )
     )
     # "ig_v_na" = list(
     #   plot_scenarios = c("Aug 2018 - IG", "Aug 2018 - NA", "Aug 2019 - IG Dev",
