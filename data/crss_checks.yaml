@@ -1,0 +1,23 @@
+# CRSS checks
+rules:
+-
+  expr: Mead.Outflow >= 0
+  name: Mead.Outflow
+  label: Mead Outflow
+  description: |
+    Mead Outflow should never be negative.
+  in_file: Res.rdf
+-
+  expr: Mead.PoolElevation > 0
+  name: Mead.Pool Elevation
+  label: Mead PE
+  description: |
+    Mead PE should never be NA
+  in_file: Res.rdf
+-
+  expr: '!is.na(SummaryOutputData.EqualizationAbove823)'
+  name: EqualizationAbove823
+  label: Equalization Above 823
+  description: |
+    Equalization Above 823 should never be NA
+  in_file: SystemConditions.rdf
