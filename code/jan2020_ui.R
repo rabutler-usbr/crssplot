@@ -57,7 +57,7 @@ jan2020_ui <- function()
   )
   # TODO: update so that these are computed if not specified
   # years to show the crit stats figures  
-  defaults[['plot_yrs']] <- defaults$start_year:defaults$end_year 
+  defaults[['plot_years']] <- defaults$start_year:defaults$end_year 
   # years to show the Mead/Powell 10/50/90 figures for
   defaults[['pe_yrs']] <- (defaults$start_year - 1):defaults$end_year
   

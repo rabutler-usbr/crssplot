@@ -349,20 +349,22 @@ check_std_ind_tables <- function(scen)
 
 set_plot_groups <- function(ui)
 {
+  # TODO: set this to "plot_groups" at some point. 
   # 0 - pg can be unspecified. If it is, then can skip everything
-  if (exists("plot_groups", where = ui)) {
+
+  if (exists("plot_group", where = ui)) {
     # 1 fully expand the specified plot_groups, inheritiing from defaults
     # caption, years, colors, scen_names can all be specified at the plot_group
     # or individual plot level 
     # expand years out rather than just end points
-    plot_groups <- list()
+    plot_group <- list()
     
-    for (pg in ui[["plot_groups"]]) {
-      plot_groups[[names(pg)]] <- plot_group(pg[[1]], ui[["defaults"]])
+    for (pg in ui[["plot_group"]]) {
+      plot_group[[names(pg)]] <- plot_group(pg[[1]], ui[["defaults"]])
     }
     
     # 2 convert to expected list structure
-    ui[["plot_groups"]] <- plot_groups
+    ui[["plot_group"]] <- plot_group
   }
   
   ui

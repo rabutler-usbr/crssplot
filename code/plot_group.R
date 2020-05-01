@@ -24,9 +24,13 @@ validate_plot_group <- function(x)
 new_plot_group <- function(x, defaults)
 {
   # set top level plot options
+  
+  # TODO: remove the "plot_scenarios" entry after we are done converting to 
+  # only the yaml based structure.
   pg <- structure(
     list(
       scenarios = x[["scenarios"]],
+      plot_scenarios = x[["scenarios"]],
       scen_names = get_pg_scen_names(x),
       plot_colors = get_pg_plot_colors(x),
       years = get_pg_years(x, defaults),
@@ -43,23 +47,23 @@ new_plot_group <- function(x, defaults)
   # go through the different plot types; for now just store them as is
   
   plot_types <- c("std_comparison", "csd_ann", "heat", "cloud")
-  
+ 
   if (exists("plots", where = x)) {
     # plots are specified as sequence. Create these plots based on defaults
     create_plots <- x[["plots"]]
     
     
     if ("std_comparison" %in% create_plots) 
-      pg[["std_comparison"]] <- TRUE
+      pg[["std_comparison"]] <- new_plot_spec(TRUE)
     
     if ("csd_ann" %in% create_plots)
-      pg[["csd_ann"]] <- TRUE
+      pg[["csd_ann"]] <- new_plot_spec(TRUE)
     
     if ("heat" %in% create_plots)
       pg[["heat"]] <- heat_spec(x, pg)
     
     if ("cloud" %in% create_plots)
-      pg[["cloud"]] <- TRUE
+      pg[["cloud"]] <- new_plot_spec(TRUE)
    
   } else {
     # check if each plot type exists. Create it if it does. Set to FALSE if 

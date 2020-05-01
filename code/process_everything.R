@@ -8,7 +8,7 @@ process_everything <- function(ui)
   scens <- ui$scenarios$scens
   icList <- ui$scenarios$ic_list
   icMonth <- ui$scenarios$ic_month
-  yrs2show <- ui$defaults$plot_yrs
+  yrs2show <- ui$defaults$plot_years
   peYrs <- ui$defaults$pe_yrs
 
   crss_res_check_scen_names(
@@ -94,7 +94,7 @@ process_everything <- function(ui)
   if (plot_flags[["heat"]]) {
     # system condition heatmap -------------------------
     message("... System conditions heatmap")
-
+browser()
     create_mead_powell_heatmaps(
       lb_dcp, sys_cond, 
       ui,
