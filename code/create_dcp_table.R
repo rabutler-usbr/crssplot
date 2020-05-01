@@ -14,7 +14,7 @@ create_dcp_table <- function(z1, z2, scenario, yrs, o_folder, ui)
   f_name <- file.path(o_folder[['tables']], f_name)
   
   # save the dcp probabilities table
-  data.table::fwrite(dcp_probs, f_name, row.names = TRUE)
+  data.table::fwrite(dcp_probs, f_name, row.names = FALSE)
   
   invisible(TRUE)
 }
