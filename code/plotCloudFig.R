@@ -428,12 +428,12 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
 
 plot_both_clouds <- function(pe, ui, folder_paths)
 {
-  p_title <- 'Powell End-of-December Elevation'
-  m_title <- 'Mead End-of-December Elevation'
-  
   # loop through all plot_groups and if create == TRUE, create the cloud figure
     
   for (i in seq_along(ui[["plot_group"]])) {
+    p_title <- 'Powell End-of-December Elevation'
+    m_title <- 'Mead End-of-December Elevation'
+    
     if (ui[["plot_group"]][[i]][["cloud"]][["create"]]) {
       
       pg <- ui[["plot_group"]][[i]]
