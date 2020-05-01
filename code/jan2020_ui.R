@@ -23,11 +23,11 @@ jan2020_ui <- function()
   # ** make sure CRSS_DIR is set correctly before running
   folders <- list(
     i_folder = "M:/Shared/CRSS/2020/Scenario",
-    CRSSDIR = "~/crss/crss.offc", #Sys.getenv("CRSS_DIR"),
+    CRSSDIR = "C:/alan/crss/crss.2020", #Sys.getenv("CRSS_DIR"),
     # set crssMonth to the month CRSS was run. data and figures will be saved in 
     # a folder with this name
     crss_month = "apr2020",
-    pdf_name = 'April2020.pdf',
+    pdf_name = 'April2020_2026.pdf',
     # inserted onto some files. Can be ''
     extra_label = ""
   )
@@ -120,8 +120,8 @@ jan2020_ui <- function()
         "dmi/InitialConditions/apr_2020/MtomToCrss_Monthly.xlsx"
       ),
       start_year = 2021,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE
     ),
     
     create_scenario(
@@ -135,8 +135,8 @@ jan2020_ui <- function()
         "dmi/InitialConditions/apr_2020/MtomToCrss_Monthly.xlsx"
       ),
       start_year = 2021,
-      std_ind_tables = FALSE,
-      std_ind_figures = FALSE
+      std_ind_tables = TRUE,
+      std_ind_figures = TRUE
     ),
     create_scenario(
       "Feb 2020 - DNF NA most",
@@ -334,12 +334,12 @@ jan2020_ui <- function()
     #     ann_text = "Results from updated August 2019 CRSS run with stress test hydrology",
     #     end_year = 2026
     #   )
-    "Jan 2020 - DNF" = list(
-      ann_text = "Results from the January 2020 full hydrology run",
+    "Apr 2020 - DNF" = list(
+      ann_text = "Results from the April 2020 full hydrology run",
       end_year = 2026
     ),
-    "Jan 2020 - ST" = list(
-      ann_text = "Results from the January 2020 stress test run", 
+    "Apr 2020 - ST" = list(
+      ann_text = "Results from the April 2020 stress test hydrology run", 
       end_year = 2026
     ),
     "Jan 2020 - DNF (MTOM most)" = list(
@@ -388,15 +388,15 @@ jan2020_ui <- function()
     feb2apr_dnf = list(
       plot_scenarios = c("Feb 2020 - DNF", "Apr 2020 - DNF"),
       std_comparison = list(
-        create = FALSE,
-        years = 2020:2060
+        create = TRUE,
+        years = 2020:2026
       ),
       csd_ann = list(
-        create = FALSE,
+        create = TRUE,
         years = 2020:2035
       ),
       cloud = list(
-        create = FALSE,
+        create = TRUE,
         # scenarios to include in cloud
         # should default to '' if it is not specified
         title_append = "from February and April 2020 CRSS with Full Hydrology",
@@ -410,15 +410,15 @@ jan2020_ui <- function()
     feb2apr_st = list(
       plot_scenarios = c("Feb 2020 - ST", "Apr 2020 - ST"),
       std_comparison = list(
-        create = FALSE,
-        years = 2020:2060
+        create = TRUE,
+        years = 2020:2026
       ),
       csd_ann = list(
-        create = FALSE,
+        create = TRUE,
         years = 2020:2035
       ),
       cloud = list(
-        create = FALSE,
+        create = TRUE,
         # scenarios to include in cloud
         # should default to '' if it is not specified
         title_append = "from February and April 2020 CRSS with Stress Test Hydrology",
@@ -434,7 +434,7 @@ jan2020_ui <- function()
       plot_scenarios = c("Apr 2020 - DNF", "Apr 2020 - ST"),
       plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST"),
       std_comparison = list(
-        create = FALSE,
+        create = TRUE,
         years = 2020:2060
         #plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST")
       ),
@@ -453,12 +453,14 @@ jan2020_ui <- function()
         #plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST")
       ),
       cloud = list(
-        create = FALSE,
+        create = TRUE,
         # scenarios to include in cloud
         scen_names = c(
           "Apr 2020 - DNF" = "Full Hydrology",
           "Apr 2020 - ST" = "Stress Test Hydrology"
         ),
+        # TODO: since this is set above, should not have to set it here too.
+        plot_colors = dnf_st_pal(full = "Apr 2020 - DNF", st = "Apr 2020 - ST"),
         # should default to '' if it is not specified
         title_append = "from April 2020 CRSS",
         # should be NULL if not specified. not ''
