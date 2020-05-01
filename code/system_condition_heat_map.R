@@ -237,25 +237,11 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
     #   trans = "sqrt"
     # ) + 
     scale_fill_gradient(
-      low = "#D1BDA2",
+      low = "#ffffff",
       high = "#006699",
       na.value = "grey90",
       trans = "sqrt"
     ) +
-    # scale_fill_got(
-    #   #low = "",
-    #   #high = "",
-    #   option = "margaery",
-    #   na.value = "grey90",
-    #   trans = "sqrt"
-    # ) +
-    # scale_fill_hp(
-    #   #low = "",
-    #   #high = "",
-    #   option = "LunaLovegood",
-    #   na.value = "grey90",
-    #   trans = "sqrt"
-    # ) +
     geom_vline(xintercept = seq(1.5, n_yrs, 1), color = "white", size = 1) +
     geom_hline(
       yintercept = seq(0.5, length(tier_names) + 0.5), 
