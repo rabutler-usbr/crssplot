@@ -184,6 +184,8 @@ set_scenarios <- function(ui)
       eval_scenarios_specification() %>%
       check_std_ind_figures(ui[["defaults"]]) %>%
       check_std_ind_tables()
+    
+    mead_pe_scatter <- check_mead_pe_scatter(cur_scen)
 
     all_scenarios <- c(
       all_scenarios,
@@ -193,7 +195,8 @@ set_scenarios <- function(ui)
         ic = cur_scen[["ic"]],
         start_year = cur_scen[["start_year"]],
         std_ind_tables = cur_scen[["std_ind_tables"]],
-        std_ind_figures = cur_scen[["std_ind_figures"]][["create"]]
+        std_ind_figures = cur_scen[["std_ind_figures"]][["create"]],
+        mead_pe_scatter = mead_pe_scatter
       )
     )
     
@@ -286,6 +289,41 @@ strip_r_from_string <- function(x)
 is_r_statement <- function(x)
 {
   grepl("`r\\s.{1,}`", x)
+}
+
+check_mead_pe_scatter <- function(scen)
+{
+  #   mead_pe_scatter = list(
+  #     year = 2020,
+  #     # peScatterData should be set to either MTOM or CRSS
+  #     # if relying on combined run, then this is likely MTOM; if using a CRSS only 
+  #     # run, then likely set to CRSS
+  #     model = 'CRSS'
+  #   )
+  if (exists("pe_scatter", scen)) {
+    req_vals <- c("year", "model", "ann_text", "add_threshold_stats")
+    assert_that(
+      all(names(scen[["pe_scatter"]]) %in% req_vals) && 
+        all(req_vals %in% names(scen[["pe_scatter"]])),
+      msg = "year, model, ann_text, and add_threhold_stats must all be specified in pe_scatter."
+    )
+    assert_that(purrr::is_scalar_numeric(scen[["pe_scatter"]][["year"]]))
+    assert_that(
+      scen[["pe_scatter"]][["model"]] %in% c("CRSS", "MTOM"),
+      msg = "model should be either CRSS or MTOM"
+    )
+    assert_that(purrr::is_scalar_character(scen[["pe_scatter"]][["ann_text"]]))
+    assert_that(
+      purrr::is_scalar_logical(scen[["pe_scatter"]][["add_threshold_stats"]])
+    )
+    pe_scatter <- scen[["pe_scatter"]]
+    pe_scatter[["create"]] <- TRUE
+    
+  } else {
+    pe_scatter <- list(create = FALSE)
+  }
+  
+  pe_scatter
 }
 
 # checks to see if user specified that std_ind_figures should be created
