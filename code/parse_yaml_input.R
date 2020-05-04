@@ -71,7 +71,7 @@ required_entries <- function(level) {
   if (level == "top") {
     rv <- c("process_data", "folders", "scenarios")
   } else if (level == "folders") {
-    rv <- c("i_folder", "CRSSDIR", "crss_month", "pdf_name")
+    rv <- c("i_folder", "crss_month", "pdf_name")
   } else if (level == "process_data") {
     rv <- c("sys_cond_data", "pe_data", "csd_dat", "crss_short_cond_data")
   } else if (level == "scenarios") {
@@ -140,9 +140,25 @@ set_folders <- function(ui)
   req_folders <- required_entries("folders")
   assert_that(all(req_folders %in% names(ui[["folders"]])))
   
-  # check for optional entries - only "extra_label" is optional
+  # check for optional entries - only "extra_label" and CRSSDIR are optional
   if (!exists("extra_label", where = ui[["folders"]])) {
     ui[["folders"]][["extra_label"]] <- ''
+  }
+  
+  if (!exists("CRSSDIR", where = ui[["folders"]])) {
+    # if CRSSDIR is not specifed, then defaults to $CRSS_DIR, but will error if
+    # than environment variable is not specified
+    crss_dir <- Sys.getenv("CRSS_DIR")
+    assert_that(
+      crss_dir != "", 
+      msg = "CRSS_DIR environment variable does not exist."
+    )
+    assert_that(
+      dir.exists(crss_dir), 
+      msg = "Folder specified by CRSS_DIR environment variable does not exist."
+    )
+    
+    ui[["folders"]][["CRSSDIR"]] <- crss_dir
   }
   
   # all required sequences and extra_label should be strings of length 1
