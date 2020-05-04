@@ -186,6 +186,7 @@ set_scenarios <- function(ui)
       check_std_ind_tables()
     
     mead_pe_scatter <- check_mead_pe_scatter(cur_scen)
+    short_conditions <- check_shortage_conditions(cur_scen)
 
     all_scenarios <- c(
       all_scenarios,
@@ -196,7 +197,8 @@ set_scenarios <- function(ui)
         start_year = cur_scen[["start_year"]],
         std_ind_tables = cur_scen[["std_ind_tables"]],
         std_ind_figures = cur_scen[["std_ind_figures"]][["create"]],
-        mead_pe_scatter = mead_pe_scatter
+        mead_pe_scatter = mead_pe_scatter,
+        shortage_conditions = short_conditions
       )
     )
     
@@ -293,13 +295,6 @@ is_r_statement <- function(x)
 
 check_mead_pe_scatter <- function(scen)
 {
-  #   mead_pe_scatter = list(
-  #     year = 2020,
-  #     # peScatterData should be set to either MTOM or CRSS
-  #     # if relying on combined run, then this is likely MTOM; if using a CRSS only 
-  #     # run, then likely set to CRSS
-  #     model = 'CRSS'
-  #   )
   if (exists("pe_scatter", scen)) {
     req_vals <- c("year", "model", "ann_text", "add_threshold_stats")
     assert_that(
@@ -324,6 +319,49 @@ check_mead_pe_scatter <- function(scen)
   }
   
   pe_scatter
+}
+
+check_shortage_conditions <- function(scen)
+{
+  if (exists("shortage_conditions", scen)) {
+    req_vals <- c("year", "model", "color_var", "subtitle", "segment_locs",
+                  "annotation_loc")
+    assert_that(
+      all(names(scen[["shortage_conditions"]]) %in% req_vals) && 
+        all(req_vals %in% names(scen[["shortage_conditions"]])),
+      msg = paste(
+        paste(req_vals, collpase = ", "), 
+        "must all be specified in shortage_conditions"
+      )
+    )
+    ss <- scen[["shortage_conditions"]]
+    assert_that(purrr::is_scalar_numeric(ss[["year"]]))
+    assert_that(
+      ss[["model"]] %in% c("CRSS", "MTOM"),
+      msg = "model should be either CRSS or MTOM"
+    )
+    if (ss[["model"]] == "CRSS")
+      # CRSS
+      assert_that(ss[["color_var"]] %in% c("mwdIcs", "WYRelease"))
+    else
+      # MTOM
+      assert_that(ss[["color_var"]] %in% c("WYRelease"))
+    
+    assert_that(purrr::is_scalar_character(ss[["subtitle"]]))
+    assert_that(is.numeric(ss[["segment_locs"]]) && 
+                  length(ss[["segment_locs"]]) == 4)
+    assert_that(is.numeric(ss[["annotation_loc"]]) && 
+                  length(ss[["annotation_loc"]]) == 2)
+    
+    
+    short <- ss
+    short[["create"]] <- TRUE
+    
+  } else {
+    short <- list(create = FALSE)
+  }
+  
+  short
 }
 
 # checks to see if user specified that std_ind_figures should be created

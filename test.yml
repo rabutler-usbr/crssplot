@@ -1,11 +1,11 @@
 # define the CRSS processing for this month's run
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
-process_data: FALSE
-#  sys_cond_data: TRUE
-#  pe_data: TRUE
-#  csd_data: TRUE
-#  crss_short_cond_data: FALSE
+process_data: 
+  sys_cond_data: FALSE
+  pe_data: FALSE
+  csd_data: FALSE
+  crss_short_cond_data: TRUE
 defaults:
   end_year: 2026
 folders:
@@ -28,7 +28,7 @@ scenarios:
     shortage_conditions:
       model: CRSS
       year: 2021
-      color_var: mwdICS
+      color_var: mwdIcs
       subtitle: Results from January 2020 CRSS
       segment_locs: [16.9, 14.5, 1055.0, 1056.4]
       annotation_loc: [2.0, 1075.0]

@@ -97,55 +97,57 @@ scenario_to_vars <- function(scenarios)
 # check the shortage condition specification
 check_shortage_cond_spec <- function(shortage_conditions)
 {
-  assert_that(
-    shortage_conditions$model %in% c("CRSS", "MTOM"), 
-    msg = "The shortage conditions model should either be 'MTOM' or 'CRSS'"
-  )
-  
-  if (shortage_conditions$model == "CRSS") {
+  if (!isFALSE(shortage_conditions[["create"]])) {
     assert_that(
-      is.null(shortage_conditions$res_file),
-      msg = "`res_file` should be null when model is CRSS"
-    )
-
-    assert_that(
-      shortage_conditions$color_var %in% c("mwdIcs", "WYRelease"),
-      msg = paste0(
-        "When using CRSS to determine conditions leading to shortage,\n",
-        "the `color_var` should be either 'mwdIcs', or 'WYRelease'."  
-      )
+      shortage_conditions$model %in% c("CRSS", "MTOM"), 
+      msg = "The shortage conditions model should either be 'MTOM' or 'CRSS'"
     )
     
-    } else {
-    # have already determined that it is either CRSS or MTOM,so must be MTOM
-    assert_that(
-      shortage_conditions$color_var %in% c("WYRelease"),
-      msg = paste0(
-        "When using MTOM to determine conditions leading to shortage,\n",
-        "the `color_var` must be 'WYRelease'."  
+    if (shortage_conditions$model == "CRSS") {
+      assert_that(
+        is.null(shortage_conditions$res_file),
+        msg = "`res_file` should be null when model is CRSS"
       )
-    )
-  }
   
+      assert_that(
+        shortage_conditions$color_var %in% c("mwdIcs", "WYRelease"),
+        msg = paste0(
+          "When using CRSS to determine conditions leading to shortage,\n",
+          "the `color_var` should be either 'mwdIcs', or 'WYRelease'."  
+        )
+      )
+      
+      } else {
+      # have already determined that it is either CRSS or MTOM,so must be MTOM
+      assert_that(
+        shortage_conditions$color_var %in% c("WYRelease"),
+        msg = paste0(
+          "When using MTOM to determine conditions leading to shortage,\n",
+          "the `color_var` must be 'WYRelease'."  
+        )
+      )
+    }
+  }
   invisible(shortage_conditions)
 }
 
 update_shortage_cond_spec <- function(shortage_conditions)
 {
-  shortage_conditions[['title']] <- paste(
-    'Conditions Leading to a Lower Basin Shortage in',
-    shortage_conditions$year + 1
-  )
-  
-  if (shortage_conditions[["model"]] == "CRSS") {
-    # the label for the percent of average
-    shortage_conditions[['lb_label']] <- "Total LB natural inflow percent\nof average (1906-2015)"
+  if (!isFALSE(shortage_conditions[["create"]])) {
+    shortage_conditions[['title']] <- paste(
+      'Conditions Leading to a Lower Basin Shortage in',
+      shortage_conditions$year + 1
+    )
     
-  } else {
-    # its MTOM
-    # the label for the percent of average
-    shortage_conditions[['lb_label']] <- 'LB total side inflow percent\nof average (1981-2015)'
+    if (shortage_conditions[["model"]] == "CRSS") {
+      # the label for the percent of average
+      shortage_conditions[['lb_label']] <- "Total LB natural inflow percent\nof average (1906-2015)"
+      
+    } else {
+      # its MTOM
+      # the label for the percent of average
+      shortage_conditions[['lb_label']] <- 'LB total side inflow percent\nof average (1981-2015)'
+    }
   }
-  
   shortage_conditions
 }
