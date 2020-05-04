@@ -94,7 +94,7 @@ process_everything <- function(ui)
   if (plot_flags[["heat"]]) {
     # system condition heatmap -------------------------
     message("... System conditions heatmap")
-browser()
+    
     create_mead_powell_heatmaps(
       lb_dcp, sys_cond, 
       ui,
@@ -140,7 +140,7 @@ browser()
     # std comparison figures -------------
     # includes previous month's results too
     message("... Scenario comparison figures")
-    
+
     comp_figs <- create_scenario_comparison_figures(
       pe, cs, 
       ui, 
@@ -207,9 +207,9 @@ browser()
     cp_scens <- get_cond_prob_scens(ui)
     get_all_cond_probs(sys_cond, cp_scens, yrs2show, ui)
   }
-  
+
   # 5 year simple table -------------------------
-  if (plot_flags[["simple_5yr"]]) {
+  if (isTRUE(plot_flags[["simple_5yr"]])) {
     ## create the 5-yr simple table that compares to the previous run
     message("... creating 5-year simple table")
     tmp_data <- read_feather(o_files$sys_cond_file) %>%

@@ -43,7 +43,7 @@ scenarios:
     start_year: 2021
     std_ind_figures: TRUE
   - name: "June 2019 w/ DCP"
-    folder: "`r rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
+    folder: "`r RWDataPlyr::rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
     ic: "`r file.path('C:/alan/CRSS/CRSS.2019','dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx')`"
     start_year: 2020
 plot_group: 
@@ -58,7 +58,7 @@ plot_group:
           years: [2021, 2026]
           caption: NULL
         cloud:
-          scen_labs: ["IG", "NA"]
+          scen_names: ["IG", "NA"]
           plot_colors: ["#F8766D", "#00BFC4"]
           title_append: from January 2020 CRSS
           caption: "This and that"

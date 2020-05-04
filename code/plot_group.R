@@ -14,7 +14,8 @@ plot_group <- function(x, defaults)
 validate_plot_group <- function(x)
 {
   valid_names <- c("scenarios", "scen_names", "plot_colors", "years", "caption",
-                   "std_comparison", "csd_ann", "heat", "cloud", "plots")
+                   "std_comparison", "csd_ann", "heat", "cloud", "plots", 
+                   "plot_scenarios")
   assert_that(all(names(x) %in% valid_names))
   assert_that(all(valid_names %in% names(x)))
   
@@ -24,7 +25,6 @@ validate_plot_group <- function(x)
 new_plot_group <- function(x, defaults)
 {
   # set top level plot options
-  
   # TODO: remove the "plot_scenarios" entry after we are done converting to 
   # only the yaml based structure.
   pg <- structure(
@@ -45,7 +45,7 @@ new_plot_group <- function(x, defaults)
   
   # TODO: update these to their specific classes
   # go through the different plot types; for now just store them as is
-  
+
   plot_types <- c("std_comparison", "csd_ann", "heat", "cloud")
  
   if (exists("plots", where = x)) {
@@ -54,16 +54,16 @@ new_plot_group <- function(x, defaults)
     
     
     if ("std_comparison" %in% create_plots) 
-      pg[["std_comparison"]] <- new_plot_spec(TRUE)
+      pg[["std_comparison"]] <- std_comp_spec(x, pg)
     
     if ("csd_ann" %in% create_plots)
-      pg[["csd_ann"]] <- new_plot_spec(TRUE)
+      pg[["csd_ann"]] <- csd_spec(x, pg)
     
     if ("heat" %in% create_plots)
       pg[["heat"]] <- heat_spec(x, pg)
     
     if ("cloud" %in% create_plots)
-      pg[["cloud"]] <- new_plot_spec(TRUE)
+      pg[["cloud"]] <- cloud_spec(x, pg)
    
   } else {
     # check if each plot type exists. Create it if it does. Set to FALSE if 
@@ -72,16 +72,16 @@ new_plot_group <- function(x, defaults)
     # TODO: update to call correct functions for everything except heat
     
     if (exists("std_comparison", where = x))
-      pg[["std_comparison"]] <- new_plot_spec(TRUE)
+      pg[["std_comparison"]] <- std_comp_spec(x, pg)
     
     if (exists("csd_ann", where = x))
-      pg[["csd_ann"]] <- new_plot_spec(TRUE)
+      pg[["csd_ann"]] <- csd_spec(x, pg)
     
     if (exists("heat", where = x))
       pg[["heat"]] <- heat_spec(x, pg)
     
     if (exists("cloud", where = x))
-      pg[["cloud"]] <- new_plot_spec(TRUE)
+      pg[["cloud"]] <- cloud_spec(x, pg)
     
     create_plots <- c()
     for (pt in plot_types) {
