@@ -164,6 +164,10 @@ set_scenarios <- function(ui)
   ss <- ui[["scenarios"]]
   assert_that(length(ss) >= 1)
   
+  # all scenario names should be unique
+  scen_names <- names(ss)
+  check_unique_names(ss, "scenario")
+  
   scens <- list()
   ic_list <- list()
   ic_month <- list()
@@ -435,6 +439,15 @@ set_plot_groups <- function(ui)
     # expand years out rather than just end points
     plot_group <- list()
     
+    # ensure each plot_group has a unique name
+    pg_names <- simplify2array(
+      lapply(
+        seq_along(ui[["plot_group"]]), 
+        function(x) {names(ui[["plot_group"]][[x]])}
+      )
+    )
+    check_unique_names(pg_names, "plot_group")
+    
     for (pg in ui[["plot_group"]]) {
       plot_group[[names(pg)]] <- plot_group(pg[[1]], ui[["defaults"]])
     }
@@ -444,6 +457,19 @@ set_plot_groups <- function(ui)
   }
   
   ui
+}
+
+check_unique_names <- function(ss, group_name)
+{
+  assert_that(
+    length(unique(ss)) == length(ss),
+    msg = paste0(
+      "All", group_name, "names must be unique.\n", 
+      paste(unique(ss[duplicated(ss)]), collapse = ", "), 
+      " show(s) up more than once"
+    )
+  )
+  invisible(ss)
 }
 
 #' Takes one plot_group, and fully expands it, inheriting defaults from defaults
