@@ -1,11 +1,11 @@
 # define the CRSS processing for this month's run
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
-process_data: 
-  sys_cond_data: TRUE
-  pe_data: TRUE
-  csd_data: TRUE
-  crss_short_cond_data: FALSE
+process_data: FALSE
+#  sys_cond_data: TRUE
+#  pe_data: TRUE
+#  csd_data: TRUE
+#  crss_short_cond_data: FALSE
 defaults:
   end_year: 2026
 folders:
@@ -41,16 +41,22 @@ scenarios:
 plot_group: 
     - feb_v_apr_dnf:
         scenarios: ["Feb 2020 - DNF IG", "Apr 2020 - DNF IG"]
-        std_comparison: TRUE
+        std_comparison:
+          years: [2021, 2060]
         csd_ann:
           years: [2021, 2040]
         cloud:
           scen_names: ["Feb 2020", "Apr 2020"]
           title_append: using full hydrology
           years: [1999,2026]
+    - feb_v_apr_dnf2:
+        scenarios: ["Feb 2020 - DNF IG", "Apr 2020 - DNF IG"]
+        std_comparison:
+          years: [2021, 2026]
     - feb_v_apr_st:
         scenarios: ["Feb 2020 - ST IG", "Apr 2020 - ST IG"]
-        std_comparison: TRUE
+        std_comparison:
+          years: [2021, 2050]
         csd_ann:
           years: [2021, 2040]
         cloud:
@@ -60,7 +66,7 @@ plot_group:
     - apr_dnf_v_st:  
         scenarios: ["Apr 2020 - DNF IG", "Apr 2020 - ST IG"]
         scen_names: ["Full Hydrology", "Stress Test Hydrology"]
-        plot_colors: ["#DEEBF7", "#9ECAE1"]
+        plot_colors: ["#138d75", "#f1c40f"]
         caption: results from April 2020 CRSS
         cloud:
           years: [1999, 2026]
