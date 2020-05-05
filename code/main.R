@@ -31,20 +31,9 @@ source("code/process_everything.R")
 source("code/access_ui_list.R")
 source("code/specify_individual_plots.R")
 source("code/check_ui_update_defaults.R")
+source("code/parse_yaml_input.R")
 
-#source("code/november2019_ui.R")
-
-#ui <- specify_ui()
-#ui <- nov2019_ui()
-
-# source("code/dev_ui.R")
-# ui <- dev_ui()
-# 
-source("code/jan2020_ui.R")
-ui <- jan2020_ui()
- 
-# source("code/udall_ui.R")
-# ui <- udall_ui()
+ui <- parse_yaml_input("test_simple.yml")
 
 process_everything(ui)
 
