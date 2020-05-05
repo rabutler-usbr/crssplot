@@ -23,12 +23,16 @@ get_plot_flags <- function(ui)
   }
   
   # mead_pe_scatter
-  if (length(ui[["ind_plots"]][["mead_pe_scatter"]]) > 0)
-    mead_pe_scatter <- TRUE
+  for (i in seq_along(ui[["ind_plots"]][["mead_pe_scatter"]])) {
+    mead_pe_scatter <- mead_pe_scatter | 
+      isTRUE(ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["create"]])
+  }
   
   # shortage_conditions
-  if (length(ui[["ind_plots"]][["shortage_conditions"]]) > 0)
-    shortage_conditions <- TRUE
+  for (i in seq_along(ui[["ind_plots"]][["shortage_conditions"]])) {
+    shortage_conditions <- shortage_conditions | 
+      isTRUE(ui[["ind_plots"]][["shortage_conditions"]][[i]][["create"]])
+  }
   
   list(
     csd_flag = csd_flag, 
