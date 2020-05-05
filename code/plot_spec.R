@@ -90,8 +90,8 @@ inherit_plot_specs <- function(x, ui, pg, plot_type)
       inherit_from_pg("plot_colors", ui, pg, plot_type)
     
     # title: defaults to ''
-    if (exists("title", ui)) {
-      x[["title"]] <- ui[["title"]]
+    if (is_att_specified(ui[[plot_type]], "title")) {
+      x[["title"]] <- ui[[plot_type]][["title"]]
     } else {
       x[["title"]] <- ""
     }
