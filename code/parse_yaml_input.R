@@ -238,7 +238,7 @@ set_scenarios <- function(ui)
       )
     }
   }
-  
+ 
   ui[["scenarios"]] <- scenario_to_vars(all_scenarios)
   ui[["ind_plots"]] <- specify_individual_plots(
     all_scenarios, 
@@ -397,7 +397,7 @@ check_shortage_conditions <- function(scen)
 check_std_ind_figures <- function(scen, defaults)
 {
   if (exists("std_ind_figures", scen)) {
-    
+
     sif <- scen[["std_ind_figures"]]
     
     # it can be either a scalar logical or a list
@@ -405,7 +405,7 @@ check_std_ind_figures <- function(scen, defaults)
     
     if (isTRUE(sif) || 
         (is.list(sif) && is.null(sif[["create"]])) || 
-        isTRUE(sif[["create"]])) {
+        (is.list(sif) && isTRUE(sif[["create"]]))) {
       # if it is not a list, make it a list
       if (!is.list(sif))
         sif <- list()

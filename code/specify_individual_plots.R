@@ -21,9 +21,11 @@ specify_individual_plots <- function(scen_list, std_fig_specs, defaults)
  
   # loop through scen_list and find scenarios with XXX = TRUE
   for (i in seq_along(scen_list)) {
+    
+    scen_name <- scen_list[[i]]$name
+    
     if (scen_list[[i]]$std_ind_figures) {
       # create the list
-      scen_name <- scen_list[[i]]$name
       tmp = list("options" = list(
         ann_text = std_fig_specs[[scen_name]]$ann_text,
         end_year = default_or_specified(
