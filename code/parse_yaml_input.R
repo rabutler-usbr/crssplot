@@ -170,6 +170,14 @@ set_folders <- function(ui)
     )
   }
   
+  # pdf_name should end in .pdf, if it does not, append .pdf to it.
+  pdf_ext <- tools::file_ext(ui[["folders"]][["pdf_name"]])
+  if (pdf_ext != "pdf")
+    ui[["folders"]][["pdf_name"]] <- paste0(
+      ui[["folders"]][["pdf_name"]], 
+      ".pdf"
+    )
+  
   ui
 }
 
