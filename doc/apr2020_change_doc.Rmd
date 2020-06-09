@@ -1,0 +1,54 @@
+---
+title: "April 2020 CRSS Updates"
+header-includes:
+  - \usepackage[none]{hyphenat}
+output: 
+  pdf_document:
+      highlight: espresso
+      keep_tex: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This document includes all of the changes made to CRSS between the "February 2020" and the "April 2020" packages. Files for the model and ruleset for these two packages are:
+
+<!-- update the RiverWare versions, model names, and ruleset names here. 
+Top row should be current model, bottom row should be previous model -->
+
+```{r modelVersions}
+df <- as.data.frame(cbind(
+  c("RW v8.0.3", "CRSS.V4.5.0.2021.Apr2020.mld", "CRSS.Baseline.2027[IGDCP/NA].v4.4.1.rls"),  
+  c("RW v7.5.2", "CRSS.V4.4.1.2021.Feb2020.mdl", "CRSS.Baseline.2027[IGDCP/NA].v4.4.0.rls")
+))
+colnames(df) <- c("April 2020", "February 2020")
+rownames(df) <- c("RiverWare", "Model", "Ruleset")
+knitr::kable(df)
+```
+
+## Changes That Affect Results
+
+- Mead's live capacity storage (`UBRuleCurveData.ReservoirData["Mead", "liveCapacityStorage"]`) was set to 27,620,000 acre-ft to match the relatively recent updates to Mead's area-capacity tables. (Mead's elevation-volume tables were previously updated, but this slot was missed in that update.) Updating the Mead live capacity value affects computations in the Mead Flood Control rule. Overall, this affect 30.10 % of months at Mead, with an average absolute difference of 0.46 ft. When Mead’s elevations change, this can have upstream affects on Powell. 11.96 % of months are affected at Powell with an average absolute difference of 0.14 ft.
+- \raggedright Navajo's "liveCapacityStorage" and "inactiveCapacityStorage" were updated on `UBRuleCurveData.ReservoirData[]`. Changing Navajo's live capacity affects the computation of the Powell inflow "forecast" (within CRSS - `PowellForecastData.Reg Inflow with Error[]`), which in turn affects all of the EOWY forecasts through changing the total volume computed in `UBEffectiveStorage()`. Of course changing these EOWY storage forecasts at Powell can affect Powell and Mead elevations. Overall, 52.90 and 55.00 % of months are affected at Powell and Mead, respectively. There is an average absolute difference of 0.14 and 0.16 feet, respectively.
+- There was a typo in the "DIT_CRSS_UCRC2007shortageEIS2010_FINALv4.5.xlsm" Demand Input Tool in the `YumaOperations.WelltonMohawkBypassFlows` water user. The typo caused this user to have a decreasing demand from 115,992 acre-ft in 2000 to 115,922 acre-ft in 2060; however, we intend to model this as a static value (115,922 acre-ft) computed from the 1990-2018 historical average. The typo was fixed, and this causes very minor differences in results as the change in the demand was small (70 acre-ft at most). This file is now saved as v4.6.
+- Parameters in Havasu's power method were modified to match those used in the 24-Month Study and MTOM. This does affect energy projections, but it does not affect reservoir releases or elevations.
+
+## Changes That Do Not Affect Results
+
+### Model and Global Functions
+
+- The DMIs used to import "VIC" demands (the agricultural and M&I demands that are scaled based on Global Circulation Model projections of changes in ET) were converted from control file executable style DMIs to trace based DMIs. All other DMIs were previously converted to trace based DMIs which removes the historical dependency on Perl. 
+- All MRM configurations are now set to "Stop all distributed MRM runs on error". This new RiverWare feature ensures that if one trace has an error, you will not waste time completing all other traces when you are using Distributed MRM.
+- The "Update MRM rulesets" RiverWare script was added to the model file. This helps us change the ruleset that every MRM configuration uses at once.
+
+### Ruleset
+
+In both the IG_DCP and NA rulesets:
+
+- Moved rule 'Set ICS Put and Take Dates' to the lowest priority rule. Rule is now part of a new policy group 'Set Operational Dates'. This makes this rule easier to find and indicates that it should be the very first thing to happen in the model run.
+
+### Other Files 
+
+- \raggedright A new event ("RWcheck") has been added to the RiverSMART study file (CRSS_StudyManager_Apr2020_MTOM.rsm). This event will eventually perform many automated checks on CRSS output to check results for errors. It is still in development and testing and we will provide more information on it once it is more complete. 
+

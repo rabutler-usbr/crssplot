@@ -1,21 +1,14 @@
 library(assertthat)
+library(fs)
 
 # checks that scenario names match in the different variables they are 
 # specified in. Returns `scens` invisibly, if all checks pass. Otherwise 
 # provides error messages.
-crss_res_check_scen_names <- function(scens, icList, icMonth, mainScenGroup, 
-                                      ss5, heatmap_names)
+crss_res_check_scen_names <- function(scens, icList, icMonth, ui)
 {
-  # some sanity checks that UI is correct
-  assert_that(
-    mainScenGroup %in% names(scens), 
-    msg = paste(mainScenGroup, ' is not found in scens.')
-  )
+  ss5 <- ui$simple_5yr$ss5
   
-  assert_that(
-    mainScenGroup %in% names(icList), 
-    msg = paste(mainScenGroup, ' is not found in icList')
-  )
+  check_plot_group_scens(ui, names(scens))
   
   # check that the names of scens, icList, and icMonth are all the same; they
   # don't necessarily need to be in the same order, just all exist in one another
@@ -36,11 +29,6 @@ crss_res_check_scen_names <- function(scens, icList, icMonth, mainScenGroup,
     msg = "scenario goup names of ss5 must match the names found in scens"
   )
   
-  assert_that(
-    all(names(heatmap_names) %in% names(scens)),
-    msg = "Scenario group names of `heatmap_names` must match the names found in `scens`"
-  )
-  
   invisible(scens)
 }
 
@@ -56,7 +44,7 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   if (get_pe_data | get_sys_cond_data) {
     message('Scenario data will be read in from: ', i_folder)
     assert_that(
-      file.exists(i_folder),
+      dir.exists(i_folder),
       msg = paste(
         i_folder, 
         'does not exist. Please ensure iFolder is set correctly.'
@@ -66,7 +54,7 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   
   # folder location to save figures and fully procssed tables
   assert_that(
-    file.exists(CRSSDIR),
+    dir.exists(CRSSDIR),
     msg = paste(
       CRSSDIR, 
       "does not exist.\n",
@@ -97,43 +85,46 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   message("pngs will be saved to: ", png_out)
   
   # folder to save procssed text files to (intermediate processed data)
-  resFolder <- file.path(CRSSDIR,'results', crssMonth, 'tempData')
+  resFolder <- file.path(CRSSDIR,'results', crss_month, 'tempData')
   if (!file.exists(resFolder)) {
     message(paste('Creating folder:', resFolder))
     dir.create(resFolder)
   }
   message('Intermediate data will be saved to: ', resFolder)
   
+  # figure data --------------------
+  fig_data <- file.path(oFigs, "figure_data")
+  if (!file.exists(fig_data)) {
+    message("Creating folder: ", fig_data)
+    dir.create(fig_data)
+  }
+  message("Figure data will be saved to: ", fig_data)
+  
+  # tables --------------------------
+  tables <- file.path(oFigs, "tables")
+  if (!file.exists(tables)) {
+    message("Creating folder: ", tables)
+    dir.create(tables)
+  }
+  message("Tables will be saved to: ", tables)
+  
   # return
-  list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out)
+  list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out, 
+       figure_data = fig_data, tables = tables)
 }
 
 # returns a list of all the necessary output file names
-crss_res_get_file_names <- function(extra_label, yrs, main_pdf)
+crss_res_get_file_names <- function(main_pdf)
 {
-  year_lab <- paste0(yrs[1], '_', tail(yrs, 1))
-  
-  # file name for the system conditions procssed file
-  sysCondTable <- paste0(extra_label, 'SysTableFull', year_lab, '.csv') 
-  
-  critStatsProc <- paste0(extra_label, 'CritStats.csv')
-  dcp_prob_file <- paste0(extra_label, year_lab, "dcp_probs.csv")
-
   # return
   list(
     sys_cond_file = 'SysCond.feather' ,
     tmp_pe_file = 'tempPE.feather',
     # file name of Powell and Mead PE data
     cur_month_pe_file = 'MeadPowellPE.feather',
-    sys_cond_table = sysCondTable,
-    crit_stats_proc = critStatsProc,
-    cond_prob_file = 'CondProbs.csv',
-    dcp_prob_file = dcp_prob_file,
     short_cond_fig = 'shortConditionsFig.pdf',
-    simple_5yr_file = '5yrSimple.pdf',
-    mead_cloud = "Mead.png",
-    powell_cloud = "Powell.png",
-    main_pdf = main_pdf
+    main_pdf = main_pdf,
+    csd_file = "csd_ann.feather"
   )
 }
 
@@ -141,7 +132,7 @@ crss_res_get_file_names <- function(extra_label, yrs, main_pdf)
 # all are fully specified paths
 crss_res_append_file_path <- function(file_names, figs_folder, res_folder)
 {
-  res <- c("sys_cond_file", "tmp_pe_file", "cur_month_pe_file")
+  res <- c("sys_cond_file", "tmp_pe_file", "cur_month_pe_file", "csd_file")
   
   for (i in names(file_names)) {
     if (i %in% res) {
@@ -152,4 +143,55 @@ crss_res_append_file_path <- function(file_names, figs_folder, res_folder)
   }
   
   file_names
+}
+
+construct_table_file_name <- function(table_name, scenario, yrs, extra_label)
+{
+  year_lab <- paste0(yrs[1], '_', tail(yrs, 1))
+  
+  if (extra_label != '') {
+    extra_label <- paste0(extra_label, "_")
+  }
+  
+  str_replace_all(scenario, " ", "") %>%
+    paste0("_", extra_label, table_name, "_", year_lab, ".csv") %>%
+    path_sanitize()
+}
+
+# checks that all scenarios specified in plot_groups are found in the available
+# scenarios (by name)
+check_plot_group_scens <- function(ui, scen_names)
+{
+  err <- NULL
+  
+  for (i in seq_len(length(ui[["plot_group"]]))) {
+    spec_scens <- ui[["plot_group"]][[i]][["plot_scenarios"]]
+    spec_scens <- spec_scens[!(spec_scens %in% scen_names)]
+    if (length(spec_scens) > 0) {
+      err <- c(
+        err, 
+        paste(
+          "In the", names(ui[["plot_group"]])[i], 
+          "plot_group, the following scenarios do not match the specified scenarios:\n  -",
+          paste(spec_scens, collapse = "\n  -")
+        )
+      )
+    }
+  }
+  
+  assert_that(length(err) == 0, msg = paste(err, collapse = "\n"))
+  
+  invisible(ui)
+}
+
+# constructs a full file name based on provided info
+# used for files that would otherwise have the same name, but inserts in the 
+# plot_group name to the file
+construct_file_name <- function(ui, folder_paths, group_num, folder_name, 
+                                file_name)
+{
+  file.path(
+    folder_paths[[folder_name]],
+    paste0(names(ui[["plot_group"]])[group_num], "_", file_name)
+  )
 }

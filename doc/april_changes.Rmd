@@ -1,0 +1,187 @@
+---
+title: "April Model Changes"
+author: "Alan"
+date: "4/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(RWDataPlyr)
+source("code/compare_rdfs.R")
+knitr::opts_chunk$set(echo = TRUE)
+feb_dnf <- "M:/Shared/CRSS/2020/Scenario/Feb2020_2021,DNF,2007Dems,IG_DCP,MTOM_Most"
+feb_st <- "M:/Shared/CRSS/2020/Scenario/Feb2020_2021,ISM1988_2018,2007Dems,IG_DCP,MTOM_Most/"
+feb_na <- "M:/Shared/CRSS/2020/Scenario/Feb2020_2021,DNF,2007Dems,NA,MTOM_Most/"
+new_scens <- file.path(
+  "~/crss/crss.offc/Scenario/", 
+  c(
+    "Feb2020_2021_9004,DNF,2007Dems,IG_DCP_9001,MTOM_Most",
+    "Feb2020_2021_9005,DNF,2007Dems,IG_DCP_9001,MTOM_Most",
+    "Feb2020_2021_9006,DNF,2007Dems,IG_DCP_9001,MTOM_Most",
+    "Feb2020_2021_9006,ISM1988_2018,2007Dems,IG_DCP_9001,MTOM_Most",
+    "Feb2020_2021_9006,DNF,CT,IG_DCP_9001,MTOM_Most",
+    "Feb2020_2021_9006,DNF,2007Dems,NA_9001,MTOM_Most"
+  )
+)
+v9004_dnf <- new_scens[1]
+v9005_dnf <- new_scens[2]
+v9006_dnf <- new_scens[3]
+v9006_st <- new_scens[4]
+v9006_ct <- new_scens[5]
+v9006_na <- new_scens[6]
+```
+
+## v9004 to February Official
+
+Changes include:
+
+- Moved rule 'Set ICS Put and Take Dates' to the lowest priority rule in both the IGDCP and NA ruleset.  Rule is now part of a new policy group 'Set Operational Dates'.
+- updated Havasu power method to match MTOM
+
+All KeySlots are equal (only the run date and ruleset names change)
+
+```{r v9004dnf}
+compare_rdfs(rdfs = "KeySlots.rdf", base_scen = feb_dnf, new_scens = v9004_dnf)
+```
+
+## v9005 to v9004/February Official
+
+Changes include:
+
+- updated `UBRuleCurveData.ReservoirData["Navajo", "liveCapacityStorage"]`
+
+This change affects the computation of `PowellForecastData.Reg Inflow with Error[]`, which in turn affects the computation of all EOWY forecasts through changing the total UB `UBEffectiveStorage()` computation and thus the forecast inflow to Powell, which is used in EOWY forecasts and UBDO related forecasts. 
+
+Interestingly, it does not affect Navajo's release:
+
+```{r navOut}
+ubres_feb <- read_rdf(file.path(feb_dnf, "UBRes.rdf"))
+ubres_9005 <- read_rdf(file.path(v9005_dnf, "UBRes.rdf"))
+all.equal(rdf_get_slot(ubres_feb, "Navajo.Outflow"), rdf_get_slot(ubres_9005, "Navajo.Outflow"))
+```
+
+But it does affect Flaming Gorge's release (through a connection with the UBDO which is based on a forecast future elevation at Powell.)
+
+```{r fgOut}
+all.equal(rdf_get_slot(ubres_feb, "FlamingGorge.Outflow"), rdf_get_slot(ubres_9005, "FlamingGorge.Outflow"))
+```
+
+```{r}
+key_feb <- read_rdf(file.path(feb_dnf, "KeySlots.rdf"))
+key_9005 <- read_rdf(file.path(v9005_dnf, "KeySlots.rdf"))
+p_diff <- abs(rdf_get_slot(key_feb, "Powell.Pool Elevation") - 
+                rdf_get_slot(key_9005, "Powell.Pool Elevation"))
+m_diff <- abs(rdf_get_slot(key_feb, "Mead.Pool Elevation") - 
+                rdf_get_slot(key_9005, "Mead.Pool Elevation"))
+p_prct <- formatC(
+  length(which(p_diff != 0)) / length(p_diff) * 100,
+  digits = 2, format = "f"
+)
+m_prct <- formatC(
+  length(which(m_diff != 0)) / length(m_diff) * 100,
+  digits = 2, format = "f"
+)
+
+p_mag <- formatC(mean(p_diff), digits = 2, format = "f")
+m_mag <- formatC(mean(m_diff), digits = 2, format = "f")
+```
+
+
+Of course this can have downstream affects on Powell and Mead's elevations. Overall, `r p_prct` and `r m_prct` % of months are affected at Powell and Mead, respectively. There is an average absolute difference of `r p_mag` and `r m_mag` feet, respectively. 
+
+
+## v9006 to v9005
+
+The final change includes an update to `UBRuleCurveData.ReservoirData["Mead", "liveCapacityStorage"]`.
+
+The results are compared to the previous run (with udpates to Navajo), so we can isolate the differences in this change by itself. 
+
+```{r}
+key_9006 <- read_rdf(file.path(v9006_dnf, "KeySlots.rdf"))
+ubres_9006 <- read_rdf(file.path(v9006_dnf, "UBRes.rdf"))
+```
+
+```{r}
+p_diff <- abs(rdf_get_slot(key_9005, "Powell.Pool Elevation") - 
+                rdf_get_slot(key_9006, "Powell.Pool Elevation"))
+m_diff <- abs(rdf_get_slot(key_9005, "Mead.Pool Elevation") - 
+                rdf_get_slot(key_9006, "Mead.Pool Elevation"))
+p_prct <- formatC(
+  length(which(p_diff != 0)) / length(p_diff) * 100,
+  digits = 2, format = "f"
+)
+m_prct <- formatC(
+  length(which(m_diff != 0)) / length(m_diff) * 100,
+  digits = 2, format = "f"
+)
+
+p_mag <- formatC(mean(p_diff), digits = 2, format = "f")
+m_mag <- formatC(mean(m_diff), digits = 2, format = "f")
+```
+
+Upating the Mead live capacity value affects computations in the Mead Flood Control rule. Overall, this affect `r m_prct` % of months at Mead, with an average absolute difference of `r m_mag` ft. When Mead's elevations change, this can have upstream affects on Powell. `r p_prct` % of months are affected at Powell with an average absolute difference of `r p_mag`.
+
+And if Powell's elevations change, the UBDO can have affects on other UB reservoirs, e.g., at Flaming Gorge (outflow):
+
+```{r}
+all.equal(rdf_get_slot(ubres_9005, "FlamingGorge.Outflow"), 
+          rdf_get_slot(ubres_9006, "FlamingGorge.Outflow"))
+fg_diff <- abs(rdf_get_slot(ubres_9005, "FlamingGorge.Outflow")- 
+          rdf_get_slot(ubres_9006, "FlamingGorge.Outflow"))
+fg_prct <- formatC(
+  length(which(fg_diff != 0)) / length(p_diff) * 100,
+  digits = 2, format = "f"
+)
+fg_mag <- formatC(mean(fg_diff), digits = 2, format = "f")
+```
+
+`r fg_prct` % of months are different at Flaming Gorge, with an average absolute difference of `r fg_mag` acre-ft.
+
+## Final Comparison of all Changes
+
+All told, the results have minimal affects on Powell and Mead's elevations as shown in the following figures. Comparisons are included for DNF and Stress Test; One comparison is made for the "Revert to 2007 No-Action Alternative" ruleset; the current trends demand scenario is included for this run as there was a minor change in that DIT. 
+
+```{r}
+get_and_filter <- function(scen, scen_name) {
+  rdf_to_rwtbl2(file.path(scen, "KeySlots.rdf")) %>% 
+    filter(ObjectSlot %in% c("Mead.Pool Elevation", "Powell.Pool Elevation"),
+           Month == "December") %>%
+    group_by(Year, ObjectSlot) %>%
+    summarise(
+      q10 = quantile(Value, 0.1), 
+      q50 = median(Value), 
+      q90 = quantile(Value, 0.9)
+    ) %>% 
+    pivot_longer(cols = starts_with("q"), names_to = "percentile") %>%
+    mutate(scen = scen_name) 
+}
+
+zz <- bind_rows(
+  get_and_filter(feb_dnf, "feb_dnf"),
+  get_and_filter(feb_na, "feb_na"),
+  get_and_filter(feb_st, "feb_st"),
+  get_and_filter(v9006_dnf, "v9006_dnf"),
+  get_and_filter(v9006_st, "v9006_st"),
+  get_and_filter(v9006_na, "v9006_na"),
+  get_and_filter(v9006_ct, "v9006_ct")
+)
+```
+
+```{r}
+plot_scens <- function(zz, scens) {
+  ltype <- c("q10" = 3, "q50" = 1, "q90" = 2)
+  zz$ObjectSlot <- factor(zz$ObjectSlot, 
+                          levels = c("Powell.Pool Elevation", "Mead.Pool Elevation"))
+  filter(zz, scen %in% scens) %>%
+    ggplot(aes(Year, value, color = scen, linetype = percentile)) +
+    geom_line(size = 1) +
+    facet_wrap(~ObjectSlot, ncol = 2, scales = "free_y") +
+    scale_linetype_manual(values = ltype) + 
+    labs(color = "Scenario", x = NULL, y = "feet")
+}
+
+plot_scens(zz, c("feb_dnf", "v9006_dnf", "v9006_ct"))
+plot_scens(zz, c("feb_st", "v9006_st"))
+plot_scens(zz, c("feb_na", "v9006_na"))
+```

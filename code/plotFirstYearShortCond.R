@@ -25,8 +25,9 @@ getMTOMConditionsData <- function(iFile, filterOn)
   zz
 }
 
-get_shortcond_from_rdf <- function(scenario, iFolder, oFolder)
+get_shortcond_from_rdf <- function(scenario, i_folder, oFolder)
 {
+  scenario <- unlist(scenario)
   rwd1 <- read_rwd_agg("data/crss_short_cond.csv")
   rwd2 <- rwd_agg(x = data.frame(
     file = "KeySlots.rdf",
@@ -39,10 +40,11 @@ get_shortcond_from_rdf <- function(scenario, iFolder, oFolder)
     stringsAsFactors = FALSE
   ))
   ann_file <- file.path(oFolder, "crssShortCond_ann.feather")
-  rw_scen_aggregate(scenario, agg = rwd1, scen_dir = iFolder, file = ann_file)
+
+  rw_scen_aggregate(scenario, agg = rwd1, scen_dir = i_folder, file = ann_file)
   
   mon_file <- file.path(oFolder, "crssShortCond_mon.feather")
-  rw_scen_aggregate(scenario, agg = rwd2, scen_dir = iFolder, file = mon_file)
+  rw_scen_aggregate(scenario, agg = rwd2, scen_dir = i_folder, file = mon_file)
   invisible(scenario)
 }
 
@@ -156,4 +158,52 @@ plotFirstYearShortCond <- function(model, iFile, scenario,
                            #labels = paste(gradLabs, "maf"))
   }
   gg
+}
+
+create_short_condition_figure <- function(ui, folder_paths)
+{
+  message(
+    'Using hard coded values for the arrow in the shortage conditions figure.',
+    '\nYou may need to update the values and re-run\n',
+    "Values are specified through UI"
+  )
+  gg_out <- list()
+ 
+  for (i in seq_along(ui[["ind_plots"]][["shortage_conditions"]])) {
+    if (ui[["ind_plots"]][["shortage_conditions"]][[i]][["create"]]) {
+      tmp_scen <- ui[["ind_plots"]][["shortage_conditions"]][[i]]
+      sl <- tmp_scen[["segment_locs"]]
+      txl <- tmp_scen[["annotaion_loc"]]
+      
+      # filterOn being set to pe shows results for traces that are <= 1077
+      shortCond <- plotFirstYearShortCond(
+        tmp_scen[["model"]],
+        iFile = folder_paths[["res_folder"]], 
+        names(ui[["ind_plots"]][["shortage_conditions"]])[i], 
+        filterOn = 'pe', 
+        tmp_scen[["year"]],
+        colorVar = tmp_scen[["color_var"]]
+      )
+      shortCond <- shortCond + 
+        annotate('segment', x = sl[1], xend = sl[2], y = sl[3], yend = sl[4], 
+                 arrow = grid::arrow(length = unit(.3,'cm')), size = 1) +
+        annotate(
+          'text', 
+          x = txl[1], 
+          y = txl[2],
+          label = tmp_scen[["lb_label"]], 
+          size = 4, 
+          hjust = 0
+        ) +
+        labs(
+          title = tmp_scen[["title"]], 
+          caption = tmp_scen[["subtitle"]]
+        ) +
+        theme(legend.title = element_text(size = 10))
+      
+      gg_out[[i]] <- shortCond
+    }
+  } 
+  
+  gg_out
 }

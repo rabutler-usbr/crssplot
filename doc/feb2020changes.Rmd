@@ -1,0 +1,101 @@
+---
+title: "February 2020 CRSS Updates"
+header-includes:
+  - \usepackage[none]{hyphenat}
+output: 
+  pdf_document:
+      highlight: espresso
+      keep_tex: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This document includes all of the changes made to CRSS between the "August 2019 - December Update" and the "February 2020" packages. Files for the model and ruleset for these two packages are:
+
+```{r modelVersions}
+df <- as.data.frame(cbind(
+    c("RW v7.5.2", "CRSS.V4.4.1.2021.Feb2020.mdl", "CRSS.Baseline.2027[IGDCP/NA].v4.4.0.rls"),
+    c("RW v7.5.2", "CRSS.V4.1.1.2020.Aug2019.mdl", "CRSS.Baseline.2027IGDCP.v4.2.0.rls")
+))
+colnames(df) <- c("February 2020", "August 2019 - December Update")
+rownames(df) <- c("RiverWare", "Model", "Ruleset")
+knitr::kable(df)
+```
+
+## Changes That Affect Results
+
+- Updated initial conditions (reservoir elevations, ICS balances, etc.) to be imported from February MTOM. Changed the Excel file in the "2007 UCRC Demand Schedule" Excel DMI dataset. 
+    - Updated `NIIPGroundwaterStorage` initial balance in NIIPGWStorage.xlsx. 2018 value was copied from 2017 value. 
+- All slots on `LBShort` and `UBShort` that were annual, were changed to annual slots, instead of repeated monthly slots. This will affect the KeySlots.xlsx file. The `LBShort.AnnualMexicoShort` and `LBShort.AnnualLBMexicoShort` slots will now contain `NaN` for January - November, only reporting the shortage value in December. Note this does not affect the simulations, but it does affect the way data are included in the output file.
+- Updated the Arizona ICS creation/delivery functions to be more consistent with other functions within the state, and to check constraints in different order:
+    - \raggedright edited `DetermineAZCRITAnnualTake()`, `DetermineAZGRICAnnualTake()`, and `DetermineArizonaAnnualTake()` to no longer depend on the current year's creation for allowable take volume.
+     - \raggedright new functions: `DetermineAZECPuts()`, `CheckAZECBalanceForCreation()`, `ConstrainAZAnnualECCreation()`, `MaxAnnualAZPutWithSharing()`
+    - edited "Compute Arizona Available ICS Water " rule to rely on new functions
+- Providing the "NA" ruleset that reverts to the 2007 Final Environmental Impact Statement "No Action" alternative in 2027.
+    - \raggedright Edited functions to work with the "NA" ruleset: `DetermineIIDICSPut()`, `ComputeStepShortageDepletion()`, `DetermineShortageTier()`, `Is80P1050Shortage()`, `ComputeShortageDepletion()`, `AllowECICSTakes()`, `InIGTimeSpan()`, `DetermineArizonaAnnualTake()`, `DetermineAZGRICFedAnnualTake()`, `DetermineAZGRICStateAnnualTake()`, `ShouldDeliverAZGRICFedStateICS()`, `ComputeMWDAvailableICSForDelivery()`, `DetermineIIDECICSPut()`, `DetermineMWDDesiredTake()`, `DetermineNVECCreationFromUnusedApportionment()`
+
+
+## Changes That Do Not Affect Results
+
+### Model and Global Functions
+
+- Added slots to record the IG/Minute 323 "specified" shortage/reduction volumes. This is to make it easier to see what the shortage/reduction volumes should be based on the end-of-previous year Mead elevation. Note that this is not necesarily the reduction below apportionment as ICS can affect the actual delivery.
+    - \raggedright New slots: `LBShort.CAPSpecifiedShortage[]`, `LBShort.SNWPSpecifiedShortage[]`, `LBShort.MexicoSpecifiedShortage[]`; all slots are inclued in Short_ann.rdf
+    - New function `GetIGShortageVolume()` to compute these values
+- Updated MRM configuration names and the natural flow DMI names they use for consistency. For the hydrology scenarios that rely on the historical period (Full and Stress Test hydrology) there are now seperate MRM configurations for runs that include salinity and runs that do not include salinity. Ex: DNF and DNF with Salinity are the Full hydrology with and without salinity. 
+- In HistoricalNaturalFlow DMI, changed the end date of the HistoricalTotNaturalFlow_Excel selection to use `DetermineHistoricalNFEndDate()` function.
+- Added more ICS slots to be imported from the "Import from 24-MS/MTOM DMI"
+- \raggedright added `MWD ICS.CoachellaDCPInitialBalance[]`, `MWD ICS.DCPInitialBalance[]`, `Nevada ICS.DCPInitialBalance[]` to now be imported from 24-MS/MTOM DMI
+- \raggedright Converted `Arizona ICS.DCPInitialBalance[]`, `Arizona ICS.CAWCDInitialBalance[]`, `Arizona ICS.CRITInitialBalance[]`, `Arizona ICS.GRICInitialBalance[]` to series slots and added them to Import from 24-MS/MTOM DMI
+- On `Arizona ICS` switched the 3 "Other ICS" slots to MVIDD
+    - Added `MVIDD Bank/Put Schedule/Take Schedule` slots to `Mead Bank`
+    - added `Arizona ICS.MVIDDInitialBalance[]` and import this from 24-MS/MTOM DMI
+- Updated how `PreviousYearBankBalance()` handles CAWCD, GRIC, MVIDD, and CRIT for initial timestep
+- Edited "DetermineNIIPInitStorage" initialization rule to only call `CalcNIIPGWStorage()` once and added description to rule.
+    - Moved `CalcNIIPGWStorage()` to the "New Navajo Functions" utility group
+- Edited expression slots to evaluate through the `RunEndDate()`. This was done to make it easier to extend the simulation end date beyond 2060 (or 2100).
+    - \raggedright `ArizonaPriority2and3Schedules.TotalActualUse[]`, `ArizonaPriority2and3Schedules.TotalScheduledUse[]`, `CAPSchedule.Depletion Schedule[]`, `Coordinated Operation.TemporaryEqualizationON[]`, `EqualizationData.Equalization Line Elevation[]`, `EqualizationData.Shifted EQ Line[]`, `EqualizationData.Shifted EQ Line Elevation[]`, `EqualizationData.UBDepletionActual[]`
+- Deleted unused slots
+    -  \raggedright `CoachellSchedule.Diversion Schedule OLD[]`, `CoachellSchedule.Depletion Schedule OLD[]`, `IIDSchedule.Diversion Schedule OLD[]`, `IIDSchedule.Depletion Schedule OLD[]`, `No Action Annual Surplus Schedules.SNWP Surplus Schedule OLD[]`, `KNN.ScalarWithExpr00002[]`, `KNN.ScalarWithExpr00001[]`, `KNN.ScalarWithExpr00003[]`, `SNWPAnnualDepletionStepShortage_xx()`
+- Deleted unused functions:
+    - \raggedright `DetermineAZGRICAnnualPut()`, `DetermineArizonaAnnualPut()`, `DetermineAZCRITAnnualPut()`, `ComputeStepShortageDiversion()`
+- Changed slot types to be more efficient and true to the data they contain (ex: changed slots that repeat value for entire simulation to scalar slots):
+    - changed `EqualizationData.value602a[]` to be an annual slot
+    - switched `MWDSchedule.AnnualReturnFlow[]` and `BlueMesaData.MayPeakFlowDate[]` to a scalar slots
+        - Edited `GetMWDDeliveryAdjustment()` to account for this change
+- Edited `EqualizationData.UBDepletion[]` to evaluate through the value returned by `CritPeriodYearsAfterEndDate()` (new function). For any years after `RunEndDate()`, the value is set to the last model year's value. This replicates previous behaviour without hard coding dates. 
+- Edited several slots on `LBShort` to simplify expression slots by relying on `SumVolumeMax0()` (new function)
+- Salinity changes
+    - providing salinity files for the Full hydrolgoy based on regression of 1989-2018
+    - imported `SaltStored` data object
+    - imported WQIP_Scenario4_2020 DMI
+    - imported Dataset 8, copy of Dataset8, WQIP_Scenario1_2020, WQIP_Scenario2_2020, WQIP_Scenario3_2020, WQIP_Scenario4_2020 datasets
+    - imported `GetPercentSaltStored()`
+    - Upated salnity mass balance, including editing NIIP water quality method and edits to several slots on `UB Salt MAss Balance`.
+    - \raggedright Change Return Flow Salt method to "None" for exports: `LittleSnakeRExports`,  `ExportsFromRoaringForkRiver`, `ExportsAboveGlenwoodSprings`, `MiscUsesAboveFontenelle`, `DuchesneRiverExports`, `SanJuanChamaExport`, `PriceRiverExport`
+    - \raggedright Added `AnnualSalinity.PowellInflow_FWAAC[]` and `AnnualSalinity.MeadInflow_FWAAC[]` expression slots
+    - \raggedright Precision of all percentage slots in `SaltStored` increased to 5
+
+
+### Ruleset
+
+In both the IG_DCP and NA rulesets:
+
+- edited description of rule (both rulesets)
+- \raggedright edited "70R Assurance Level Surplus" and "Mead Flood Control rule" since `MWDSchedule.AnnualReturnFlow[]` is now a scalar slot
+- edited "Annual Daily Black Canyon Flow Determination" and "Annual Daily Whitewater Flow Determination" rules since `BlueMesaData.MayPeakFlowDate[]` is now a scalar slot
+- Edited the "Reduce Use for IG Shortage Conditions" rule to set the new slots that record the specified shortage/reductions
+
+In only the IG_DCP ruleset: 
+
+- Update "Set ICS Put and Take Dates"  rule so that it is tied to `RunEndDate()` instead of hard coded dates
+
+
+### Other Files 
+
+- Updated the RiverSMART study file so that UBDO, LBDCP, and LBEnergy Excel files are created from their respective rdf files
+- fixed misspellings in control files (three more slots now in the NVICS rdf file)
+- In UCRC DIT - removed "NV300" demand scenario (now v4.5)
+- split the Short.rdf file in to Short_ann and Short_mon to seperate annual and monthly data, respectively.

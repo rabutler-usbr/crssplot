@@ -63,7 +63,8 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
   gg
 }
 
-singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
+singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL, 
+                                addThreshStats)
 {
   zz <- zz %>% filter(Year == yr, Variable == var) %>%
     mutate(TheColor = ifelse(Value <= 1075, '<= 1,075\'', 
@@ -79,7 +80,10 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
   
   gg <- ggplot(zz, aes(TraceNumber, Value, color = TheColor)) + 
     geom_point(size = 3, shape = 18) +
-    labs(x = 'Trace Number', y = 'Pool Elevation [ft]', title = myTitle) + 
+    labs(
+      x = 'Trace Number', y = 'Pool Elevation [ft]', 
+      title = myTitle, caption = caption
+    ) + 
     scale_y_continuous(
       label = scales::comma, 
       minor_breaks = seq(800, 1200, 5)
@@ -87,7 +91,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
     scale_color_manual(values = myCols) +
     theme(legend.title = element_blank())
   
-  if(addThreshStats){
+  if (addThreshStats) {
     nn <- zz %>%
       mutate(lt1075 = ifelse(Value <= 1075, 1, 0),
              lt1076 = ifelse(Value <= 1076 & Value > 1075, 1, 0),
@@ -99,9 +103,10 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, addThreshStats)
         lt1077 = sum(lt1077)
       )
     
-    myText <- paste(nn$lt1075, 'runs are below 1,075 ft\n','an additional',
-                    nn$lt1076, 'runs are within 1 ft of being below 1,075 ft\n',
-                    nn$lt1077, 'runs are within 2 ft of being below 1,075 ft')
+    myText <- paste0(
+      nn$lt1075, ' runs are below 1,075 ft\n',
+      'an additional ', nn$lt1076, ' runs are within 1 ft of being below 1,075 ft\n',
+      nn$lt1077, ' runs are within 2 ft of being below 1,075 ft')
     
     gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
       annotate(
@@ -183,7 +188,8 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
 # legLoc is the location of the legend
 # nC is number of columns in legend
 # annSize is the size of the annotation
-plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', nC = 4)
+plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', 
+                          nC = 4)
 {
   varName <- stringr::str_wrap(csVarNames(), 14)
   names(varName) <- names(csVarNames())
@@ -355,7 +361,7 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 #'   names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
 # Assumes that there are only two scenarios to process
-create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
+create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
 {
   assert_that(
     length(scenNames) == 2, 
@@ -454,220 +460,31 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA)
       annotate('text', x = 1.5, y = 3.4, label = addFootnote, hjust = 0, size = 2)
   }
     
-  gg
+  pdf(ofile, width = 8, height = 8)
+  print(gg)
+  dev.off()
+  
+  invisible(iData)
 }
 
-plotCloudFigs <- function(scenario, zz, yrs, var, myTitle, legendTitle, legendWrap = NULL)
+create_all_simple_5yr <- function(zz, ui, folder_paths)
 {
-# Used to generate cloud figures.  Commented out are colors used for plots in DCP presentations
-# and the median projections from the 07' Interim Guidelines (shown with double hash ##)
-  
-  zz <- zz %>%
-    dplyr::filter(StartMonth %in% scenario, Year %in% yrs, Variable == var) %>%
-    # compute the 10/50/90 and aggregate by start month
-    dplyr::group_by(StartMonth, Year, Variable) %>%
-    dplyr::summarise('Med' = median(Value), 'Min' = quantile(Value,.1), 
-                     'Max' = quantile(Value,.9)) 
-  
-  # Set tick marks for x and y axis
-  myXLabs <- seq(1990,3000,5)
-  myYLabs <- seq(900,4000,50)
-  
-  #  Pulling historical Pool Elevation data
-  if(var == 'Powell.Pool Elevation'){
-    hist <- read.csv('data/HistPowellPE.csv')
-    hist$Variable <- 'Powell.Pool Elevation'
-    
-    # Adding switch to allow plotting of correct IG important elevations
-    Switch <- T
-    EQLine <- as.data.frame(read.csv('data/EQLine.csv'))
-    EQLine$StartMonth <- 'Historical Elevation'
-    
-    ##IGProj <- read.csv('C:/RCodes/Process-CRSS-Res-TribalWaterStudy/data/IGMedProjections_Powell.csv')
-    ##IGProj$Variable <- 'Powell.Pool Elevation'
-  }else{
-    hist <- read.csv('data/HistMeadPE.csv')  
-    hist$Variable <- 'Mead.Pool Elevation'
-    
-    # Adding switch to allow plotting of correct IG important elevations
-    Switch <- F
-    
-    ##IGProj <- read.csv('C:/RCodes/Process-CRSS-Res-TribalWaterStudy/data/IGMedProjections_Mead.csv')
-    ##IGProj$Variable <- 'Mead.Pool Elevation'
+  for (i in seq_along(ui[["plot_group"]])) {
+    if (ui[["plot_group"]][[i]][["simple_5yr"]][["create"]]) {
+      
+      ofile <- construct_file_name(
+        ui, folder_paths, i, "figs_folder", '5yrSimple.pdf'
+      )
+      
+      create5YrSimpleTable(
+        zz, 
+        ui[["plot_group"]][[i]][["simple_5yr"]][["scen_names"]], 
+        ui[["plot_group"]][[i]][["simple_5yr"]][["years"]], 
+        ui[["plot_group"]][[i]][["simple_5yr"]][["footnote"]],
+        ofile
+      )
+    }
   }
-  
-  # Formatting data frame to match zz
-  hist$StartMonth <- 'Historical Elevation'
-  hist$Med <- hist$Min <- hist$Max <- hist$EOCYPE
-  hist <- within(hist, rm(EOCYPE))
-  hist <- hist[c("StartMonth","Year","Variable","Med","Min","Max")]
-  
-  # Formatting Interim Guidelines data frame to match zz
-  ##IGProj$StartMonth <- 'Median Interim Guidelines FEIS'
-  ##IGProj$Med <- IGProj$Min <- IGProj$Max <- IGProj$EOCYPE
-  ##IGProj <- within(IGProj, rm(EOCYPE))
-  ##IGProj <- IGProj[c("StartMonth","Year","Variable","Med","Min","Max")]
-  
-  # Getting all scenarios passed to fxn
-  addIC <- unique(zz$StartMonth)
-  
-  # Appending last historical year pool elevation for each scenario
-  for(i in 1:length(addIC)){
-    zz <- bind_rows(zz, hist[length(hist[,1]),])
-    zz$StartMonth[length(zz$StartMonth)] <- addIC[i]
-  }
-  
-  # Appending historical data
-  zz <- bind_rows(hist,zz)
-  ##zz <- bind_rows(zz,IGProj)
-  
-  # Setting colors for graph- ensures historical data is black on plot
-  colorNames <- unique(zz$StartMonth)
-  #DCP colors (to match AZ Big Bang slides)"#54FF9F","#F4A460"
-  #Grey for Interim Guidelines Projections (if included) #8B8682. Add to end.
-  plotColors <- c("#000000", "#00BFC4","#F8766D")
-  names(plotColors) <- colorNames
-  
-  # Adding factors so ggplot does not alphebetize legend
-  zz$StartMonth = factor(zz$StartMonth, levels=colorNames)
-  
-  # Generating labels for the lines in ggplot
-  histLab = "Historical Elevation"
-  ##IGLab = "\"2007 Projections\""
-  names(histLab) = "Historical Elevation"
-  ##names(IGLab) = "\"2007 Projections\""
-  histLab = append(histLab, cloudLabs)
-  ##histLab = append(histLab, IGLab)
-  
-  # Read in Reclamation logo png
-  im <- load.image('logo/660LT-TK-flush.png')
-  im_rast <- grid::rasterGrob(im, interpolate = T)
-  
-  # Parameters for cloud plot customization (line thicknesses, text size, etc.)
-  # Have been pulled out for convenience
-  #Text
-  TitleSize = 13
-  AxisText = 11
-  LegendLabText = 9.5
-  
-  AxisLab = 9
-  LabSize = 2.9
-  LegendText = 8
-  
-  #Lines
-  IGStartLine = .8
-  OpsLines = .6
-  Medians = 1
-  GridMaj = .25
-  GridMin = .25
-  
-  #Y axis limits
-  yaxmin = floor(min(zz$Min)/50)*50
-  yaxmax = ceiling(max(zz$Max)/50)*50
-  
-  #Other
-  LegendWidth = 1
-  LegendHeight = 2.5
-  
-  
-  # Start making the plot
-  gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +  theme_light()
-  
-  # Generate plot a to make ribbon legend
-  name <- str_wrap("10th to 90th percentile of full range",20)
-  gga <- gg + geom_ribbon(data = subset(zz,StartMonth %in% rev(addIC)),aes(ymin=Min, ymax=Max, fill = StartMonth), 
-                          alpha = 0.5, linetype = 2, size = 0.5*Medians) +
-    scale_fill_manual(name, 
-                      values = plotColors, guide = guide_legend(order=1),
-                      labels = str_wrap(cloudLabs, 15)) + scale_color_manual(name,
-                                                                             values = plotColors, guide = guide_legend(order=1),
-                                                                             labels = str_wrap(cloudLabs, 15))  +
-    theme(legend.text = element_text(size=LegendText),legend.title = element_text(size=LegendLabText, face="bold"),
-          legend.box.margin = margin(0,0,0,0)) 
-  legenda <- get_legend(gga)
-  
-  # Generate plot b to take medians legend
-  ggb <- gg + geom_line(size=Medians) + 
-    scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
-                       values = plotColors, labels = str_wrap(histLab, 15)) +
-    theme(legend.text = element_text(size=LegendText),legend.title = element_text(size=LegendLabText, face="bold"),
-          legend.box.margin = margin(0,0,0,0)) 
-  legendb <- get_legend(ggb)
-  
-  # Make legend grob.  4 rows used to make legend close together and in the middle with respects to the vertical
-  gglegend <- plot_grid(NULL, legenda,legendb, NULL, align = 'hv', nrow=4)
-  
-  # Generate plot
-  gg <- gg + geom_vline(xintercept=2007, size = IGStartLine, color = '#707070') + 
-    annotate("text", x=2007.1, y = yaxmin, 
-             label = 'Adoption of the 2007\nInterim Guidelines', size = LabSize, hjust = 0,
-             fontface = "bold") + 
-             {if(Switch)geom_line(data=EQLine, aes(x = Year, y = EQLine), size = OpsLines,
-                                  color = '#707070', linetype = 5)} +   
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = myXLabs,
-                       labels = myXLabs, expand = c(0,0)) +
-    scale_y_continuous(minor_breaks = seq(900,4000,25), 
-                       breaks = myYLabs, labels = comma, limits = c(yaxmin, yaxmax)) +
-    geom_ribbon(data = subset(zz,StartMonth %in% addIC),aes(ymin=Min, ymax=Max, fill = StartMonth), 
-                alpha = 0.5, linetype = 2, size = 0.5*Medians) + #, colour = NA) + #Orig alpha =0.3
-    geom_line(size=Medians) +
-    scale_fill_manual(str_wrap("10th to 90th percentile of full range",20),
-                      values = plotColors, guide = FALSE,
-                      labels = str_wrap(cloudLabs, 15)) + 
-    scale_color_manual(name = str_wrap("Historical and Median Projected Pool Elevation",20),
-                       values = plotColors, guide = FALSE,
-                       labels = str_wrap(histLab, 15)) +
-    labs(y = 'feet', title = myTitle, x = '') + 
-    theme(plot.title = element_text(size = TitleSize),
-          ## axis.text.x = element_text(size = AxisLab),
-          axis.text.y = element_text (size =AxisLab),
-          axis.title = element_text(size=AxisText),
-          panel.grid.minor = element_line(size = GridMin),
-          panel.grid.major = element_line(size = GridMaj)) +
-    guides(fill=FALSE) +
-    
-    # Adding lines for Mead ops - plot only if Switch = False
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1075, xend =2026, yend = 1075, size = OpsLines, 
-          color ='#707070', linetype = 5)} + 
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1070, label = "Level 1 Shortage Condition", 
-          size = LabSize, hjust = 0, fontface = "italic")} +
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1050, xend =2026, yend = 1050, size = OpsLines, 
-          color ='#707070', linetype = 5)} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1045, label = "Level 2 Shortage Condition", 
-          size = LabSize, hjust = 0, fontface = "italic")} +
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1025, xend =2026, yend = 1025, size = OpsLines, 
-          color ='#707070', linetype = 5)} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1020, label = "Level 3 Shortage Condition", 
-          size = LabSize, hjust = 0, fontface = "italic")} +
-    {if(Switch!=TRUE)geom_segment(x=2007, y=1145, xend =2026, yend = 1145, size = OpsLines, 
-          color ='#707070', linetype = 5)} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = 1140, label = "Normal or ICS Surplus Condition", 
-          size = LabSize, hjust = 0, fontface = "italic")} +
-    {if(Switch!=TRUE)annotate("text", x = 2007.1, y = yaxmax, label = "Surplus Condition", 
-          size = LabSize, hjust = 0, fontface = "italic")} +
-    
-    # Adding lines and annotation for Powell ops - plot only if Switch = True
-    {if(Switch)annotate("text", x = 2007.1, y = yaxmax, label = "Equalization Tier", 
-          size = LabSize, hjust = 0, fontface = "italic")} +
-    ##{if(Switch)geom_segment(x=1998, y=3490, xend =2026, yend = 3490, size = OpsLines, 
-    ##     color ='#707070', linetype = 5)} + 
-    ##{if(Switch)annotate("text", x = 1999.5, y = 3485, label = "Minimum Power Pool", 
-    ##     size = LabSize, hjust = 0, fontface = "italic")} +
-    {if(Switch)geom_segment(x=2007, y=3525, xend =2026, yend = 3525, size = OpsLines, 
-          color ='#707070', linetype = 5)} + 
-    {if(Switch)annotate("text", x = 2007.1, y = 3520, label = "Lower Elevation Balancing Tier", 
-          size = LabSize, hjust = 0, fontface = "italic")} +    
-    {if(Switch)geom_segment(x=2007, y=3575, xend =2026, yend = 3575, size = OpsLines, 
-          color ='#707070', linetype = 5)} + 
-    {if(Switch)annotate("text", x = 2007.1, y = 3570, label = "Mid Elevation Release Tier", 
-          size = LabSize, hjust = 0, fontface = "italic")} + 
-    {if(Switch)annotate("text", x = 2007.1, y = 3582, label = "Upper Elevation Balancing Tier", 
-          size = LabSize, hjust = 0, fontface = "italic")} + 
-    
-    # Add BOR Logo
-    annotation_custom(im_rast, ymin = yaxmin, ymax = yaxmin + 12, xmin = 1999, xmax = 2006) 
-  gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4))
-  gg
 }
 
 determine_plot_colors <- function(plot_colors, col_vars)
@@ -684,4 +501,74 @@ determine_plot_colors <- function(plot_colors, col_vars)
   }
   
   plot_colors
+}
+
+create_mead_pe_scatter <- function(ui, o_files, traceMap)
+{
+  gg_out <- list()
+  for (i in seq_along(ui[["ind_plots"]][["mead_pe_scatter"]])) {
+    if (isTRUE(ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["create"]])) {
+      message("   ... ", names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
+      
+      tmp_model <- ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["model"]]
+      
+      if (tmp_model == "CRSS") {
+        pe <- read_feather(o_files$cur_month_pe_file) %>%
+          filter(Agg == names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
+        
+      } else if (tmp_model == "MTOM") {
+        
+        icDim <- 1981:2015
+        tmpIcMonth <- paste(
+          str_replace(
+            ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], "20", ""
+          ), 
+          "Dec", 
+          sep = "-"
+        )
+        
+        decVals <- do.call(
+          rbind, 
+          lapply(
+            icDim, 
+            get1TraceIc, 
+            icList[[names(ui[["ind_plots"]][["mead_pe_scatter"]])[i]]], 
+            tmpIcMonth, 
+            traceMap
+          )
+        )
+        traceNum <- traceMap$trace[match(icDim, traceMap$ic)]
+        
+        pe <- decVals %>%
+          select(`Mead.Pool Elevation`) %>%
+          rename(Value = `Mead.Pool Elevation`) %>%
+          mutate(
+            TraceNumber = as.numeric(traceNum), 
+            Year = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]],
+            Variable = "mead_dec_pe"
+          )
+        
+      } else {
+        stop("Invalid peScatterData variable")
+      }
+      scatterTitle <- paste(
+        'Lake Mead December', 
+        ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], 
+        'Elevations from', 
+        ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["model"]]
+      )
+      
+      gg <- singleYearPEScatter(
+        pe, 
+        ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], 
+        'mead_dec_pe', 
+        scatterTitle, 
+        caption = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["ann_text"]],
+        addThreshStats = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["add_threshold_stats"]]
+      )
+      gg_out[[i]] <- gg
+    }
+  }
+
+  gg_out
 }

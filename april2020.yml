@@ -1,0 +1,80 @@
+# define the CRSS processing for this month's run
+# note that for list, they need to be same data types, e..g, ints or floats
+---
+process_data: FALSE
+#  sys_cond_data: TRUE
+#  pe_data: TRUE
+#  csd_data: TRUE
+#  crss_short_cond_data: FALSE
+defaults:
+  end_year: 2026
+folders:
+  i_folder: "M:/Shared/CRSS/2020/Scenario"
+  CRSSDIR: "~/crss/crss.offc"
+  crss_month: "apr2020_new"
+  pdf_name: 'apr2020.pdf'
+  extra_label: ""
+scenarios:
+  - name: Feb 2020 - ST IG
+    folder: "`r RWDataPlyr::rw_scen_gen_names('Feb2020_2021,ISM1988_2018,2007Dems,IG_DCP', paste0('Trace', 4:38))`"
+    ic: "`r file.path(Sys.getenv('CRSS_DIR'),'dmi/InitialConditions/feb_2020/MtomToCrss_Monthly.xlsx')`"
+    start_year: 2021
+  - name: Feb 2020 - DNF IG
+    folder: "`r RWDataPlyr::rw_scen_gen_names('Feb2020_2021,DNF,2007Dems,IG_DCP', paste0('Trace', 4:38))`"
+    ic: "`r file.path(Sys.getenv('CRSS_DIR'),'dmi/InitialConditions/feb_2020/MtomToCrss_Monthly.xlsx')`"
+    start_year: 2021
+  - name: Apr 2020 - DNF IG
+    folder: "`r RWDataPlyr::rw_scen_gen_names('Apr2020_2021,DNF,2007Dems,IG_DCP', paste0('Trace', sprintf('%02d', 4:38)))`"
+    ic: "`r file.path(Sys.getenv('CRSS_DIR'),'dmi/InitialConditions/apr_2020/MtomToCrss_Monthly.xlsx')`"
+    start_year: 2021
+    std_ind_figures: 
+      ann_text: Results from the Feb 2020 CRSS with Full hydrology
+      end_year: 2026
+    std_ind_tables: TRUE
+  - name: Apr 2020 - ST IG
+    folder: "`r RWDataPlyr::rw_scen_gen_names('Apr2020_2021,ISM1988_2018,2007Dems,IG_DCP', paste0('Trace', sprintf('%02d', 4:38)))`"
+    ic: "`r file.path(Sys.getenv('CRSS_DIR'),'dmi/InitialConditions/apr_2020/MtomToCrss_Monthly.xlsx')`"
+    start_year: 2021
+    std_ind_figures: 
+      ann_text: Results from the Feb 2020 CRSS with Stress Test hydrology
+    std_ind_tables: TRUE
+plot_group: 
+    - feb_v_apr_dnf:
+        scenarios: ["Feb 2020 - DNF IG", "Apr 2020 - DNF IG"]
+        std_comparison:
+          years: [2021, 2060]
+        csd_ann:
+          years: [2021, 2040]
+        cloud:
+          scen_names: ["Feb 2020", "Apr 2020"]
+          title_append: using full hydrology
+          years: [1999,2026]
+    - feb_v_apr_dnf2:
+        scenarios: ["Feb 2020 - DNF IG", "Apr 2020 - DNF IG"]
+        std_comparison:
+          years: [2021, 2026]
+    - feb_v_apr_st:
+        scenarios: ["Feb 2020 - ST IG", "Apr 2020 - ST IG"]
+        std_comparison:
+          years: [2021, 2050]
+        csd_ann:
+          years: [2021, 2040]
+        cloud:
+          scen_names: ["Feb 2020", "Apr 2020"]
+          title_append: using stress test hydrology
+          years: [1999,2026]
+    - apr_dnf_v_st:  
+        scenarios: ["Apr 2020 - DNF IG", "Apr 2020 - ST IG"]
+        scen_names: ["Full Hydrology", "Stress Test Hydrology"]
+        plot_colors: ["#138d75", "#f1c40f"]
+        caption: results from April 2020 CRSS
+        cloud:
+          years: [1999, 2026]
+          title_append: this is the cloud title append 
+        heat:
+          title: this is the heat title 
+          years: [2021, 2026]
+# can also specify
+# plots:
+#  - std_comparison
+#  - heat
