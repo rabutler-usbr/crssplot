@@ -7,6 +7,7 @@ Code extends [RWDataPlyr](https://github.com/BoulderCodeHub/RWDataPlyr) and reli
 
 * CoRiverNF (https://github.com/BoulderCodeHub/CoRiverNF)
 * CRSSIO (https://github.com/BoulderCodeHub/CRSSIO)
+* data.table
 * devtools
 * dplyr
 * feather
@@ -37,3 +38,4 @@ devtools::install_github('BoulderCodeHub/CRSSIO')
   - set the path in `ui <- parse_yaml_input("some/path/file.yaml")` to point to the yaml file created in step 1. The path can be an absolute path or a path relative to the Process-CRSS-Res folder. 
 3. Call `source("code/main.R")` to process all of the results.
 
+See [doc/README.md](doc/README.md) for more details on how this process works in the overall CRSS publication process. 
