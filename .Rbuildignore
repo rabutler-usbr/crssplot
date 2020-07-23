@@ -1,0 +1,14 @@
+^\.travis\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
+^appveyor\.yml$
+^README\.Rmd$
+^README-.*\.png$
+^cran-comments\.md$
+^codecov\.yml$
+^\.github/workflows/R-CMD-check\.yaml$
+^\.github/workflows/pr-commands\.yaml$
+^CRAN-RELEASE$
+^doc$
+^Meta$
+^data-raw$
