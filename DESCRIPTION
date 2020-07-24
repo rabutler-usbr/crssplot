@@ -33,6 +33,7 @@ Imports:
     magick,
     purrr,
     readxl,
+    rlang,
     RWDataPlyr (>= 0.6.0),
     scales,
     stringr,

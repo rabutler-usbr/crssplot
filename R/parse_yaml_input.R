@@ -8,7 +8,7 @@
 #' @export
 parse_yaml_input <- function(file)
 {
-  zz <- yaml.load_file(file)
+  zz <- yaml::yaml.load_file(file)
   
   assert_that(all(required_entries("top") %in% names(zz)))
 
@@ -75,7 +75,7 @@ required_entries <- function(level) {
   } else if (level == "folders") {
     rv <- c("i_folder", "crss_month", "pdf_name")
   } else if (level == "process_data") {
-    rv <- c("sys_cond_data", "pe_data", "csd_dat", "crss_short_cond_data")
+    rv <- c("sys_cond_data", "pe_data", "csd_data", "crss_short_cond_data")
   } else if (level == "scenarios") {
     rv <- c("name", "folder", "ic", "start_year")
   }
@@ -333,14 +333,14 @@ check_mead_pe_scatter <- function(scen)
         all(req_vals %in% names(scen[["pe_scatter"]])),
       msg = "year, model, ann_text, and add_threhold_stats must all be specified in pe_scatter."
     )
-    assert_that(purrr::is_scalar_numeric(scen[["pe_scatter"]][["year"]]))
+    assert_that(rlang::is_scalar_integer(scen[["pe_scatter"]][["year"]]))
     assert_that(
       scen[["pe_scatter"]][["model"]] %in% c("CRSS", "MTOM"),
       msg = "model should be either CRSS or MTOM"
     )
-    assert_that(purrr::is_scalar_character(scen[["pe_scatter"]][["ann_text"]]))
+    assert_that(rlang::is_scalar_character(scen[["pe_scatter"]][["ann_text"]]))
     assert_that(
-      purrr::is_scalar_logical(scen[["pe_scatter"]][["add_threshold_stats"]])
+      rlang::is_scalar_logical(scen[["pe_scatter"]][["add_threshold_stats"]])
     )
     pe_scatter <- scen[["pe_scatter"]]
     pe_scatter[["create"]] <- TRUE
@@ -366,7 +366,7 @@ check_shortage_conditions <- function(scen)
       )
     )
     ss <- scen[["shortage_conditions"]]
-    assert_that(purrr::is_scalar_numeric(ss[["year"]]))
+    assert_that(rlang::is_scalar_integer(ss[["year"]]))
     assert_that(
       ss[["model"]] %in% c("CRSS", "MTOM"),
       msg = "model should be either CRSS or MTOM"
@@ -378,7 +378,7 @@ check_shortage_conditions <- function(scen)
       # MTOM
       assert_that(ss[["color_var"]] %in% c("WYRelease"))
     
-    assert_that(purrr::is_scalar_character(ss[["subtitle"]]))
+    assert_that(rlang::is_scalar_character(ss[["subtitle"]]))
     assert_that(is.numeric(ss[["segment_locs"]]) && 
                   length(ss[["segment_locs"]]) == 4)
     assert_that(is.numeric(ss[["annotation_loc"]]) && 
@@ -404,7 +404,7 @@ check_std_ind_figures <- function(scen, defaults)
     sif <- scen[["std_ind_figures"]]
     
     # it can be either a scalar logical or a list
-    assert_that(is_scalar_logical(sif) || is.list(sif))
+    assert_that(rlang::is_scalar_logical(sif) || is.list(sif))
     
     if (isTRUE(sif) || 
         (is.list(sif) && is.null(sif[["create"]])) || 
@@ -417,13 +417,13 @@ check_std_ind_figures <- function(scen, defaults)
       # ann_text can be specified; if it is, it should be scalar character 
       # or null
       if (exists("ann_text", where = sif))
-        assert_that(is_scalar_character(sif[["ann_text"]]) || 
+        assert_that(rlang::is_scalar_character(sif[["ann_text"]]) || 
                       is.null(sif[["ann_text"]]))
       
       # end_year can be specified; if it is, it should be scalar int; if it is
       # not, then set it to defaults
       if (exists("end_year", where = sif)) {
-        assert_that(is_scalar_integer(sif[["end_year"]]))
+        assert_that(rlang::is_scalar_integer(sif[["end_year"]]))
       } else {
         sif[["end_year"]] <- defaults[["end_year"]]
       }
@@ -446,7 +446,7 @@ check_std_ind_figures <- function(scen, defaults)
 check_std_ind_tables <- function(scen)
 {
   if (exists("std_ind_tables", scen)) {
-    assert_that(is_scalar_logical(scen[["std_ind_tables"]]))
+    assert_that(rlang::is_scalar_logical(scen[["std_ind_tables"]]))
   } else {
     scen[["std_ind_tables"]] <- FALSE
   }

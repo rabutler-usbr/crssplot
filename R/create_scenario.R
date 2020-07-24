@@ -11,7 +11,7 @@ create_scenario <- function(name, scen_folders, ic, start_year,
     (length(ic) == 2 & is.numeric(ic)) | (length(ic) == 1 & is.character(ic)),
     msg = "`ic` should either be a numeric with 2 values, or a file path."
   ) 
-  assert_that(length(start_year) == 1 & is.number(start_year))
+  assert_that(length(start_year) == 1 & assertthat::is.number(start_year))
   assert_that(
     start_year >= 2000, 
     msg = "Expect the model year to begin after 1999"

@@ -2,10 +2,10 @@
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
 process_data: 
-  sys_cond_data: FALSE
-  pe_data: FALSE
-  csd_data: FALSE
-  crss_short_cond_data: TRUE
+  sys_cond_data: TRUE
+  pe_data: TRUE
+  csd_data: TRUE
+  crss_short_cond_data: FALSE
 defaults:
   end_year: 2026
 folders:

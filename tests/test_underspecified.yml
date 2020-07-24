@@ -23,7 +23,7 @@ scenarios:
     shortage_conditions:
       model: CRSS
       year: 2021
-      color_var: mwdICS
+      color_var: mwdIcs
       subtitle: Results from August 2018 CRSS
       segment_locs: [16.9, 14.5, 1055.0, 1056.4]
       annotation_loc: [2.0, 1075.0]
@@ -38,7 +38,7 @@ scenarios:
     start_year: 2019
     std_ind_figures: TRUE
   - name: "June 2019 w/ DCP"
-    folder: "`r rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
+    folder: "`r RWDataPlyr::rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
     ic: "dmi/june_2019/MtomToCrss_Monthly.xlsx"
     start_year: 2020
 plot_group: 
