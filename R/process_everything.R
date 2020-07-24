@@ -31,7 +31,9 @@ process_everything <- function(ui)
       res_folder = folder_paths$res_folder
     )
   
-  traceMap <- read.csv('data/Trace2IcMap.csv')
+  traceMap <- read.csv(
+    system.file("extdata", "Trace2IcMap.csv", package = "crssplot")
+  )
   
   # PROCESS RESULTS --------------
   process_all_rdfs(ui, o_files, folder_paths, traceMap)
