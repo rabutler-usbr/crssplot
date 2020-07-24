@@ -2,10 +2,7 @@
 % Please edit documentation in R/parse_yaml_input.R
 \name{parse_yaml_input}
 \alias{parse_yaml_input}
-\title{Parse yaml input
-
-\code{parse_yaml_input()} parses the yaml input into the data structure required
-by \code{\link[=process_everything]{process_everything()}}.}
+\title{Parse yaml input}
 \usage{
 parse_yaml_input(file)
 }
@@ -13,8 +10,6 @@ parse_yaml_input(file)
 \item{file}{Path to the yml file.}
 }
 \description{
-Parse yaml input
-
 \code{parse_yaml_input()} parses the yaml input into the data structure required
 by \code{\link[=process_everything]{process_everything()}}.
 }

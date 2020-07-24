@@ -1,4 +1,4 @@
-#' @title Parse yaml input
+#' Parse yaml input
 #' 
 #' `parse_yaml_input()` parses the yaml input into the data structure required
 #' by [process_everything()].
