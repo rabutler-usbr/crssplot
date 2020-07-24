@@ -53,8 +53,8 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
 #'   "surplus" variables. 
 #' @param heat_ui Additional user input specific to this plot type that must
 #'   include `years` and `scen_names`. 
-#' @param my_title
-#' @param y_wrap
+#' @param my_title Title
+#' @param y_wrap Number of characters to use in wrapping the y labels.
 #' @noRd
 mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 {
@@ -242,7 +242,6 @@ add_logo_shield <- function(gg)
 #' @param heat_ui Only `$caption` entry is accessed directly.
 #' 
 #' @export
-
 system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
                                        heat_ui)
 {

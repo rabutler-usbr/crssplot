@@ -1,4 +1,33 @@
 
+#' Plot 10/50/90 percentiles
+#' 
+#' `plotEOCYElev()` computes and then plots the 10, 50, and 90 percentiles for 
+#' the specified variable (`var`). Plots for different scenarios, denoted by 
+#' `StartMonth` column; all unique values in the StartMonth column are included
+#' in the plot.
+#' 
+#' @param zz Data frame. Must have Year, Variable, StartMonth, and Value 
+#'   columns.
+#'   
+#' @param yrs Years to show in plot. `zz` is filtered to only contain these
+#'   years.
+#'   
+#' @param var Variable to plot. `zz` is filtered to only contain this variable.
+#'   
+#' @param myTitle Title. Used in `labs(title = myTitle)`.
+#' 
+#' @param legendTitle Color legend title.
+#' 
+#' @param legendWrap Maximum number of character per line in color legend. 
+#'   StartMonth will be wrapped based on this value, if it is not `NULL`.
+#'   
+#' @param plot_colors Optional named vectors. If specified, names must match 
+#'   unique StartMonth values and can be used to set specific colors for each
+#'   scenario. If not used, default ggplot2 colors are used. 
+#'   
+#' @return `gg` object.
+#' 
+#' @export
 plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
                          plot_colors = NULL)
 {
@@ -6,8 +35,8 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
     dplyr::filter(Year %in% yrs, Variable == var) %>%
     # compute the 10/50/90 and aggregate by start month
     dplyr::group_by(StartMonth, Year, Variable) %>%
-    dplyr::summarise('50th' = median(Value), '10th' = quantile(Value,.1), 
-                     '90th' = quantile(Value,.9)) %>%
+    dplyr::summarise('50th' = median(Value), '10th' = quantile(Value, .1), 
+                     '90th' = quantile(Value, .9)) %>%
     ungroup() %>%
     select(-Variable) %>%
     tidyr::gather(Percentile, Value, -StartMonth, -Year)
@@ -52,6 +81,7 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
       guide = guide_legend(title = legendTitle)
     ) +
     scale_linetype_manual(values = qLt)
+  
   gg
 }
 
@@ -113,6 +143,42 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL,
   gg
 }
 
+#' Probability plot for single variable and multiple scenarios
+#' 
+#' `compare_crit_stats()` compares the probability that a single event 
+#' (variable) occurs/does not occur for multiple scenarios. 
+#' 
+#' @param zz Data frame. Must have Year, Variable, AggName, and Value columns.
+#' 
+#' @param yrs Years to show in plot. `zz` is filtered to only contain these
+#'   years.
+#'   
+#' @param variable Variable to plot. `zz` is filtered to only contain this 
+#'   variable.
+#'   
+#' @param annText Caption. Used in `annotation()` for a y value of 0.95.
+#'   Is this more a subtitle? Test it out?
+#'   
+#' @param plotTitle Title. Used in `labs(title = plotTitle)`.
+#' 
+#' @param legendTitle Color legend title.
+#' 
+#' @param legLoc Color legend location. Defaults to right.
+#' 
+#' @param nC Number of columns in the color legend.
+#' 
+#' @param annSize Text size for `annText`.
+#' 
+#' @param legendWrap Maximum number of character per line in color legend. 
+#'   StartMonth will be wrapped based on this value, if it is not `NULL`.
+#'   
+#' @param plot_colors Optional named vectors. If specified, names must match 
+#'   unique StartMonth values and can be used to set specific colors for each
+#'   scenario. If not used, default ggplot2 colors are used. 
+#'   
+#' @return `gg` object.
+#' 
+#' @export
 compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle, 
                              legendTitle = '', 
                              legLoc = 'right', nC = 1, annSize = 3, 
