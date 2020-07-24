@@ -47,6 +47,15 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
   invisible(TRUE)
 }
 
+#' Call `system_conditions_heat_map()` with Mead specific data. 
+#' @param dcp Data frame that includes Year, Agg, Variable, Value. Variable
+#'   must include "normal_no_recovery", "normal_recovery", "dcp1" - "dcp8", and
+#'   "surplus" variables. 
+#' @param heat_ui Additional user input specific to this plot type that must
+#'   include `years` and `scen_names`. 
+#' @param my_title
+#' @param y_wrap
+#' @noRd
 mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 {
   yrs <- heat_ui$years
@@ -212,6 +221,27 @@ add_logo_shield <- function(gg)
   
   gg
 }
+
+#' Create a heat map of conditions
+#' 
+#' `system_condition_heat_map()` creates a heat map of conditions 
+#' (`zz$Variable`) for all years (`zz$Year`) and scenarios (`zz$Agg`) in `zz`.
+#' 
+#' @param zz Data frame with Year, Variable, Value, and Agg columns.
+#' 
+#' @param n_yrs Unnecessary parameter. Could be computed as 
+#'   length(unique(zz$Year))
+#'   
+#' @param tier_names Unnecessary parameter. Used to determine number of tiers,
+#'   but it can also be computed as length(unique(zz$Variable)).
+#'   
+#' @param my_title Used in labs(title)
+#' 
+#' @param y_title Used in labs(y)
+#' 
+#' @param heat_ui Only `$caption` entry is accessed directly.
+#' 
+#' @export
 
 system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
                                        heat_ui)

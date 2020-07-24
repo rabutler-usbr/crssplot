@@ -47,7 +47,10 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
       legend.key.height = unit(2,'line'), 
       legend.key.width = grid::unit(2, 'line')
     ) +
-    scale_color_manual(values = plot_colors, guide = guide_legend(title = legendTitle)) +
+    scale_color_manual(
+      values = plot_colors, 
+      guide = guide_legend(title = legendTitle)
+    ) +
     scale_linetype_manual(values = qLt)
   gg
 }
@@ -94,7 +97,8 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL,
     
     myText <- paste0(
       nn$lt1075, ' runs are below 1,075 ft\n',
-      'an additional ', nn$lt1076, ' runs are within 1 ft of being below 1,075 ft\n',
+      'an additional ', nn$lt1076, 
+      ' runs are within 1 ft of being below 1,075 ft\n',
       nn$lt1077, ' runs are within 2 ft of being below 1,075 ft')
     
     gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
@@ -144,7 +148,11 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
   ggplot(zz, aes(Year, Value, color = AggName)) +
     geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_x_continuous(
+      minor_breaks = 1990:3000, 
+      breaks = myLabs, 
+      labels = myLabs
+    ) + 
     scale_y_continuous(
       minor_breaks = seq(yL[1],yL[2],0.05), 
       breaks = seq(yL[1],yL[2],0.10),
@@ -172,11 +180,37 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
     labs(y = 'Percent of Traces', title = plotTitle)
 }
 
-# annText is text that's added to annotation
-# legendTitle 
-# legLoc is the location of the legend
-# nC is number of columns in legend
-# annSize is the size of the annotation
+#' Plot the "critical stats" figure
+#' 
+#' `plotCritStats()` creates a figure with multiple variables and one scenario
+#' where the variables are the probability a condition will/will not occur.
+#' 
+#' Expected Variables are: lbShortage, lbSurplus, mead_min_lt_1000, 
+#' mead_min_lt_1020, mead_min_lt_1025, powell_wy_min_lt_3490, 
+#' powell_wy_min_lt_3525, mead_dec_lt_1000, mead_dec_lt_1020, 
+#' powell_dec_lt_3525, mead_dec_lt_1025.
+#' 
+#' @param zz Data frame. Requires Year, Variable, Value columns. All other 
+#'   columns are dropped when grouped by Year and Variable and then summarised. 
+#'   The Variable columns is expected to have a subset of variables in 
+#'   `csVarNames()`. See details. 
+#'   
+#' @param yrs Vector of years to show in plot. `zz` is filtered to only include 
+#'   these years.
+#'
+#' @param annText Used in labs(caption=annText)
+#' 
+#' @param legendTitle How to title the color legend. 
+#' 
+#' @param legLoc The location of the color legend.
+#' 
+#' @param nC The number of columns to use in color legend.
+#'
+#' @param annSize Unused. Was the size of the annotation.
+#' 
+#' @return `gg` object.
+#' 
+#' @export
 plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom', 
                           nC = 4)
 {
@@ -202,7 +236,11 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
   gg <- ggplot(zz, aes(Year, Value, color = vName)) +
     geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_x_continuous(
+      minor_breaks = 1990:3000, 
+      breaks = myLabs, 
+      labels = myLabs
+    ) + 
     scale_y_continuous(
       minor_breaks = seq(yL[1],yL[2],0.05), 
       breaks = seq(yL[1],yL[2],0.10),
@@ -220,10 +258,30 @@ plotCritStats <- function(zz, yrs, annText, legendTitle = '', legLoc = 'bottom',
   gg
 }
 
-# monthRun will be added to the title
-# legLoc is the location of the legend
-# nC is number of columns in legend
-plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, legLoc = 'bottom')
+#' Plot chances of LB shortage and surplus
+#' 
+#' `plotShortageSurplus()` creates a line plot of the chances of shortage and
+#' surplus for the specified years. 
+#' 
+#' @param zz Data frame. Must have Year, Variable, Value columns. Any others 
+#'   will be collapsed together when summarizing. Variable must have 
+#'   "lbShortage" and "lbSurplus" variables.
+#' 
+#' @param yrs The years that are shown in the figure. 
+#' 
+#' @param monthRun String that will be added to the title.
+#' 
+#' @param legendTitle Title of the color legend.
+#' 
+#' @param legLoc The location of the color legend.
+#' 
+#' @param nC The number of columns in the color legend.
+#' 
+#' @return `gg` object.
+#' 
+#' @export
+plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, 
+                                legLoc = 'bottom')
 {
   varName <- c("lbShortage" = 'Shortage of Any Amount',
                "lbSurplus" = 'Surplus of Any Amount')
@@ -246,12 +304,18 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
     myLabs <- seq(1990,3000,5)
   }
  
-  myTitle <- paste('Percent of Traces with Lower Basin Surplus or Shortage\nResults from the',
-                    monthRun, 'CRSS Run*')
+  myTitle <- paste(
+    'Percent of Traces with Lower Basin Surplus or Shortage\nResults from the',
+    monthRun, 'CRSS Run*'
+  )
   
   gg <- gg + geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_x_continuous(
+      minor_breaks = 1990:3000, 
+      breaks = myLabs, 
+      labels = myLabs
+    ) + 
     scale_y_continuous(
       minor_breaks = seq(yL[1],yL[2],0.05), 
       breaks = seq(yL[1],yL[2],0.10),
@@ -268,7 +332,23 @@ plotShortageSurplus <- function(zz, yrs, monthRun, legendTitle = '', nC = 2, leg
   gg
 }
 
-
+#' Plot a stacked bar plot of shortage tiers
+#' 
+#' `plotShortStackedBar()` plots a stacked barplot for the chances of shortage
+#' for one scenario. 
+#' 
+#' @param zz Data frame. Must have Year, Variable, and Value. All other columns
+#'   are collapsed together when summarizing. Variables must include 
+#'   lbShortageStep1, lbShortageStep2, and lbShortageStep3.
+#'   
+#' @param yrs Years to show in plot. `zz` is filtered to only contain these 
+#'   years.
+#'   
+#' @param annText Used in `labs(caption = annText)`.
+#' 
+#' @return `gg` object.
+#' 
+#' @export
 plotShortStackedBar <- function(zz, yrs, annText)
 {
   varName <- c("lbShortageStep1" = "Step 1 Shortage",
@@ -293,7 +373,11 @@ plotShortStackedBar <- function(zz, yrs, annText)
   
   gg <- gg + geom_bar(stat = 'identity') + 
     coord_cartesian(ylim = yL) + 
-    scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs, labels = myLabs) + 
+    scale_x_continuous(
+      minor_breaks = 1990:3000, 
+      breaks = myLabs, 
+      labels = myLabs
+    ) + 
     scale_y_continuous(
       minor_breaks = seq(yL[1],yL[2],0.05), 
       breaks = seq(yL[1],yL[2],0.1),
@@ -305,13 +389,17 @@ plotShortStackedBar <- function(zz, yrs, annText)
       legend.position = "bottom"
     ) +
     scale_fill_discrete(guide = guide_legend(title = '')) + 
-    labs(x = 'Year', y = 'Percent of Traces', title = 'Lower Basin Shortages by Tier',
-         caption = annText)
+    labs(
+      x = 'Year', y = 'Percent of Traces', 
+      title = 'Lower Basin Shortages by Tier',
+      caption = annText
+    )
+  
   gg
 }
 
-# assumes zz is data already read in and will return one variable for the given yrs
-# rownames of zz should be years, and colnames should be variable names
+# assumes zz is data already read in and will return one variable for the given 
+# yrs rownames of zz should be years, and colnames should be variable names
 getSingleVarData <- function(zz, yrs, var)
 {
   rr <- match(yrs, rownames(zz))
@@ -444,9 +532,15 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
       fontface = "bold"
     )
   
-  if(!is.na(addFootnote)){
+  if (!is.na(addFootnote)) {
     gg <- gg +
-      annotate('text', x = 1.5, y = 3.4, label = addFootnote, hjust = 0, size = 2)
+      annotate(
+        'text', 
+        x = 1.5, y = 3.4, 
+        label = addFootnote, 
+        hjust = 0, 
+        size = 2
+      )
   }
     
   pdf(ofile, width = 8, height = 8)

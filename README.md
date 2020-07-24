@@ -4,8 +4,8 @@
 
 Goals are to: 
 
-1. Provide an easy, mostly automated way to produce the "standard" crss figures.
-2. Provide a common API for creating new CRSS figures that can be included in this package or run using the same general framework.
+1. Provide an easy, mostly automated way to produce the "standard" crss figures accross many scenarios.
+2. Provide a set of plots with a common API for creating new CRSS figures for any slot/variable. These functions can be wrapped in code from goal 1 in this package or used in other analyses/frameworks.
 
 ### Setup
 
