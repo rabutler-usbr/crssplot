@@ -97,8 +97,35 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
   zz
 }
 
-# filterOn: valid choices are 'shortage', 'pe'
-# if filterOn == pe, then will keep all traces that are <= 1077
+#' Scatter plot of elevation vs. trace number 
+#' 
+#' `plotFirstYearShortCond()` plots elevation vs. trace number for a single 
+#' year. It colors the points based on Powell release for the following WY and 
+#' the shape is based on either Powell October-December release or MWD's ICS
+#' creation/delivery volume.
+#' 
+#' @param model Either "MTOM" or "CRSS"
+#' 
+#' @param iFile Folder path or file that contains the data. If `model` is 
+#'   CRSS, then the folder should have "crssShortCond_ann.feather" and 
+#'   "crssShortCond_mon.feather" files. If `model` is "MTOM", then this should
+#'   be a csv file that contains the necessary data.
+#' 
+#' @param scenario If `model` is CRSS, then this is the scenario that will be
+#'   used. 
+#' 
+#' @param filterOn Valid choices are 'shortage' or 'pe'. If 'pe', then will keep 
+#'   all traces that are <= 1077. 
+#'   
+#' @param dataYear Year to plot. Data are filtered to this year.
+#' 
+#' @param colorVar Has to be "WYRelease" if `model` is MTOM. Otherwise, can be
+#' "WYRelease" or any other variable in the feather files. Typically, the other
+#' value is "mwdIcs". 
+#' 
+#' @return `gg` object.
+#' 
+#' @export
 plotFirstYearShortCond <- function(model, iFile, scenario, 
                                    filterOn = 'shortage', dataYear, 
                                    colorVar = "WYRelease")

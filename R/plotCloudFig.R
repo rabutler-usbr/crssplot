@@ -1,4 +1,32 @@
 
+#' Plot range of conditions as cloud
+#' 
+#' `plotCloudFigs()` plots the 10th and 90th percentiles as a cloud and the 
+#' median as a line. It will also add in historical data, and is hard coded
+#' to only work for Powell and Mead elevation. Function adds in reclamation 
+#' object.
+#' 
+#' @param zz Data frame. Must have StartMonth, Year, Variable, and Value 
+#'   columns.
+#'   
+#' @param yrs Years to show in the plot. If any exist before the min in `zz`, 
+#'   then historical values are obtained and added to the figure.
+#'   
+#' @param var Should be either "powell_dec_pe" or "mead_dec_pe". `zz` is 
+#'   filtered to only include those data.
+#'   
+#' @param myTitle Plot title.
+#' 
+#' @param ui List. Currently requires entries that have scenarios, scenario 
+#'   names, color label, and legend wrapping numbers.
+#'   
+#' @param pg_i Integer. Index into `ui` used for getting the scenarios and 
+#'   scenario names. 
+#'   
+#' @return `ggGrob`
+#' 
+#' @export
+
 plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
 {
   # Used to generate cloud figures.  Commented out are colors used for plots in DCP presentations

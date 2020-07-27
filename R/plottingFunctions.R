@@ -85,6 +85,31 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
   gg
 }
 
+#' Scatter plot for one year of Mead elevation
+#' 
+#' `singleYearPEScatter()` plots elevation vs. trace number for one year. It 
+#' specifically colors points based on pre-specified elevation thresholds: 
+#' below 1,075', 1,075'-1,076', 1,076'-1,077', and above 1,077'. 
+#' 
+#' @param zz Data frame. Must have Year, Variable, Value, and TraceNumber 
+#'   columns.
+#'   
+#' @param yr Year to create plot for. 
+#' 
+#' @param var The variable to plot. This is not necessary, as the other 
+#'   components are so specific that they can really only apply to Mead 
+#'   elevation.
+#'   
+#' @param myTitle Title of plot.
+#' 
+#' @param caption Caption (`labs(caption = caption)`). 
+#' 
+#' @param addThreshStats Boolean. If `TRUE`, annotates figure with the number
+#'   of traces that fall into each of the four elevation bins. 
+#'   
+#' @param return `gg` object.
+#' 
+#' @export
 singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL, 
                                 addThreshStats)
 {
