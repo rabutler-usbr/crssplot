@@ -1,0 +1,76 @@
+# define the CRSS processing for this month's run
+# note that for list, they need to be same data types, e..g, ints or floats
+---
+process_data: 
+  sys_cond_data: TRUE
+  pe_data: TRUE
+  csd_data: TRUE
+  crss_short_cond_data: FALSE
+defaults:
+  end_year: 2026
+folders:
+  i_folder: "C:/alan/CRSS/tmp_output"
+  CRSSDIR: "C:/alan/CRSS/tmp_output"
+  crss_month: "dev"
+  pdf_name: 'ig_vs_na.pdf'
+  extra_label: ""
+scenarios:
+  - name: Jan 2020 - ST IG
+    folder: "2020/Jan2020_2021,ISM1988_2018,2007Dems,IG_DCP,MTOM_Most"
+    ic:
+      powell: 3628.56
+      mead: 1095.40
+    start_year: 2021
+    std_ind_figures: 
+      ann_text: Results from the January 2020 CRSS
+      end_year: 2036
+    std_ind_tables: TRUE
+    shortage_conditions:
+      model: CRSS
+      year: 2021
+      color_var: mwdIcs
+      subtitle: Results from January 2020 CRSS
+      segment_locs: [16.9, 14.5, 1055.0, 1056.4]
+      annotation_loc: [2.0, 1075.0]
+    pe_scatter:
+      year: 2021
+      model: CRSS
+      ann_text: These are from the January 2020 CRSS
+      add_threshold_stats: TRUE
+  - name: Jan 2020 - ST NA
+    folder: "2020/Jan2020_2021,ISM1988_2018,2007Dems,NA,MTOM_Most"
+    ic: {powell: 3600.56, mead: 1080.40}
+    start_year: 2021
+    std_ind_figures: TRUE
+  - name: "June 2019 w/ DCP"
+    folder: "`r RWDataPlyr::rw_scen_gen_names('2019/Jun2019_2020,ISM1988_2017,2007Dems,IG_DCP', paste0('Trace', 4:8), 'DCP_Cons')`"
+    ic: "`r file.path('C:/alan/CRSS/CRSS.2019','dmi/InitialConditions/june_2019/MtomToCrss_Monthly.xlsx')`"
+    start_year: 2020
+plot_group: 
+    - aug2obs:
+        scenarios: ["Jan 2020 - ST IG", "Jan 2020 - ST NA"]
+        std_comparison: TRUE
+        csd_ann:
+          years: [2021, 2030]
+        heat:
+          scen_names: ["IG", "NA"]
+          title: "Jan 2020 CRSS"
+          years: [2021, 2026]
+          caption: NULL
+        cloud:
+          scen_names: ["IG", "NA"]
+          plot_colors: ["#F8766D", "#00BFC4"]
+          title_append: from January 2020 CRSS
+          caption: "This and that"
+          years: [1999,2026]
+    - aug2june:  
+        scenarios: ["Jan 2020 - ST IG", "June 2019 w/ DCP"]
+        scen_names: ["Jan 2020", "June 2019 DCP"]
+        plot_colors: ["#DEEBF7", "#9ECAE1"]
+        years: [2018, 2036]
+        plots: [std_comparison, heat]
+        caption: Every plot gets this
+# can also specify
+# plots:
+#  - std_comparison
+#  - heat

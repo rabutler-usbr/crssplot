@@ -1,41 +1,28 @@
-## Process CRSS Results
+## crssplot
 
-Repository includes code used to process CRSS results, starting in April 2015.
+**WIP** - working to convert [BoulderCodeHub/Process-CRSS-Res](https://github.com/BoulderCodeHub/Process-CRSS-Res) into a package. 
 
-Code extends [RWDataPlyr](https://github.com/BoulderCodeHub/RWDataPlyr) and relies on
-[CRSSIO](https://github.com/BoulderCodeHub/CRSSIO) (custom R Packages) to generate the "standard" CRSS figures and tables. Required packages are:
+Goals are to: 
 
-* CoRiverNF (https://github.com/BoulderCodeHub/CoRiverNF)
-* CRSSIO (https://github.com/BoulderCodeHub/CRSSIO)
-* data.table
-* devtools
-* dplyr
-* feather
-* ggplot2
-* grid
-* gridExtra
-* reshape2
-* RWDataPlyr
-* scales
-* stringr
-* tidyr
+1. Provide an easy, mostly automated way to produce the "standard" crss figures accross many scenarios.
+2. Provide a set of plots with a common API for creating new CRSS figures for any slot/variable. These functions can be wrapped in code from goal 1 in this package or used in other analyses/frameworks.
 
 ### Setup
 
-Ensure the above packages are installed on the computer. CoRiverNF and CRSSIO can be installed as follows, while the others can be installed from CRAN:
-
 ```
 library(devtools)
-devtools::install_github('BoulderCodeHub/CoRiverNF')
-devtools::install_github('BoulderCodeHub/CRSSIO')
+devtools::install_github('rabutler-usbr/crsspub')
 ```
 
-### Usage
+### Standard Figures
 
 1. Setup a yaml file that determines which scenarios are used and which plots are created. [yaml Specification](https://github.com/BoulderCodeHub/Process-CRSS-Res/wiki/yaml-specification) includes the details about the yaml file configuration.
     * It does not matter where you save this file. It can be saved in this repository or in the CRSS folder.
-2. Edit [main.R](https://github.com/BoulderCodeHub/Process-CRSS-Res/blob/master/code/main.R).
-    * set the path in `ui <- parse_yaml_input("some/path/file.yaml")` to point to the yaml file created in step 1. The path can be an absolute path or a path relative to the Process-CRSS-Res folder. 
-3. Call `source("code/main.R")` to process all of the results.
+2. Then call:
 
-See [doc/README.md](doc/README.md) for more details on how this process works in the overall CRSS publication process. 
+```
+ui <- parse_yaml_input("path/to/yml/file.yml")
+process_everything(ui)
+```
+
+See [doc/README.md](https://github.com/BoudlerCodeHub/Process-CRSS-Res/doc/README.md) for more details on how this process works in the overall CRSS publication process. 

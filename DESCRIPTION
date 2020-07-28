@@ -1,0 +1,46 @@
+Package: crssplot
+Title: Create Standard CRSS Plots
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Alan",
+           family = "Butler",
+           role = c("aut", "cre"),
+           email = "rabutler@usbr.gov",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Creates the 'standard' set of CRSS figures that are used to 
+    review model runs. User input is provided via yml files to make it quick
+    and easy to make multiple comparisons from many different scenarios. 
+License: CC0
+Copyright: This software is in the public domain because it contains
+        materials that originally came from the U.S. Bureau of
+        Reclamation, an agency of the U.S. Department of Interior.
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Imports:
+    assertthat,
+    CoRiverNF,
+    cowplot (>= 1.0.0),
+    CRSSIO (>= 0.7.0),
+    data.table,
+    dplyr,
+    feather,
+    fs,
+    ggplot2,
+    grDevices,
+    gridExtra,
+    imager,
+    magick,
+    purrr,
+    readxl,
+    rlang,
+    RWDataPlyr (>= 0.6.0),
+    scales,
+    stringr,
+    tibble,
+    tidyr,
+    utils,
+    yaml
+Suggests: 
+    testthat

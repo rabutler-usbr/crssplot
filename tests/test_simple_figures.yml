@@ -1,0 +1,54 @@
+# define the CRSS processing for this month's run
+# note that for list, they need to be same data types, e..g, ints or floats
+---
+process_data: FALSE
+#  sys_cond_data: FALSE
+#  pe_data: FALSE
+#  csd_data: FALSE
+#  crss_short_cond_data: TRUE
+defaults:
+  end_year: 2026
+folders:
+  i_folder: "`r system.file('extdata', 'Scenario', package = 'crssplot')`"
+  CRSSDIR: "."
+  crss_month: "auto_tests"
+  pdf_name: 'test_file'
+  extra_label: ""
+scenarios:
+  - name: April ST 2007 UCRC
+    folder: "Apr2020_2021,ISM1988_2018,2007Dems,IG_DCP,MTOM_Most"
+    ic:
+      powell: 3610.24
+      mead: 1084.70
+    start_year: 2021
+    std_ind_figures: 
+      ann_text: Results from the April 2020 CRSS
+      end_year: 2036
+    std_ind_tables: TRUE
+  - name: April ST CT
+    folder: "Apr2020_2021,ISM1988_2018,CT,IG_DCP,MTOM_Most"
+    ic: {powell: 3610.24, mead: 1084.70}
+    start_year: 2021
+    std_ind_figures: FALSE
+plot_group: 
+  - aug2obs:
+      scenarios: ["April ST 2007 UCRC", "April ST CT"]
+      std_comparison:
+        years: [2021, 2026]
+      csd_ann:
+        years: [2021, 2030]
+      heat:
+        scen_names: ["IG", "NA"]
+        title: "Jan 2020 CRSS"
+        years: [2021, 2026]
+        caption: NULL
+      cloud:
+        scen_names: ["IG", "NA"]
+        plot_colors: ["#F8766D", "#00BFC4"]
+        title_append: from April 2020 CRSS
+        caption: "This and that"
+        years: [1999,2026]
+# can also specify
+# plots:
+#  - std_comparison
+#  - heat

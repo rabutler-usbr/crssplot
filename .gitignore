@@ -3,6 +3,10 @@
 .RData
 .Rhistory
 
+# test results
+tests/testthat/results/*
+!tests/testthat/results/auto_tests/tempData/tempData.zip
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
