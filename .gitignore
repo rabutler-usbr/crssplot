@@ -4,8 +4,14 @@
 .Rhistory
 
 # test results
-tests/testthat/results/*
+
+tests/testthat/results/auto_tests/tempData/*
 !tests/testthat/results/auto_tests/tempData/tempData.zip
+tests/testthat/results/auto_tests/tables/*
+tests/testthat/results/auto_tests/png/*
+tests/testthat/results/auto_tests/figure_data/*
+tests/testthat/results/auto_tests/test_file.pdf
+
 
 # Windows image file caches
 Thumbs.db
