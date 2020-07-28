@@ -1,7 +1,7 @@
 # define the CRSS processing for this month's run
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
-process_data: TRUE
+process_data: FALSE
 #  sys_cond_data: FALSE
 #  pe_data: FALSE
 #  csd_data: FALSE
