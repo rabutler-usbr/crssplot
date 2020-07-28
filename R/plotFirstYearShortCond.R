@@ -2,7 +2,7 @@
 
 getMTOMConditionsData <- function(iFile, filterOn) 
 {
-  zz <- read.csv(iFile)
+  zz <- utils::read.csv(iFile)
   
   if(filterOn == 'shortage'){
     # trim to only traces with shortages  
@@ -24,8 +24,7 @@ getMTOMConditionsData <- function(iFile, filterOn)
 get_shortcond_from_rdf <- function(scenario, i_folder, oFolder)
 {
   scenario <- unlist(scenario)
-  rwd1 <- read_rwd_agg("data/crss_short_cond.csv")
-  rwd2 <- rwd_agg(x = data.frame(
+  rwd2 <- RWDataPlyr::rwd_agg(x = data.frame(
     file = "KeySlots.rdf",
     slot = "Powell.Outflow",
     period = "asis",
@@ -36,11 +35,15 @@ get_shortcond_from_rdf <- function(scenario, i_folder, oFolder)
     stringsAsFactors = FALSE
   ))
   ann_file <- file.path(oFolder, "crssShortCond_ann.feather")
-
-  rw_scen_aggregate(scenario, agg = rwd1, scen_dir = i_folder, file = ann_file)
+  
+  # short_cond_rwa is exported by package
+  RWDataPlyr::rw_scen_aggregate(scenario, agg = crssplot::short_cond_rwa, 
+                                scen_dir = i_folder, 
+                                file = ann_file)
   
   mon_file <- file.path(oFolder, "crssShortCond_mon.feather")
-  rw_scen_aggregate(scenario, agg = rwd2, scen_dir = i_folder, file = mon_file)
+  RWDataPlyr::rw_scen_aggregate(scenario, agg = rwd2, scen_dir = i_folder, 
+                                file = mon_file)
   invisible(scenario)
 }
 
@@ -52,7 +55,7 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
   zz <- zz %>%
     filter(Year == dataYear) %>%
     group_by(Scenario, Year, TraceNumber) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(lbGains = nfAbvMead + nfBelowMead,
            mwdIcs = mwdPut/.95 - mwdTake) %>%
     select(-nfAbvMead, -nfBelowMead, -mwdTake, -mwdPut)
@@ -63,7 +66,7 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
     group_by(Scenario, TraceNumber, Year, Variable) %>%
     summarise(Value = sum(Value)/1000000) %>% # now OND total release 
     group_by(Scenario, TraceNumber, Year) %>%
-    spread(Variable, Value)
+    tidyr::spread(Variable, Value)
   
   message(
     "Assuming that ", scenario, " uses full observed hydrology\n",
@@ -169,7 +172,11 @@ plotFirstYearShortCond <- function(model, iFile, scenario,
       y = paste0('Mead End-of-December ',dataYear,' elevation (feet)'),
       color = color_lab
     ) +
-    scale_y_continuous(minor_breaks = 900:1200, breaks = seq(900,1200,1), label = comma) +
+    scale_y_continuous(
+      minor_breaks = 900:1200, 
+      breaks = seq(900,1200,1), 
+      labels = scales::comma
+    ) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     coord_cartesian(
       ylim = c(round(min(zz$DecElev), 0) - 1.2, max(c(1075, zz$DecElev))+ 0.5))

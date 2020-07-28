@@ -6,8 +6,6 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
     
     # system condition rwa
     sys_rwa <- CRSSIO::sys_cond_rwa()
-    if (packageVersion("CRSSIO") <= "0.7.0")
-      sys_rwa$period <- "eocy"
     
     getScenarioData(
       ui$scenarios$scens, 
@@ -25,11 +23,11 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
     ## get the Mead and Powel EOCY Data
     message('starting to get PE data')
     
-    pe_rwa <- read_rwd_agg("data/MPPEStats_sam.csv")
+    # pe_rwa is exported by package
     
     getScenarioData(ui$scenarios$scens, ui$folders$i_folder, 
                     o_files$tmp_pe_file, TRUE, 
-                    'aggFromScenList', pe_rwa)
+                    'aggFromScenList', crssplot::pe_rwa)
     
     # append initial conditions onto May data
     getAndAppendIC(ui$scenarios$scens, o_files$tmp_pe_file, 
@@ -59,7 +57,7 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
     message('starting to get annual computed state depletions data')
     
     # system condition rwa
-    sys_rwa <- rwd_agg(rdfs = "CSD_ann.rdf")
+    sys_rwa <- RWDataPlyr::rwd_agg(rdfs = "CSD_ann.rdf")
     
     getScenarioData(
       ui[["scenarios"]][["scens"]],

@@ -83,7 +83,7 @@ csd_bxp <- function(zz, state, yrs, plot_colors)
     gg <- zz %>% 
       filter(Variable %in% state_info[["slots"]][state], Year %in% yrs) %>%
       ggplot(aes(as.factor(Year), Value, fill = Agg)) +
-      stat_boxplot_custom() +
+      CRSSIO::stat_boxplot_custom() +
       scale_fill_manual(values = plot_colors) +
       labs(title = paste(state, "Annual Actual Use"), x = NULL, y = "acre-ft") +
       geom_hline(

@@ -23,7 +23,7 @@ compute_mead_dcp_probs <- function(zz, aggs, yrs)
       surplus = as.numeric(Value >= 1145)
     ) %>%
     select(-Variable, -Value, -Month) %>%
-    gather(Variable, Value, -Year, -Scenario, -TraceNumber, -Agg) %>%
+    tidyr::gather(Variable, Value, -Year, -Scenario, -TraceNumber, -Agg) %>%
     group_by(Year, Agg, Variable) %>%
     summarise(Value = mean(Value)) %>%
     group_by(Agg, Variable) %>%
@@ -67,7 +67,7 @@ format_dcp_table <- function(zz)
   varname <- dcp_tier_names()
   zz %>%
     mutate(Value = Value * 100) %>%
-    spread(Year, Value) %>%
+    tidyr::spread(Year, Value) %>%
     ungroup() %>%
     select(-Agg) %>%
     mutate(Variable = varname[Variable])

@@ -35,8 +35,8 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
     dplyr::filter(Year %in% yrs, Variable == var) %>%
     # compute the 10/50/90 and aggregate by start month
     dplyr::group_by(StartMonth, Year, Variable) %>%
-    dplyr::summarise('50th' = median(Value), '10th' = quantile(Value, .1), 
-                     '90th' = quantile(Value, .9)) %>%
+    dplyr::summarise('50th' = median(Value), '10th' = stats::quantile(Value, .1), 
+                     '90th' = stats::quantile(Value, .9)) %>%
     ungroup() %>%
     select(-Variable) %>%
     tidyr::gather(Percentile, Value, -StartMonth, -Year)
@@ -60,7 +60,7 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
       mutate(StartMonth = stringr::str_wrap(StartMonth, width = legendWrap))
     
     # also update the plot color names
-    names(plot_colors) <- str_wrap(names(plot_colors), width = legendWrap)
+    names(plot_colors) <- stringr::str_wrap(names(plot_colors), width = legendWrap)
   }
   
   # plot
@@ -132,7 +132,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL,
       title = myTitle, caption = caption
     ) + 
     scale_y_continuous(
-      label = scales::comma, 
+      labels = scales::comma, 
       minor_breaks = seq(800, 1200, 5)
     ) +
     scale_color_manual(values = myCols) +
@@ -219,9 +219,9 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
   }
   
   zz <- zz %>%
-    filter(Year %in% yrs, Variable == variable) %>%
-    group_by(Year, AggName) %>%
-    summarise(Value = mean(Value))
+    dplyr::filter(Year %in% yrs, Variable == variable) %>%
+    dplyr::group_by(Year, AggName) %>%
+    dplyr::summarise(Value = mean(Value))
   
   # determine plotting colors
   plot_colors <- determine_plot_colors(plot_colors, unique(zz$AggName))
@@ -231,9 +231,9 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
     aggs <- stringr::str_wrap(aggsN, width = legendWrap)
     names(aggs) <- aggsN
     zz <- zz %>%
-      mutate(AggName = aggs[AggName])
+      dplyr::mutate(AggName = aggs[AggName])
     
-    names(plot_colors) <- str_wrap(names(plot_colors), width = legendWrap)
+    names(plot_colors) <- stringr::str_wrap(names(plot_colors), width = legendWrap)
   }
   
   ggplot(zz, aes(Year, Value, color = AggName)) +
@@ -583,8 +583,8 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
   pTable <- formatSimpleTable(pTable, rns, paste('WY',yrs))
   
   myTheme <- gridExtra::ttheme_default(
-    gpar.coltext = gpar(cex = 1), 
-    gpar.rowtext = gpar(cex = 1), show.hlines = T,
+    gpar.coltext = grid::gpar(cex = 1), 
+    gpar.rowtext = grid::gpar(cex = 1), show.hlines = T,
     core.just = 'right'
   )
   
@@ -634,9 +634,9 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
       )
   }
     
-  pdf(ofile, width = 8, height = 8)
+  grDevices::pdf(ofile, width = 8, height = 8)
   print(gg)
-  dev.off()
+  grDevices::dev.off()
   
   invisible(iData)
 }
@@ -687,14 +687,14 @@ create_mead_pe_scatter <- function(ui, o_files, traceMap)
       tmp_model <- ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["model"]]
       
       if (tmp_model == "CRSS") {
-        pe <- read_feather(o_files$cur_month_pe_file) %>%
+        pe <- feather::read_feather(o_files$cur_month_pe_file) %>%
           filter(Agg == names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
         
       } else if (tmp_model == "MTOM") {
         
         icDim <- 1981:2015
         tmpIcMonth <- paste(
-          str_replace(
+          stringr::str_replace(
             ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], "20", ""
           ), 
           "Dec", 

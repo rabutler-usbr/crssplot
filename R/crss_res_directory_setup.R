@@ -144,15 +144,15 @@ crss_res_append_file_path <- function(file_names, figs_folder, res_folder)
 
 construct_table_file_name <- function(table_name, scenario, yrs, extra_label)
 {
-  year_lab <- paste0(yrs[1], '_', tail(yrs, 1))
+  year_lab <- paste0(yrs[1], '_', utils::tail(yrs, 1))
   
   if (extra_label != '') {
     extra_label <- paste0(extra_label, "_")
   }
   
-  str_replace_all(scenario, " ", "") %>%
+  stringr::str_replace_all(scenario, " ", "") %>%
     paste0("_", extra_label, table_name, "_", year_lab, ".csv") %>%
-    path_sanitize()
+    fs::path_sanitize()
 }
 
 # checks that all scenarios specified in plot_groups are found in the available

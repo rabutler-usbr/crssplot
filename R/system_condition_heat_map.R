@@ -70,12 +70,12 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     ungroup() %>%
     filter(Year %in% yrs) %>%
     mutate(Agg = scen_rename[Agg]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       n2 = normal_no_recovery + normal_recovery,
       s1_and_2 = dcp2 + dcp3 + dcp4 + dcp5 + dcp6 + dcp7
     ) %>%
-    gather(Variable, Value, -Year, -Agg) %>%
+    tidyr::gather(Variable, Value, -Year, -Agg) %>%
     filter(Variable %in% c("surplus", "n2", "dcp1", "s1_and_2", "dcp8")) %>%
     mutate(Value = if_else(Value == 0, NA_real_, Value * 100)) %>%
     mutate(
@@ -84,10 +84,10 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       val_lab = if_else(val_lab == "0%", "<1%", val_lab)
     ) %>%
     mutate(
-      Agg = str_wrap(Agg, width = 10), 
+      Agg = stringr::str_wrap(Agg, width = 10), 
       Variable = factor(
-        str_wrap(tier_names[Variable], y_wrap), 
-        levels = rev(str_wrap(tier_names, y_wrap))
+        stringr::str_wrap(tier_names[Variable], y_wrap), 
+        levels = rev(stringr::str_wrap(tier_names, y_wrap))
       )
     )
   
@@ -118,13 +118,13 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     select(-Month) %>%
     filter(Year %in% yrs) %>%
     mutate(Agg = scen_rename[Agg]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       ueb = uebGt823 + ueb823 + uebLt823,
       mer = mer823 + mer748,
       leb = lebGt823 + leb823 + lebLt823
     ) %>%
-    gather(Variable, Value, -Year, -Agg, -TraceNumber, -Scenario) %>%
+    tidyr::gather(Variable, Value, -Year, -Agg, -TraceNumber, -Scenario) %>%
     filter(Variable %in% c("eq", "ueb", "mer", "leb")) %>%
     group_by(Year, Agg, Variable) %>%
     summarise(Value = mean(Value)) %>%
@@ -136,10 +136,10 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       val_lab = if_else(val_lab == "0%", "<1%", val_lab)
     ) %>%
     mutate(
-      Agg = str_wrap(Agg, width = 10), 
+      Agg = stringr::str_wrap(Agg, width = 10), 
       Variable = factor(
-        str_wrap(tier_names[Variable], y_wrap), 
-        levels = rev(str_wrap(tier_names, y_wrap))
+        stringr::str_wrap(tier_names[Variable], y_wrap), 
+        levels = rev(stringr::str_wrap(tier_names, y_wrap))
       )
     )
   
@@ -159,10 +159,13 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
 add_logo_vertical <- function(gg)
 {
   # now uses cowplot::draw_image which relies on "magick"
-  logo_path <- "logo/BofR-vert-cmyk.png"
+  logo_path <- system.file(
+    "extdata/logo/BofR-vert-cmyk.png", 
+    package = "crssplot"
+  )
   
-  ggdraw(gg) +
-    draw_image(
+  cowplot::ggdraw(gg) +
+    cowplot::draw_image(
       logo_path, 
       x = 1.455, y = .13, 
       hjust = 1, vjust = 1, 
@@ -176,7 +179,11 @@ add_logo_horiz <- function(gg)
   gg_grob <- ggplotGrob(gg)
   
   # logo -------------------------------
-  logo <- imager::load.image("logo/BofR-horiz-cmyk.png")
+  logo_path <- system.file(
+    "extdata/logo/BofR-horiz-cmyk.png", 
+    package = "crssplot"
+  )
+  logo <- imager::load.image(logo_path)
   logo <- grid::rasterGrob(logo, interpolate = TRUE)
   
   l2 <- ggplot() +
@@ -184,8 +191,8 @@ add_logo_horiz <- function(gg)
     theme_minimal() +
     annotation_custom(logo)
 
-  gg <- grid.arrange(arrangeGrob(
-    gg_grob, nullGrob(), l2,
+  gg <- gridExtra::grid.arrange(gridExtra::arrangeGrob(
+    gg_grob, grid::nullGrob(), l2,
     layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
     heights = c(.9, .1),
     widths = c(.8, .2)
@@ -211,8 +218,8 @@ add_logo_shield <- function(gg)
     theme_minimal() +
     annotation_custom(logo)
   
-  gg <- grid.arrange(arrangeGrob(
-    gg_grob, nullGrob(), l2,
+  gg <- gridExtra::grid.arrange(gridExtra::arrangeGrob(
+    gg_grob, grid::nullGrob(), l2,
     layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
     heights = c(.9, .1),
     widths = c(.9, .1)

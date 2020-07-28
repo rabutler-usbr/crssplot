@@ -71,9 +71,9 @@ mead_powell_condition_barplot <- function(zz, yrs2show, scens, ofolder)
     )
     
     sys_data[[aa]] <- as.data.frame(tmp$fullTable) %>%
-      rownames_to_column(var = "Variable") %>%
-      as_tibble() %>%
-      gather(Year, Value, -Variable) %>%
+      tibble::rownames_to_column(var = "Variable") %>%
+      tibble::as_tibble() %>%
+      tidyr::gather(Year, Value, -Variable) %>%
       mutate(Scenario = aa)
   }
   
@@ -91,7 +91,7 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
   #short_data
   tmp <- filter(sys_data, Variable %in% names(mead_vars2)) %>%
     mutate(Variable = mead_vars2[Variable]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       short3_fill = short3 / 2,
       short2_fill = short3 + short2 / 2,
@@ -100,19 +100,19 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
   
   short_data <- full_join(
     select(tmp, -short3_fill, -short2_fill, -short1_fill) %>%
-      gather(Variable, Value, -Year, -Scenario),
+      tidyr::gather(Variable, Value, -Year, -Scenario),
     select(tmp, -short1, -short2, -short3) %>%
       rename(
         short1 = short1_fill, 
         short2 = short2_fill, 
         short3 = short3_fill
       ) %>%
-      gather(Variable, fill_loc, -Year, -Scenario),
+      tidyr::gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
     mutate(val_lab = to_percent(Value)) %>%
     mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
-    unite(fill_var, Scenario, Variable, remove = FALSE)
+    tidyr::unite(fill_var, Scenario, Variable, remove = FALSE)
   
   names(color_map_3) <- c(
     paste0(scens[1], "_short", 1:3), 
@@ -123,13 +123,13 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
     all_names <- names(color_map_3)
     names(all_names) <- all_names
     all_names[1:3] <- NA_character_
-    all_names <- str_split_fixed(all_names, "_", 2)[,2]
+    all_names <- stringr::str_split_fixed(all_names, "_", 2)[,2]
     short_to_long <- c("Shortage - 1st Level (Mead <= 1,075 and >= 1,050)",
                        "Shortage - 2nd Level (Mead < 1,050 and >= 1,025)",       
                        "Shortage - 3rd Level (Mead < 1,025)")
     names(short_to_long) <- paste0("short", 1:3)
     all_names[4:6] <- short_to_long[all_names[4:6]]
-    str_wrap(all_names, width = 20)
+    stringr::str_wrap(all_names, width = 20)
   }
   
   gg_short <- ggplot(short_data, aes(Scenario, Value, fill = fill_var)) +
@@ -192,7 +192,7 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
   # surplus plot ----------------------
   tmp <- filter(sys_data, Variable %in% names(mead_surplus)) %>%
     mutate(Variable = mead_surplus[Variable]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     # now they are additive
     mutate(surplus = surplus - fc_surplus) %>%
     mutate(
@@ -202,15 +202,15 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
   
   surp_data <- full_join(
     select(tmp, -surplus_fill, -fc_surplus_fill) %>%
-      gather(Variable, Value, -Year, -Scenario),
+      tidyr::gather(Variable, Value, -Year, -Scenario),
     select(tmp, -surplus, -fc_surplus) %>%
       rename(fc_surplus = fc_surplus_fill, surplus = surplus_fill) %>%
-      gather(Variable, fill_loc, -Year, -Scenario),
+      tidyr::gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
     mutate(val_lab = to_percent(Value)) %>%
     mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
-    unite(fill_var, Scenario, Variable, remove = FALSE)
+    tidyr::unite(fill_var, Scenario, Variable, remove = FALSE)
   
   names(color_map_2) <- c(
     paste0(scens[1], c("_fc_surplus", "_surplus")), 
@@ -221,7 +221,7 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
     all_names <- names(color_map_2)
     names(all_names) <- all_names
     all_names[1:2] <- NA_character_
-    all_names <- str_split_fixed(all_names, "_", 2)[,2]
+    all_names <- stringr::str_split_fixed(all_names, "_", 2)[,2]
     short_to_long <- names(mead_surplus)
     short_to_long[
       short_to_long == "Surplus Condition - any amount (Mead>= 1,145 ft)"
@@ -229,7 +229,7 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
     names(short_to_long) <- mead_surplus
     
     all_names[3:4] <- short_to_long[all_names[3:4]]
-    str_wrap(all_names, width = 20)
+    stringr::str_wrap(all_names, width = 20)
   }
   
   gg_surplus <- ggplot(surp_data, aes(Scenario, Value, fill = fill_var)) +
@@ -285,9 +285,13 @@ mead_condition_barplot <- function(sys_data, scens, ofolder)
     sep = "\n"
   )
   
-  cap_grob <- grid::textGrob(cap_text, x = 1, hjust = 1, gp=gpar(fontsize = 9))
+  cap_grob <- grid::textGrob(
+    cap_text, 
+    x = 1, hjust = 1, 
+    gp = grid::gpar(fontsize = 9)
+  )
   
-  gg <- grid.arrange(arrangeGrob(
+  gg <- gridExtra::grid.arrange(gridExtra::arrangeGrob(
     short_grob, short_leg, surp_grob, surp_leg, norm_grob, scen_leg, 
     cap_grob, l2,
     layout_matrix = matrix(c(1:5, NA, 6, 6, 7, 8), ncol = 2, byrow = TRUE),
@@ -341,7 +345,7 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   # equalization plot --------------------
   tmp <- filter(sys_data, Variable %in% names(eq_vars)) %>%
     mutate(Variable = eq_vars[Variable]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       eq_fill = eq_823 + eq / 2,
       eq_823_fill = eq_823 / 2
@@ -349,18 +353,18 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   
   eq_data <- full_join(
     select(tmp, -eq_fill, -eq_823_fill) %>%
-      gather(Variable, Value, -Year, -Scenario),
+      tidyr::gather(Variable, Value, -Year, -Scenario),
     select(tmp, -eq, -eq_823) %>%
       rename(
         eq = eq_fill, 
         eq_823 = eq_823_fill
       ) %>%
-      gather(Variable, fill_loc, -Year, -Scenario),
+      tidyr::gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
     mutate(val_lab = to_percent(Value)) %>%
     mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
-    unite(fill_var, Scenario, Variable, remove = FALSE)
+    tidyr::unite(fill_var, Scenario, Variable, remove = FALSE)
   
   eq_color_map <- color_map_2
   
@@ -373,12 +377,12 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
     all_names <- names(eq_color_map)
     names(all_names) <- all_names
     all_names[1:2] <- NA_character_
-    all_names <- str_split_fixed(all_names, "_", 2)[,2]
+    all_names <- stringr::str_split_fixed(all_names, "_", 2)[,2]
     short_to_long <- c("Equalization - annual release > 8.23 maf",
                        "Equalization - annual release = 8.23 maf")
     names(short_to_long) <- c("eq", "eq_823")
     all_names[3:4] <- short_to_long[all_names[3:4]]
-    str_wrap(all_names, width = 20)
+    stringr::str_wrap(all_names, width = 20)
   }
   
   gg_eq <- ggplot(eq_data, aes(Scenario, Value, fill = fill_var)) +
@@ -410,7 +414,7 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   
   tmp <- filter(sys_data, Variable %in% names(ueb_vars)) %>%
     mutate(Variable = ueb_vars[Variable]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       ueb_gt_fill = ueb_lt + ueb_823 + ueb_gt / 2,
       ueb_823_fill = ueb_lt + ueb_823 / 2,
@@ -419,19 +423,19 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   
   ueb_data <- full_join(
     select(tmp, -ueb_gt_fill, -ueb_823_fill, -ueb_lt_fill) %>%
-      gather(Variable, Value, -Year, -Scenario),
+      tidyr::gather(Variable, Value, -Year, -Scenario),
     select(tmp, -ueb_gt, -ueb_823, -ueb_lt) %>%
       rename(
         ueb_gt = ueb_gt_fill, 
         ueb_823 = ueb_823_fill,
         ueb_lt = ueb_lt_fill
       ) %>%
-      gather(Variable, fill_loc, -Year, -Scenario),
+      tidyr::gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
     mutate(val_lab = to_percent(Value)) %>%
     mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
-    unite(fill_var, Scenario, Variable, remove = FALSE)
+    tidyr::unite(fill_var, Scenario, Variable, remove = FALSE)
   
   ueb_color_map <- color_map_3
   
@@ -444,11 +448,11 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
     all_names <- names(ueb_color_map)
     names(all_names) <- all_names
     all_names[1:3] <- NA_character_
-    all_names <- str_split_fixed(all_names, "_", 2)[,2]
+    all_names <- stringr::str_split_fixed(all_names, "_", 2)[,2]
     short_to_long <- names(ueb_vars)
     names(short_to_long) <- ueb_vars
     all_names[4:6] <- short_to_long[all_names[4:6]]
-    str_wrap(all_names, width = 20)
+    stringr::str_wrap(all_names, width = 20)
   }
   
   ueb_data$fill_var <- factor(ueb_data$fill_var, levels = names(ueb_color_map))
@@ -482,7 +486,7 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
  
   tmp <- filter(sys_data, Variable %in% names(mer_vars)) %>%
     mutate(Variable = mer_vars[Variable]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       mer_823_fill = mer_748 + mer_823 / 2,
       mer_748_fill = mer_748 / 2
@@ -490,18 +494,18 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   
   mer_data <- full_join(
     select(tmp, -mer_748_fill, -mer_823_fill) %>%
-      gather(Variable, Value, -Year, -Scenario),
+      tidyr::gather(Variable, Value, -Year, -Scenario),
     select(tmp, -mer_748, -mer_823) %>%
       rename(
         mer_748 = mer_748_fill, 
         mer_823 = mer_823_fill
       ) %>%
-      gather(Variable, fill_loc, -Year, -Scenario),
+      tidyr::gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
     mutate(val_lab = to_percent(Value)) %>%
     mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
-    unite(fill_var, Scenario, Variable, remove = FALSE)
+    tidyr::unite(fill_var, Scenario, Variable, remove = FALSE)
   
   mer_color_map <- color_map_2
   
@@ -514,13 +518,13 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
     all_names <- names(mer_color_map)
     names(all_names) <- all_names
     all_names[1:2] <- NA_character_
-    all_names <- str_split_fixed(all_names, "_", 2)[,2]
+    all_names <- stringr::str_split_fixed(all_names, "_", 2)[,2]
     
     short_to_long <- names(mer_vars)
     names(short_to_long) <- mer_vars
     
     all_names[3:4] <- short_to_long[all_names[3:4]]
-    str_wrap(all_names, width = 20)
+    stringr::str_wrap(all_names, width = 20)
   }
   
   mer_data$fill_var <- factor(mer_data$fill_var, levels = names(mer_color_map))
@@ -554,7 +558,7 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   
   tmp <- filter(sys_data, Variable %in% names(leb_vars)) %>%
     mutate(Variable = leb_vars[Variable]) %>%
-    spread(Variable, Value) %>%
+    tidyr::spread(Variable, Value) %>%
     mutate(
       leb_gt_fill = leb_lt + leb_823 + leb_gt / 2,
       leb_823_fill = leb_lt + leb_823 / 2,
@@ -563,19 +567,19 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
   
   leb_data <- full_join(
     select(tmp, -leb_gt_fill, -leb_823_fill, -leb_lt_fill) %>%
-      gather(Variable, Value, -Year, -Scenario),
+      tidyr::gather(Variable, Value, -Year, -Scenario),
     select(tmp, -leb_gt, -leb_823, -leb_lt) %>%
       rename(
         leb_gt = leb_gt_fill, 
         leb_823 = leb_823_fill,
         leb_lt = leb_lt_fill
       ) %>%
-      gather(Variable, fill_loc, -Year, -Scenario),
+      tidyr::gather(Variable, fill_loc, -Year, -Scenario),
     by = c("Year", "Scenario", "Variable")
   ) %>%
     mutate(val_lab = to_percent(Value)) %>%
     mutate(val_lab = if_else(val_lab == "0%", NA_character_, val_lab)) %>%
-    unite(fill_var, Scenario, Variable, remove = FALSE)
+    tidyr::unite(fill_var, Scenario, Variable, remove = FALSE)
   
   leb_color_map <- color_map_3
   
@@ -588,11 +592,11 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
     all_names <- names(leb_color_map)
     names(all_names) <- all_names
     all_names[1:3] <- NA_character_
-    all_names <- str_split_fixed(all_names, "_", 2)[,2]
+    all_names <- stringr::str_split_fixed(all_names, "_", 2)[,2]
     short_to_long <- names(leb_vars)
     names(short_to_long) <- leb_vars
     all_names[4:6] <- short_to_long[all_names[4:6]]
-    str_wrap(all_names, width = 20)
+    stringr::str_wrap(all_names, width = 20)
   }
   
   leb_data$fill_var <- factor(leb_data$fill_var, levels = names(leb_color_map))
@@ -649,9 +653,13 @@ powell_condition_barplot <- function(sys_data, scens, ofolder, scen_leg)
     sep = "\n"
   )
   
-  cap_grob <- grid::textGrob(cap_text, x = 1, hjust = 1, gp=gpar(fontsize = 9))
+  cap_grob <- grid::textGrob(
+    cap_text, 
+    x = 1, hjust = 1, 
+    gp = grid::gpar(fontsize = 9)
+  )
   
-  gg <- grid.arrange(arrangeGrob(
+  gg <- gridExtra::grid.arrange(gridExtra::arrangeGrob(
     eq_grob, eq_leg, ueb_grob, ueb_leg, mer_grob, mer_leg, leb_grob, leb_leg, 
     scen_leg, cap_grob, l2,
     layout_matrix = matrix(c(1:8, 9, 9, 10, 11), ncol = 2, byrow = TRUE),

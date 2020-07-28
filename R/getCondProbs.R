@@ -47,7 +47,7 @@ get_all_cond_probs <- function(sysCond, scenarios, yrs2show, ui)
   for (scen in scenarios) {
     
     sysCond <- dplyr::filter(sysCond, Year %in% yrs2show & Agg == scen)
-    sysTable <- CRSSIO::createSysCondTable(sysCond, yrs2show)
+    sysTable <- CRSSIO::crsso_get_sys_cond_table(sysCond, yrs2show)
     
     cp1 <- getConditionalProbs(
       sysCond, 
@@ -137,10 +137,10 @@ get_all_cond_probs <- function(sysCond, scenarios, yrs2show, ui)
     cpt1$PrctChance <- cpt1$PrctChance*100
     
     f_name <- construct_table_file_name(
-      "cond_probs", scenario, paste(yrs2show[1], yrs2show[2], sep = "-"), 
+      "cond_probs", scen, paste(yrs2show[1], yrs2show[2], sep = "-"), 
       ui$folders$extra_label
     )
     
-    data.table::fwrite(cpt1, ofile, row.names = F)
+    data.table::fwrite(cpt1, f_name, row.names = FALSE)
   }
 }

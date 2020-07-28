@@ -17,6 +17,8 @@ process_everything <- function(ui)
     ui
   )
   
+  ui$folders$i_folder <- update_ifolder(ui$folders$i_folder)
+  
   folder_paths <- crss_res_directory_setup(
     ui$folders$i_folder, 
     get_pe_data = ui$process_data$pe_data, 
@@ -31,7 +33,7 @@ process_everything <- function(ui)
       res_folder = folder_paths$res_folder
     )
   
-  traceMap <- read.csv(
+  traceMap <- utils::read.csv(
     system.file("extdata", "Trace2IcMap.csv", package = "crssplot")
   )
   
@@ -46,7 +48,7 @@ process_everything <- function(ui)
   plot_flags <- get_plot_flags(ui)
 
   if (TRUE) {
-    pe <- read_feather(o_files$cur_month_pe_file) %>%
+    pe <- feather::read_feather(o_files$cur_month_pe_file) %>%
       # The StartMonth column is used as the color variable in plotEOCYElev, and 
       # the names that should show up in the legend/differentiate scenario groups
       # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
@@ -68,7 +70,7 @@ process_everything <- function(ui)
       rename(AggName = Agg) %>%
       select(-StartMonth)
     
-    cs <- read_feather(o_files$sys_cond_file) %>%
+    cs <- feather::read_feather(o_files$sys_cond_file) %>%
       rename(AggName = Agg) %>%
       filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
       rbind(cs) %>%
@@ -78,14 +80,14 @@ process_everything <- function(ui)
   # TODO: switch this to be true if creating heatmap, or dcp table
   if (TRUE) {
     dcp_yrs <- c(min(yrs2show) - 1, yrs2show)
-    tmp <- read_feather(o_files$cur_month_pe_file)
+    tmp <- feather::read_feather(o_files$cur_month_pe_file)
     lb_dcp <- compute_mead_dcp_probs(tmp, all_plotted_scens, 2019:2026)
     ub_dcp <- compute_powell_dcp_probs(tmp, all_plotted_scens, 2019:2026)
   }
   
   # TODO: heatmap, individual tables, ui$create_figures$conditional_probs
   if (TRUE) {
-    sys_cond <- read_feather(o_files$sys_cond_file)
+    sys_cond <- feather::read_feather(o_files$sys_cond_file)
   }
   
   # PLOTTING -------------------------------
@@ -152,7 +154,7 @@ process_everything <- function(ui)
   # csd boxplots ---------------------------
   if (plot_flags[["csd_flag"]]) {
     message("... CSD boxplots")
-    csd_ann <- read_feather(o_files[["csd_file"]])
+    csd_ann <- feather::read_feather(o_files[["csd_file"]])
     comp_figs <- c(comp_figs, create_all_csd_boxplots(csd_ann, ui))
   }
   
@@ -176,7 +178,7 @@ process_everything <- function(ui)
       length(scatter_figs) > 0 || length(short_cond_figs > 0)) {
     # save figures and table
     message("\ncreating pdf: ", o_files$main_pdf, "\n")
-    pdf(o_files$main_pdf, width = 8, height = 6)
+    grDevices::pdf(o_files$main_pdf, width = 8, height = 6)
     
     for (i in seq_along(comp_figs)) {
       print(comp_figs[[i]])
@@ -193,7 +195,7 @@ process_everything <- function(ui)
     for (i in seq_along(short_cond_figs)) {
       print(short_cond_figs[[i]])
     }
-    dev.off()
+    grDevices::dev.off()
   }
   
   # plot Clouds ----------------
@@ -213,12 +215,27 @@ process_everything <- function(ui)
   if (isTRUE(plot_flags[["simple_5yr"]])) {
     ## create the 5-yr simple table that compares to the previous run
     message("... creating 5-year simple table")
-    tmp_data <- read_feather(o_files$sys_cond_file) %>%
-      rbind(read_feather(o_files$cur_month_pe_file))
+    tmp_data <- feather::read_feather(o_files$sys_cond_file) %>%
+      rbind(feather::read_feather(o_files$cur_month_pe_file))
     
     create_all_simple_5yr(tmp_data, ui, folder_paths)
     
     rm(tmp_data)
   }
   
+}
+
+# checks if the i_folder input is an r statement. if it is, then it parses it
+# otherwise returns it.
+update_ifolder <- function(x) {
+  
+  if (is_r_statement(x)) {
+    # strip of `r and `
+    x <- x %>%
+      strip_r_from_string() %>%
+      parse(text = ., keep.source = FALSE) %>%
+      eval()
+  }
+  
+  x
 }

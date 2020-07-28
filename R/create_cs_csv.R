@@ -23,8 +23,12 @@ create_cs_csv <- function(cs, scenario, o_folders, ui)
   
   o_file <- file.path(
     o_folders[["figure_data"]], 
-    path_sanitize(paste0(str_replace_all(scenario, " ", ""), "_CritStats.csv"))
+    fs::path_sanitize(paste0(
+      stringr::str_replace_all(scenario, " ", ""), 
+      "_CritStats.csv"
+    ))
   )
+  
   message("      ... saving crit stats figure data")
   data.table::fwrite(cs_out, o_file, row.names = FALSE)
   

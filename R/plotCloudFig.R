@@ -41,8 +41,8 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     dplyr::filter(StartMonth %in% scenario, Year %in% yrs, Variable == var) %>%
     # compute the 10/50/90 and aggregate by start month
     dplyr::group_by(StartMonth, Year, Variable) %>%
-    dplyr::summarise('Med' = median(Value), 'Min' = quantile(Value,.1), 
-                     'Max' = quantile(Value,.9)) 
+    dplyr::summarise('Med' = median(Value), 'Min' = stats::quantile(Value, .1), 
+                     'Max' = stats::quantile(Value, .9)) 
   
   # Set tick marks for x and y axis
   myXLabs <- seq(1990,3000,5)
@@ -52,18 +52,25 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   #  variable name.  Can be upper or lower case.
   if (var == "powell_dec_pe") {
     
-    hist <- read.csv('data/HistPowellPE.csv')
+    hist <- utils::read.csv(system.file(
+      'extdata/HistPowellPE.csv', package = "crssplot"
+    ))
+    
     hist$Variable <- 'powell_dec_pe'
     
     # Adding switch to allow plotting of correct IG important elevations
     is_powell <- TRUE
-    EQLine <- as.data.frame(read.csv('data/EQLine.csv'))
+    EQLine <- as.data.frame(utils::read.csv(
+      system.file('extdata/EQLine.csv', package = "crssplot")
+    ))
     EQLine$StartMonth <- 'Historical Elevation'
     
     ##IGProj <- read.csv('C:/RCodes/Process-CRSS-Res-TribalWaterStudy/data/IGMedProjections_Powell.csv')
     ##IGProj$Variable <- 'Powell.Pool Elevation'
   }else{
-    hist <- read.csv('data/HistMeadPE.csv')  
+    hist <- utils::read.csv(
+      system.file('extdata/HistMeadPE.csv', package = "crssplot")
+    )
     hist$Variable <- 'mead_dec_pe'
     
     # Adding switch to allow plotting of correct IG important elevations
@@ -131,13 +138,15 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   n1 <- names(histLab)
   n2 <- names(scen_labs)
   
-  histLab <- str_wrap(histLab, 15)
-  scen_labs <- str_wrap(scen_labs, 15)
+  histLab <- stringr::str_wrap(histLab, 15)
+  scen_labs <- stringr::str_wrap(scen_labs, 15)
   names(histLab) <- n1
   names(scen_labs) <- n2
   
   # Read in Reclamation logo png
-  im <- load.image('logo/BofR-vert-cmyk.png')
+  im <- imager::load.image(
+    system.file('extdata/logo/BofR-vert-cmyk.png', package = "crssplot")
+  )
   im_rast <- grid::rasterGrob(
     im, 
     interpolate = TRUE, 
@@ -171,13 +180,12 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   LegendWidth = 1
   LegendHeight = 2.5
   
-  
   # Start making the plot
   gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +
     theme_light()
   
   # Generate plot a to make ribbon legend
-  name <- str_wrap("10th to 90th percentile of full range",20)
+  name <- stringr::str_wrap("10th to 90th percentile of full range",20)
   gga <- gg + 
     geom_ribbon(
       data = subset(zz,StartMonth %in% rev(addIC)),
@@ -203,13 +211,13 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
       legend.key = element_rect(), 
       legend.key.size = unit(1.75, 'lines')
     ) 
-  legenda <- get_legend(gga)
+  legenda <- get_legend(ggplotGrob(gga))
   
   # Generate plot b to take medians legend
   ggb <- gg + 
     geom_line(size=Medians) + 
     scale_color_manual(
-      name = str_wrap("Historical and Median Projected Pool Elevation",20),
+      name = stringr::str_wrap("Historical and Median Projected Pool Elevation",20),
       values = plotColors, 
       labels = histLab
     ) +
@@ -220,11 +228,11 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
       legend.key = element_rect(), 
       legend.key.size = unit(1.75, 'lines')
     ) 
-  legendb <- get_legend(ggb)
+  legendb <- get_legend(ggplotGrob(ggb))
 
   # Make legend grob.  4 rows used to make legend close together and in the 
   # middle with respects to the vertical
-  gglegend <- plot_grid(
+  gglegend <- cowplot::plot_grid(
     NULL, legenda, legendb, NULL, im_rast, NULL, 
     ncol = 1, 
     rel_heights = c(.6, 1, 1, .6, .2, .17)
@@ -242,9 +250,9 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myXLabs,
                        labels = myXLabs, expand = c(0,0)) +
     scale_y_continuous(
-      minor_breaks = seq(900,4000,25), 
+      minor_breaks = seq(900, 4000, 25), 
       breaks = myYLabs, 
-      labels = comma, 
+      labels = scales::comma, 
       limits = c(yaxmin, yaxmax)
     ) +
     geom_ribbon(
@@ -259,11 +267,11 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
       aes(Year, Med), 
       size = Medians, color = plotColors["Historical Elevation"]
     ) +
-    scale_fill_manual(str_wrap("10th to 90th percentile of full range",20),
+    scale_fill_manual(stringr::str_wrap("10th to 90th percentile of full range",20),
                       values = plotColors, guide = FALSE,
                       labels = scen_labs) + 
     scale_color_manual(
-      name = str_wrap("Historical and Median Projected Pool Elevation",20),
+      name = stringr::str_wrap("Historical and Median Projected Pool Elevation",20),
       values = plotColors, guide = FALSE,
       labels = histLab
     ) +
@@ -440,7 +448,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   }
   
   # Add BOR Logo
-  gg <- plot_grid(gg, gglegend, rel_widths = c(2,.4)) #%>%
+  gg <- cowplot::plot_grid(gg, gglegend, rel_widths = c(2,.4)) #%>%
     #add_logo_horiz()
   gg
 }

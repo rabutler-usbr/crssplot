@@ -10,7 +10,7 @@ getScenarioData <- function(scens,
                             aggFunction, 
                             rwa)
 {
-  if (!is(rwa, "rwd_agg")) {
+  if (!RWDataPlyr::is_rwd_agg(rwa)) {
     stop("rwa should be a rwd_agg object")
   }
   
@@ -29,11 +29,8 @@ getScenarioData <- function(scens,
     length(scensVec),
     ' scenarios'
   )
-  
-  #zz <- RWDataPlyr::getDataForAllScens(scensVec,scensVec,slaInput, iFolder, 
-  #                                      oFile, TRUE)
 
-  zz <- rw_scen_aggregate(scensVec, agg = rwa, scen_dir = iFolder)
+  zz <- RWDataPlyr::rw_scen_aggregate(scensVec, agg = rwa, scen_dir = iFolder)
   
   if(addAggAttribute){
     message('adding attribute...')
@@ -45,7 +42,7 @@ getScenarioData <- function(scens,
     }
     
     message('writing file...')
-    write_feather(zz, oFile)
+    feather::write_feather(zz, oFile)
   }
 }
 

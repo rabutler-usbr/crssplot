@@ -21,7 +21,7 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
   # month and return it
   ic_date <- as.Date(paste0(icMonth,"-01"), format = "%y-%b-%d")
   
-  tmp <- read_excel(icFile, sheet = icTrace)
+  tmp <- readxl::read_excel(icFile, sheet = icTrace)
   colnames(tmp)[1] <- "month"
   
   filter(tmp, as.Date(month, format = "%Y-%b-%d") == ic_date) %>%
@@ -41,7 +41,7 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
                            addAggAttribute = TRUE, aggFunction, traceMap, 
                            icDimNumber = 6)
 {
-  res <- read_feather(fileToAppend)
+  res <- feather::read_feather(fileToAppend)
 
   icSave <- data.frame()
   
@@ -124,5 +124,5 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
   
   # append I.C. on to rest of April results
   res <- bind_rows(icSave, res)
-  write_feather(res, oFile)
+  feather::write_feather(res, oFile)
 }
