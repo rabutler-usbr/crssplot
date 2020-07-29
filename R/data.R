@@ -30,3 +30,25 @@
 #' 
 #' @rdname rwd_agg_data
 "short_cond_rwa"
+
+#' Example data
+#' 
+#' `ex_pe` is a data frame (tibble) that includes example data based on Lakes 
+#' Powell and Mead pool elevation for multiple scenarios and metrics. Results
+#' are from April 2020 CRSS using the stress test hydrology, and were generated
+#' using [RWDataPlyr::rw_scen_aggregate()].
+#' 
+#' @format Data frame with 21,146 rows and 7 variables:
+#' \describe{
+#'   \item{Year}{year}
+#'   \item{Month}{month, full name}
+#'   \item{TraceNumber}{trace number, 1-31 are from CRSS, 0 are initial 
+#'   conditions}
+#'   \item{Scenario}{RiverSMART scenario folder, 2 are included}
+#'   \item{Variable}{variable name, 11 are included}
+#'   \item{Value}{variable value, in feet for `powell_dec_pe` and `mead_dec_pe`
+#'   and binary occurrence for remaining variables.}
+#'   \item{ScenarioGroup}{scenario group. Used to group multiple "Scenario" 
+#'   folders together for processing/analysis. 2 are included}
+#' }
+"ex_pe"

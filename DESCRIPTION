@@ -44,3 +44,5 @@ Imports:
     yaml
 Suggests: 
     testthat
+Depends: 
+    R (>= 2.10)

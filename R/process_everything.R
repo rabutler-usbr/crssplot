@@ -16,7 +16,7 @@ process_everything <- function(ui)
     icMonth, 
     ui
   )
-  
+
   ui$folders$i_folder <- update_ifolder(ui$folders$i_folder)
   
   folder_paths <- crss_res_directory_setup(

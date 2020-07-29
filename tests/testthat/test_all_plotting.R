@@ -1,4 +1,6 @@
 
+create_figures <- TRUE
+
 setup(unzip(
   "results/auto_tests/tempData/tempData.zip", 
   exdir = "results/auto_tests/tempData"
@@ -14,5 +16,7 @@ teardown({
 test_that("everything works.", {
   yi <- parse_yaml_input("../test_simple_figures.yml")
   expect_type(yi, "list")
-  process_everything(yi)
+  
+  skip_if_not(create_figures, "skipping process_everything()")
+  expect_warning(process_everything(yi))
 })
