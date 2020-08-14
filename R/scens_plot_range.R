@@ -92,11 +92,7 @@ scens_plot_range <- function(df, vars, years = NULL, scenarios = NULL,
   
   df <- mutate(df, Percentile = factor(Percentile, levels = names(qLt)))
   
-  if (length(years) < 15) {
-    myLabs <- 1900:3000
-  } else {
-    myLabs <- seq(1900, 3000, 5)
-  }
+  myLabs <- get_year_breaks(years)
  
   ops <- list(...)
   # these are the plotting options this function can handle

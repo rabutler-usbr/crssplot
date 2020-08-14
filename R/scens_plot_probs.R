@@ -46,6 +46,9 @@
 #'   
 #' @return `gg` object.
 #' 
+#' @examples 
+#' scens_plot_probs(ex_pe, "powell_wy_min_lt_3525", y_lab = "percent")
+#' 
 #' @rdname scens_plot_
 #' @export
 scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL, 
@@ -82,11 +85,7 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
   # parse ... and other plot options
   plot_colors <- determine_plot_colors(plot_colors, scenarios)
   
-  if (length(years) < 15) {
-    myLabs <- 1900:3000
-  } else {
-    myLabs <- seq(1900, 3000, 5)
-  }
+  myLabs <- get_year_breaks(years)
   
   ops <- list(...)
   # these are the plotting options this function can handle
@@ -143,3 +142,15 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
   
   gg
 }
+
+# determine spacing for main year breaks
+get_year_breaks <- function(x) {
+  if (length(x) < 15) {
+    myLabs <- 1900:3000
+  } else {
+    myLabs <- seq(1900, 3000, 5)
+  }
+  
+  myLabs
+}
+
