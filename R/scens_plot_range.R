@@ -1,50 +1,9 @@
 
-#' Plot scenario comparison figures
-#' 
+#' @description 
 #' `scen_plot_range()` plots the range of results for multiple scenarios. The
 #' range is shown as lines for 10th, 50th, and 90th percentiles. Typically 
 #' this is done for only one variable, but multiple variables can be provided 
 #' and will be shown as separate facets. 
-#' 
-#' `...` is used to pass additional options to ggplot functions. The following
-#' are used: 
-#' 
-#' - "title", and "caption" are passed to [ggplot2::labs()]. "color_label" and 
-#' "y_lab" are also passed using `color` and `y` parameters, respectively.
-#' - "legend_wrap" is used to modify labels in legends etc. by calling 
-#' [stringr::str_wrap()] on the appropriate variable, with 
-#' `width = legend_wrap`.
-#' - "facet_scales", "facet_nrow", and "facet_ncol" are all passed to 
-#' [ggplot2::facet_wrap()].
-#' 
-#' `scen_plot_range()` will use the following additional options: "y", "title", 
-#' "color_label", "legend_wrap", "facet_scales", "facet_nrow", and "facet_ncol".
-#' 
-#' The legend order can be modified by converting "ScenarioGroup" column to a 
-#' factor before calling `scen_plot_range()`, with the levels specifying the
-#' order the scenarios will show up in the legend.
-#' 
-#' @param df Data frame. Must have "Year", "Variable", "ScenarioGroup", and 
-#'   "Value" columns.
-#'   
-#' @param vars Character vector specifying the variable(s) to use.
-#' 
-#' @param years Numeric vector specifying the years to show. If `NULL`, use all
-#'   years in `df`.
-#'   
-#' @param scenarios Character vector specifying the scenarios to use (found in
-#' `df$ScenarioGroup`). If `NULL`, use all scenarios in `df`.
-#' 
-#' @param plot_colors Named character vector to set custom plot colors. Names
-#'   should match scenarios found in `df$ScenarioGroup`. 
-#'   
-#' @param scen_labels Named character vector to set custom legend labels for the
-#'   scenarios. Used to show legend labels that are different from values found
-#'   in `df$ScenarioGroup`.
-#'   
-#' @param ... Parameters passed to other functions. See details.
-#'   
-#' @return `gg` object.
 #' 
 #' @examples
 #' # quick simple plot of one variable
