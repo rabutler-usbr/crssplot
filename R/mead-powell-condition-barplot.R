@@ -11,7 +11,7 @@ mead_vars <- c(
   "Normal Year or ICS Surplus Condition"
 )
 
-mead_normal <- tail(mead_vars, 1)
+mead_normal <- utils::tail(mead_vars, 1)
 mead_surplus <- c("surplus", "fc_surplus")
 names(mead_surplus) <- mead_vars[5:6]
 
