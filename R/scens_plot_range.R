@@ -20,6 +20,10 @@
 #' `scen_plot_range()` will use the following additional options: "y", "title", 
 #' "color_label", "legend_wrap", "facet_scales", "facet_nrow", and "facet_ncol".
 #' 
+#' The legend order can be modified by converting "ScenarioGroup" column to a 
+#' factor before calling `scen_plot_range()`, with the levels specifying the
+#' order the scenarios will show up in the legend.
+#' 
 #' @param df Data frame. Must have "Year", "Variable", "ScenarioGroup", and 
 #'   "Value" columns.
 #'   
@@ -124,8 +128,10 @@ scens_plot_range <- function(df, vars, years = NULL, scenarios = NULL,
   # parse ... and other plot options
   plot_colors <- determine_plot_colors(plot_colors, scenarios)
   
-  qLt <- c(3,1,2)
-  names(qLt) <- c('10th','50th','90th')
+  qLt <- c(2, 1, 3)
+  names(qLt) <- c('90th','50th','10th')
+  
+  df <- mutate(df, Percentile = factor(Percentile, levels = names(qLt)))
   
   if (length(years) < 15) {
     myLabs <- 1900:3000
@@ -149,7 +155,7 @@ scens_plot_range <- function(df, vars, years = NULL, scenarios = NULL,
   if (!is.null(ops$legend_wrap)) {
     zz <- zz %>%
       mutate(ScenarioGroup = stringr::str_wrap(
-        StartMonth, 
+        ScenarioGroup, 
         width = ops$legend_wrap
       ))
     
