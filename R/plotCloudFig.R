@@ -217,7 +217,10 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   ggb <- gg + 
     geom_line(size=Medians) + 
     scale_color_manual(
-      name = stringr::str_wrap("Historical and Median Projected Pool Elevation",20),
+      name = stringr::str_wrap(
+        "Historical and Median Projected Pool Elevation", 
+        20
+      ),
       values = plotColors, 
       labels = histLab
     ) +

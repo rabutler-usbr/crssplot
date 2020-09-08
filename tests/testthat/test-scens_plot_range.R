@@ -22,7 +22,11 @@ test_that("scens_plot_range() works", {
     "ggplot_built"
   )
   expect_s3_class(
-    ggplot_build(scens_plot_range(ex_pe, "mead_dec_pe", scenarios = "April ST CT")),
+    ggplot_build(scens_plot_range(
+      ex_pe, 
+      "mead_dec_pe", 
+      scenarios = "April ST CT")
+    ),
     "ggplot_built"
   )
   pc <- c("April ST CT" = "red", "April ST 2007 UCRC" = "black")

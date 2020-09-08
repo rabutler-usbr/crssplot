@@ -1,9 +1,11 @@
 #' @description 
-#' `scen_plot_cloud()` plots the range of results for multiple scenarios. The
+#' `scens_plot_cloud()` plots the range of results for multiple scenarios. The
 #' range is shown as a shaded region (cloud) extending from the 10th to 90th 
 #' percentiles, along with a solid line for the median. Typically 
 #' this is done for only one variable, but multiple variables can be provided 
 #' and will be shown as separate facets. 
+#' 
+#' Additionally, `scens_plot_cloud()` can use the "fill_label" option. 
 #' 
 #' @param historical Data frame of historical data to add to the figure. Must
 #'   have a "Year" column, and the same number of additional columns as the 
@@ -17,7 +19,7 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
                              scenarios = NULL, plot_colors = NULL, 
                              scen_labels = NULL, ...) {
   # check df -------------------------------
-  crssplot:::check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
+  check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
   
   # check historical -----------------------
   if (!is.null(historical)) {
@@ -26,7 +28,7 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
       req_cols <- c(req_cols, vars)
     }
     
-    crssplot:::check_required_columns(historical, req_cols)
+    check_required_columns(historical, req_cols)
     assert_that(
       ncol(historical) == length(vars) + 1, 
       msg = "`historical` should have the same number of columns as the length of `vars` + 1."
@@ -73,17 +75,77 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
     df <- bind_rows(df, historical)
   }
   
-  test_cols <- c("Historical" = "black", "April ST 2007 UCRC" = "red", 
-                 "April ST CT" = "blue")
+  years <- unique(df$Year)
+  
+  # plot options ----------------------------------------------
+  
+  if ("Historical" %in% names(plot_colors)) {
+    plot_colors <- determine_plot_colors(plot_colors, c(scenarios, "Historical"))
+  } else {
+    plot_colors <- determine_plot_colors(plot_colors, scenarios)
+    plot_colors <- c(plot_colors, "Historical" = "black")
+  }
+  
+  ops <- list(...)
+  # these are the plotting options this function can handle
+  exp_ops <- c("y_lab", "title", "caption", "color_label", "legend_wrap", 
+               "facet_scales", "facet_nrow", "facet_ncol", "fill_label",
+               "fill_label")
+  
+  check_options(names(ops), exp_ops)
+ 
+  if (!exists("facet_scales", where = ops)) {
+    ops[["facet_scales"]] <- "fixed"
+  }
+  
+  if (exists("legend_wrap", where = ops)) {
+    tmp_width <- ops[["legend_wrap"]]
+  } else {
+    tmp_width <- 1000
+  }
+  
+  if (!exists("color_label", where = ops)) {
+    ops[["color_label"]] <- stringr::str_wrap(
+      "Historical and median projections",
+      tmp_width
+    )
+  } else {
+    ops[["color_label"]] <- stringr::str_wrap(ops[["color_label"]], tmp_width)
+  }
+  
+  if (!exists("fill_label", where = ops)) {
+    ops[["fill_label"]] <- stringr::str_wrap(
+      "10th to 90th percentile of full range", 
+      tmp_width
+    )
+  } else {
+    ops[["fill_label"]] <- stringr::str_wrap(ops[["fill_label"]], tmp_width)
+  }
+  
+  myLabs <-  get_year_breaks(years)
   
   ggplot(df, aes(Year)) +
-    geom_line(aes(y = middle, color = ScenarioGroup)) +
     geom_ribbon(data = filter(df, ScenarioGroup != "Historical"),
-                aes(ymin = bottom, ymax = top, fill = ScenarioGroup)) +
-    scale_fill_manual(values = test_cols) +
-    scale_color_manual(values = test_cols) +
-    labs(
-      fill = "10th to 90th\npercentile of full\nrange",
-      color = "Historical and\nmedian projected\npool elevation"
-    )
+                aes(ymin = bottom, ymax = top, fill = ScenarioGroup), 
+                    #color = ScenarioGroup),
+                alpha = 0.5, linetype = 2, size = 0.5) +
+    geom_line(aes(y = middle, color = ScenarioGroup), size = 1) +
+    scale_fill_manual(
+      values = plot_colors,
+      guide = guide_legend(title = ops$fill_label),
+      labels = scen_labels
+    ) +
+    scale_color_manual(
+      values = plot_colors,
+      guide = guide_legend(title = ops$color_label),
+      labels = scen_labels
+    ) +
+    labs(y = ops[["y_lab"]]) +
+    scale_x_continuous(
+      breaks = myLabs,
+      minor_breaks = 1900:3000, 
+      labels = myLabs,
+      expand = c(0,0)
+    ) + 
+    scale_y_continuous(labels = scales::comma)
 }
