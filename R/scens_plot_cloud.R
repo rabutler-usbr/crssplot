@@ -104,6 +104,10 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
     tmp_width <- 1000
   }
   
+  # change scenario names, and the plot colors to wrap
+  df$ScenarioGroup <- stringr::str_wrap(df$ScenarioGroup, tmp_width)
+  names(plot_colors) <- stringr::str_wrap(names(plot_colors), tmp_width)
+  
   if (!exists("color_label", where = ops)) {
     ops[["color_label"]] <- stringr::str_wrap(
       "Historical and median projections",
