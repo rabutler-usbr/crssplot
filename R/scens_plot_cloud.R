@@ -89,8 +89,7 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
   ops <- list(...)
   # these are the plotting options this function can handle
   exp_ops <- c("y_lab", "title", "caption", "color_label", "legend_wrap", 
-               "facet_scales", "facet_nrow", "facet_ncol", "fill_label",
-               "fill_label")
+               "facet_scales", "facet_nrow", "facet_ncol", "fill_label")
   
   check_options(names(ops), exp_ops)
  
@@ -128,7 +127,7 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
   
   myLabs <-  get_year_breaks(years)
   
-  ggplot(df, aes(Year)) +
+  gg <- ggplot(df, aes(Year)) +
     geom_ribbon(data = filter(df, ScenarioGroup != "Historical"),
                 aes(ymin = bottom, ymax = top, fill = ScenarioGroup), 
                     #color = ScenarioGroup),
@@ -152,4 +151,12 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
       expand = c(0,0)
     ) + 
     scale_y_continuous(labels = scales::comma)
+  
+  if (length(vars) > 1) {
+    gg <- gg + 
+      facet_wrap(~Variable, scales = ops$facet_scales, nrow = ops$facet_nrow, 
+                 ncol = ops$facet_ncol)
+  }
+  
+  gg
 }
