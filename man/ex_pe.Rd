@@ -26,6 +26,6 @@ ex_pe
 \code{ex_pe} is a data frame (tibble) that includes example data based on Lakes
 Powell and Mead pool elevation for multiple scenarios and metrics. Results
 are from April 2020 CRSS using the stress test hydrology, and were generated
-using \code{\link[RWDataPlyr:rw_scen_aggregate]{RWDataPlyr::rw_scen_aggregate()}}.
+using \code{\link[RWDataPlyr:rdf_aggregate]{RWDataPlyr::rw_scen_aggregate()}}.
 }
 \keyword{datasets}
