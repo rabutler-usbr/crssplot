@@ -1,4 +1,5 @@
 library(crssplot)
+library(dplyr)
 ofile <- "data-raw/sample_figures.pdf"
 
 pdf(ofile, width = 9, height = 6)
@@ -72,8 +73,9 @@ pal <- c(
   "April ST CT" = "#f1c40f"
 )
 
-p1 <- scens_plot_cloud(ex_pe, "mead_dec_pe", historical = h_mead, legend_wrap = 20,
-                 plot_colors = pal, y_lab = "feet", years = 2020:2026) +
+p1 <- scens_plot_cloud(ex_pe, "mead_dec_pe", historical = h_mead, 
+                       legend_wrap = 20,
+                       plot_colors = pal, y_lab = "feet", years = 2020:2026) +
   theme_cloud()
 
 p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"), 
@@ -84,5 +86,32 @@ p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"),
 
 print(p1)
 print(p2)
+
+# vars_plot_probs() -------------------------------------------------
+
+vv <- c("mead_min_lt_1000", "mead_min_lt_1020", "powell_wy_min_lt_3490", 
+        "powell_dec_lt_3525")
+zz <- filter(ex_pe, Variable %in% vv)
+
+gg <- vars_plot_probs(zz, "April ST CT")
+
+v_names <- c("mead_min_lt_1000" = "Mead < 1,000' in Any Month", 
+             "mead_min_lt_1020" = "Mead < 1,020' in Any Month", 
+             "powell_wy_min_lt_3490" = "Powell < 3,490' in Any Month in the WY", 
+             "powell_dec_lt_3525" = "Powell < 3,525' in December")
+
+gg2 <- vars_plot_probs(zz, "April ST CT", years = 2021:2040, 
+                       var_labels = v_names, legend_wrap = 10)
+
+gg3 <- vars_plot_probs(zz, unique(zz$ScenarioGroup))
+
+v_col <- c("red", "black")
+names(v_col) <- vv[1:2]
+gg4 <- vars_plot_probs(zz, "April ST CT", vars = vv[1:2], plot_colors = v_col)
+
+print(gg)
+print(gg2)
+print(gg3)
+print(gg4)
 
 dev.off()

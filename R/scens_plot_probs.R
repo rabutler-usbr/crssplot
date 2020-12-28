@@ -1,10 +1,17 @@
 
-#' Plot scenario comparison figures
+#' Plot scenario and variable comparison figures
+#' 
+#' @description 
+#' Plotting functions that are designed to largely compare across scenarios 
+#' are the `scens_plot_*()` family, while those designed to compare across 
+#' variables are the `vars_plot_*()` family. However, both families will facet
+#' across the other dimention, e.g., `scens_plot_*()` will facet by variable.
 #' 
 #' `scens_plot_probs()` plots probability plots, i.e., the chance of a variable
 #' occurring. Different `scenarios` are shown as different colors, and if there
 #' are different variables (`vars`) they are shown as different facets. 
 #' 
+#' @details 
 #' `...` is used to pass additional options to ggplot functions. The following
 #' are used: 
 #' 
@@ -27,13 +34,16 @@
 #' @param df Data frame. Must have "Year", "Variable", "ScenarioGroup", and 
 #'   "Value" columns.
 #'   
-#' @param vars Character vector specifying the variable(s) to use.
+#' @param vars Character vector specifying the variable(s) to use (found in 
+#'   `df$Variable`). If `NULL`, use all variables in `df`. Must be specified in 
+#'   `scens_plot_*()` family.
 #' 
 #' @param years Numeric vector specifying the years to show. If `NULL`, use all
 #'   years in `df`.
 #'   
 #' @param scenarios Character vector specifying the scenarios to use (found in
-#' `df$ScenarioGroup`). If `NULL`, use all scenarios in `df`.
+#'   `df$ScenarioGroup`). If `NULL`, use all scenarios in `df`. Must be 
+#'   specified in `vars_plot_*()` family.
 #' 
 #' @param plot_colors Named character vector to set custom plot colors. Names
 #'   should match scenarios found in `df$ScenarioGroup`. 
@@ -99,11 +109,14 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
   if (!exists("facet_scales", where = ops)) {
     ops[["facet_scales"]] <- "fixed"
   }
+  if (!exists("y_lab", where = ops)) {
+    ops[["y_lab"]] <- "Percent of Traces"
+  }
   
   if (!is.null(ops$legend_wrap)) {
-    zz <- zz %>%
+    df <- df %>%
       mutate(ScenarioGroup = stringr::str_wrap(
-        StartMonth, 
+        ScenarioGroup, 
         width = ops$legend_wrap
       ))
     
