@@ -1,7 +1,14 @@
 #' @description 
 #' `vars_plot_probs()` plots the probabilities for multiple variables on a a 
 #' single plot. Different `vars` are shown as different colors, and if there are 
-#' multiple `scenarios` they are shown as different facets.
+#' multiple `scenarios` they are shown as different facets. The variables' 
+#' probabilities can be shown as lines (`plot_type = "line"`) or as stacked bars
+#' (`plot_type = "stacked bar"`). For stacked bars, care should be taken by user
+#' to ensure summing probabilities makes sense.
+#' 
+#' @param plot_type For `vars_plot_probs()`, should the plot use lines 
+#'   (`'line'`), or stacked bars (`'stacked bar'`). Can also use `1` or `2`, 
+#'   respectively.
 #' 
 #' @examples 
 #' vv <- c("mead_min_lt_1000", "mead_min_lt_1020", "powell_wy_min_lt_3490", 
@@ -12,7 +19,8 @@
 #' @rdname scens_plot_
 #' @export
 vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL, 
-                            plot_colors = NULL, var_labels = NULL, ...) {
+                            plot_colors = NULL, var_labels = NULL, 
+                            plot_type = "line", ...) {
   # check df -------------------------------
   check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
   
@@ -31,6 +39,17 @@ vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL,
     df <- filter(df, Year %in% years)
   } else {
     years <- unique(df$Year)
+  }
+  
+  # check plot type ---------------------------------
+  plot_types <- c("line", "stacked bar")
+  if (is.character(plot_type)) {
+    plot_type <- match.arg(plot_type, plot_types)
+  } else if (is.numeric(plot_type)) {
+    assert_that(plot_type %in% 1:2)
+    plot_type <- plot_types[plot_type]
+  } else {
+    stop("`plot_type` is an invalid type.")
   }
   
   df <- df %>%
@@ -83,11 +102,26 @@ vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL,
   # plot --------------------------------------------
   yL <- c(0, 1)
   
-  gg <- ggplot(
-    df, 
-    aes(Year, Value, color = Variable)
-  ) +
-    geom_line(size = 1) + 
+  if (plot_type == "line") {
+    gg <- ggplot(df, aes(Year, Value, color = Variable)) +
+      geom_line(size = 1) +
+      scale_color_manual(
+        values = plot_colors, 
+        guide = guide_legend(title = ops$color_label),
+        labels = var_labels
+      )
+  } else {
+    # stacked barplot
+    gg <- ggplot(df, aes(Year, Value, fill = Variable)) +
+      geom_bar(stat = 'identity') +
+      scale_fill_manual(
+        values = plot_colors, 
+        guide = guide_legend(title = ops$color_label),
+        labels = var_labels
+      )
+  }
+  
+  gg <- gg + 
     scale_x_continuous(
       breaks = myLabs,
       minor_breaks = 1900:3000, 
@@ -99,12 +133,7 @@ vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL,
       breaks = seq(yL[1], yL[2], 0.10),
       labels = scales::percent_format(accuracy = 1)
     ) +
-    labs(y = ops$y_lab, title = ops$title, caption = ops$caption) +
-    scale_color_manual(
-      values = plot_colors, 
-      guide = guide_legend(title = ops$color_label),
-      labels = var_labels
-    ) +
+    labs(y = ops$y_lab, title = ops$title, caption = ops$caption) + 
     theme_crss()
   
   if (length(scenarios) > 1) {

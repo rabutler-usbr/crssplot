@@ -46,6 +46,7 @@ vars_plot_probs(
   vars = NULL,
   plot_colors = NULL,
   var_labels = NULL,
+  plot_type = "line",
   ...
 )
 }
@@ -78,6 +79,10 @@ scenarios. Used to show legend labels that are different from values found
 in \code{df$ScenarioGroup}.}
 
 \item{...}{Parameters passed to other functions. See details.}
+
+\item{plot_type}{For \code{vars_plot_probs()}, should the plot use lines
+(\code{'line'}), or stacked bars (\code{'stacked bar'}). Can also use \code{1} or \code{2},
+respectively.}
 }
 \value{
 \code{gg} object.
@@ -107,7 +112,10 @@ and will be shown as separate facets.
 
 \code{vars_plot_probs()} plots the probabilities for multiple variables on a a
 single plot. Different \code{vars} are shown as different colors, and if there are
-multiple \code{scenarios} they are shown as different facets.
+multiple \code{scenarios} they are shown as different facets. The variables'
+probabilities can be shown as lines (\code{plot_type = "line"}) or as stacked bars
+(\code{plot_type = "stacked bar"}). For stacked bars, care should be taken by user
+to ensure summing probabilities makes sense.
 }
 \details{
 \code{...} is used to pass additional options to ggplot functions. The following

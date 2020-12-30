@@ -87,7 +87,7 @@ p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"),
 print(p1)
 print(p2)
 
-# vars_plot_probs() -------------------------------------------------
+# vars_plot_probs() line -------------------------------------------------
 
 vv <- c("mead_min_lt_1000", "mead_min_lt_1020", "powell_wy_min_lt_3490", 
         "powell_dec_lt_3525")
@@ -113,5 +113,43 @@ print(gg)
 print(gg2)
 print(gg3)
 print(gg4)
+
+# vars_plot_probs() bar -------------------------------------------------
+
+zz <- filter(ex_pe, Variable == "mead_dec_pe") %>%
+  mutate(Shortage = case_when(
+    Value <= 1075 & Value > 1050 ~ 1,
+    Value <= 1050 & Value > 1025 ~ 2, 
+    Value <= 1025 ~ 3,
+    TRUE ~ 0
+  )) %>%
+  mutate(
+    Short1 = if_else(Shortage == 1, 1, 0),
+    Short2 = if_else(Shortage == 2, 1, 0),
+    Short3 = if_else(Shortage == 3, 1, 0)
+  ) %>%
+  select(-Variable, -Value, -Shortage) %>%
+  tidyr::pivot_longer(c("Short1", "Short2", "Short3"), names_to = "Variable",
+                      values_to = "Value")
+
+gg <- vars_plot_probs(zz, scenarios = "April ST CT", plot_type = "stacked bar")
+gg2 <- vars_plot_probs(
+  zz, 
+  scenarios = c("April ST CT", "April ST 2007 UCRC"), 
+  plot_type = "stacked bar"
+)
+
+vname <- c("Short1" = "Shortage 1", "Short2" = "Shortage 2", 
+           "Short3" = "Shortage 3")
+
+vcol <- c("Short1" = "grey80", "Short2" = "grey50", 
+           "Short3" = "grey20")
+
+gg3 <- vars_plot_probs(zz, scenarios = "April ST CT", plot_type = 2, 
+                       var_labels = vname, plot_colors = vcol)
+
+print(gg)
+print(gg2)
+print(gg3)
 
 dev.off()
