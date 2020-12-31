@@ -152,4 +152,35 @@ print(gg)
 print(gg2)
 print(gg3)
 
+# vars_plot_heatmap() -------------------------------------------
+
+gg <- vars_plot_heatmap(zz, scenarios = "April ST CT")
+gg2 <- vars_plot_heatmap(zz, scenarios = "April ST CT", 
+                         vars = c("Short2", "Short1", "Short3"))
+gg3 <- vars_plot_heatmap(
+  zz, 
+  scenarios = unique(zz$ScenarioGroup), 
+  years = 2020:2026, 
+  y_lab = "shortage", 
+  var_labels = vname,
+  title = "ok", subtitle = "then", caption = "here and now", color_label = "prct"
+)
+vnames <- c(
+  "Short1" = "a really really reallly really really reallyl long label", 
+  "Short2" = "b", "Short3" = "c"
+)
+
+gg4 <- vars_plot_heatmap(
+  zz, 
+  scenarios = "April ST CT", 
+  var_labels = vnames, 
+  legend_wrap = 15, 
+  vars = c("Short2", "Short1", "Short3")
+)
+
+print(gg)
+print(gg2)
+print(gg3)
+print(gg4)
+
 dev.off()

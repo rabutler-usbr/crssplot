@@ -36,7 +36,8 @@
 #'   
 #' @param vars Character vector specifying the variable(s) to use (found in 
 #'   `df$Variable`). If `NULL`, use all variables in `df`. Must be specified in 
-#'   `scens_plot_*()` family.
+#'   `scens_plot_*()` family. For `vars_plot_heatmap()`, the order that `vars`
+#'   are provided will be used to order the heatmap from top to bottom.
 #' 
 #' @param years Numeric vector specifying the years to show. If `NULL`, use all
 #'   years in `df`.

@@ -16,6 +16,14 @@
 #' 
 #' gg <- vars_plot_probs(ex_pe, "April ST CT", vars = vv)
 #' 
+#' # it does not make sense to stack bars for these 4 variables, but you can:
+#' gg <- vars_plot_probs(
+#'   ex_pe, 
+#'   "April ST CT", 
+#'   vars = vv, 
+#'   plot_type = "stacked bar"
+#' )
+#' 
 #' @rdname scens_plot_
 #' @export
 vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL, 
