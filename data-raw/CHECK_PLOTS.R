@@ -87,6 +87,41 @@ p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"),
 print(p1)
 print(p2)
 
+# scens_plot_boxplot() ---------------------------------------------------
+gg <- scens_plot_boxplot(ex_pe, vars = "powell_dec_pe")
+
+tst_names <- c(
+  "April ST 2007 UCRC" = "2007 Demands", "April ST CT" = "Current Trend Demands"
+)
+
+gg2 <- scens_plot_boxplot(
+  ex_pe, 
+  vars = c("powell_dec_pe", "mead_dec_pe"), 
+  years = 2021:2036,
+  title = "Mead and Powell", subtitle = "End-of-December Elevation",
+  y_lab = "(feet)", caption = "Results from April 20xx",
+  facet_scales = "free_y", 
+  plot_colors = pal,
+  scen_labels = tst_names,
+  legend_wrap = 10
+)
+
+gg3 <- scens_plot_boxplot(
+  ex_pe, 
+  vars = c("powell_dec_pe", "mead_dec_pe"), 
+  title = "Mead and Powell", subtitle = "End-of-December Elevation",
+  y_lab = "(feet)", caption = "Results from April 20xx",
+  facet_scales = "free_y", 
+  plot_colors = pal,
+  scen_labels = tst_names,
+  legend_wrap = 10,
+  facet_nrow = 2
+)
+
+print(gg)
+print(gg2)
+print(gg3)
+
 # vars_plot_probs() line -------------------------------------------------
 
 vv <- c("mead_min_lt_1000", "mead_min_lt_1020", "powell_wy_min_lt_3490", 
