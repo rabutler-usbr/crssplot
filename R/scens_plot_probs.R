@@ -102,7 +102,7 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
   ops <- list(...)
   # these are the plotting options this function can handle
   exp_ops <- c("y_lab", "title", "caption", "color_label", "legend_wrap", 
-               "facet_scales", "facet_nrow", "facet_ncol")
+               "facet_scales", "facet_nrow", "facet_ncol", "subtitle")
   
   check_options(names(ops), exp_ops)
   if (!exists("color_label", where = ops)) {
@@ -141,7 +141,8 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
       labels = myLabs
     ) + 
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-    labs(y = ops$y_lab, title = ops$title, caption = ops$caption) +
+    labs(y = ops$y_lab, title = ops$title, caption = ops$caption, 
+         subtitle = ops$subtitle) +
     scale_color_manual(
       values = plot_colors, 
       guide = guide_legend(title = ops$color_label),
