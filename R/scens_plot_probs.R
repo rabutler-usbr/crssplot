@@ -15,8 +15,9 @@
 #' `...` is used to pass additional options to ggplot functions. The following
 #' are used: 
 #' 
-#' - "title", and "caption" are passed to [ggplot2::labs()]. "color_label" and 
-#' "y_lab" are also passed using `color` and `y` parameters, respectively.
+#' - "title", "subtitle", and "caption" are passed to [ggplot2::labs()]. 
+#' "color_label" and "y_lab" are also passed using `color` and `y` parameters, 
+#' respectively.
 #' - "legend_wrap" is used to modify labels in legends etc. by calling 
 #' [stringr::str_wrap()] on the appropriate variable, with 
 #' `width = legend_wrap`.

@@ -1,4 +1,43 @@
 
+#' @description 
+#' `var_plot_trace_scatter()` creates a trace number vs. value scatter plot for
+#' a single year and variable. If multiple `scenarios` are specified the 
+#' scenarios are shown as different facets. 
+#' 
+#' @param color_by For `var_plot_trace_scatter()`, the points can be colored 
+#'   based on a specified column in the `df`. This should be specified as a 
+#'   string, and should exist in `df`. 
+#'   
+#' @examples 
+#' # scatter plot for Mead elevation in Dec. 2021
+#' var_plot_trace_scatter(
+#'   ex_pe, 
+#'   vars = "mead_dec_pe", 
+#'   years = 2021, 
+#'   scenarios = "April ST CT"
+#' )
+#' 
+#' # add in a new variable to be used to color the points:
+#' zz <- mutate(ex_pe, color_cat = case_when(
+#'   Value > 1095 ~ "No concern",
+#'   Value > 1076 ~ "Some concern",
+#'   Value > 1074 ~ "Moderate concern",
+#'   TRUE ~ "concern")
+#' )
+#' 
+#' cc <- c("No concern" = "grey20", "Some concern" = "blue", 
+#'         "Moderate concern" = "steelblue", "concern" = "red")
+#' 
+#' # color by the new variable, and show two scenarios:
+#' gg <- var_plot_trace_scatter(
+#'   zz, 
+#'   vars = "mead_dec_pe", 
+#'   years = 2021, 
+#'   scenarios = c("April ST CT", "April ST 2007 UCRC"), 
+#'   color_by = "color_cat"
+#' )
+#' 
+#' @rdname scens_plot_
 #' @export
 var_plot_trace_scatter <- function(df, scenarios,  years, vars, color_by = NULL,
                                    plot_colors = NULL, ...) {

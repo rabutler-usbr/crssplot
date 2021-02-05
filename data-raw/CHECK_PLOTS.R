@@ -184,7 +184,12 @@ print(gg3)
 print(gg4)
 
 # var_plot_trace_scatter ----------------------------------
-var_plot_trace_scatter(ex_pe, vars = "mead_dec_pe", years = 2021, scenarios = "April ST CT")
+var_plot_trace_scatter(
+  ex_pe, 
+  vars = "mead_dec_pe", 
+  years = 2021, 
+  scenarios = "April ST CT"
+)
 
 zz <- mutate(ex_pe, color_cat = case_when(
   Value > 1095 ~ "No concern",
