@@ -32,6 +32,7 @@ Imports:
     gridExtra,
     imager,
     magick,
+    patchwork,
     purrr,
     readxl,
     rlang,
