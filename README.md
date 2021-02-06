@@ -49,6 +49,7 @@ truncated/sample set of them.
 
 ``` r
 library(crssplot)
+library(ggplot2)
 library(patchwork)
 # ex_pe is sample data frame that comes from RWDataPlyr and running the 
 # automated process above
@@ -65,12 +66,14 @@ p1 <- scens_plot_probs(
   ex_pe, years = 2021:2026,
   vars = "powell_wy_min_lt_3525", 
   subtitle = "Percent of traces less than elevation 3,525' in any water year"
-)
+) +
+  expand_limits(y = c(0, 1))
 p2 <- scens_plot_probs(
   ex_pe, years = 2021:2026,
   vars = "powell_wy_min_lt_3490", 
   subtitle = "Percent of traces less than elevation 3,490' in any water year"
-)
+) +
+  expand_limits(y = c(0, 1))
 
 p1 + p2 +
   plot_layout(guides = "collect")
