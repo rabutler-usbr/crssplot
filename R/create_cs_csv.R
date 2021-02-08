@@ -9,7 +9,7 @@ create_cs_csv <- function(cs, scenario, o_folders, ui)
   cs_out <- cs %>%
     dplyr::filter(
       Year %in% yrs2show, 
-      AggName == scenario, 
+      ScenarioGroup == scenario, 
       Variable != 'lbSurplus'
     ) %>%
     # compute the percent of traces by averaging values 

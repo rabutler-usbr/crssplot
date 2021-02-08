@@ -9,7 +9,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   critStatsFig1 <- plotCritStats(
     dplyr::filter(
       cs, 
-      AggName == scenario, 
+      ScenarioGroup == scenario, 
       !(Variable %in% c('mead_min_lt_1020','lbSurplus'))
     ), 
     yrs2show, 
@@ -18,7 +18,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   
   critStatsFig2 <- plotCritStats(dplyr::filter(
     cs, 
-    AggName == scenario, 
+    ScenarioGroup == scenario, 
     !(Variable %in% c('mead_dec_lt_1025','lbSurplus'))
   ), 
   yrs2show, 
@@ -31,7 +31,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
     dplyr::filter(
       sys_cond, 
       Variable %in% c('lbShortage', 'lbSurplus'),
-      Agg == scenario
+      ScenarioGroup == scenario
     ), 
     yrs2show, 
     scenario
@@ -43,7 +43,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
     dplyr::filter(
       sys_cond, 
       Variable %in% c('lbShortageStep1','lbShortageStep2','lbShortageStep3'),
-      Agg == scenario
+      ScenarioGroup == scenario
     ), 
     yrs2show, 
     ann_txt

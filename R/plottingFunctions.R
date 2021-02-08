@@ -3,10 +3,10 @@
 #' 
 #' `plotEOCYElev()` computes and then plots the 10, 50, and 90 percentiles for 
 #' the specified variable (`var`). Plots for different scenarios, denoted by 
-#' `StartMonth` column; all unique values in the StartMonth column are included
+#' `ScenarioGroup` column; all unique values in the ScenarioGroup column are included
 #' in the plot.
 #' 
-#' @param zz Data frame. Must have Year, Variable, StartMonth, and Value 
+#' @param zz Data frame. Must have Year, Variable, ScenarioGroup, and Value 
 #'   columns.
 #'   
 #' @param yrs Years to show in plot. `zz` is filtered to only contain these
@@ -19,10 +19,10 @@
 #' @param legendTitle Color legend title.
 #' 
 #' @param legendWrap Maximum number of character per line in color legend. 
-#'   StartMonth will be wrapped based on this value, if it is not `NULL`.
+#'   ScenarioGroup will be wrapped based on this value, if it is not `NULL`.
 #'   
 #' @param plot_colors Optional named vectors. If specified, names must match 
-#'   unique StartMonth values and can be used to set specific colors for each
+#'   unique ScenarioGroup values and can be used to set specific colors for each
 #'   scenario. If not used, default ggplot2 colors are used. 
 #'   
 #' @return `gg` object.
@@ -34,12 +34,12 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
   zz <- zz %>%
     dplyr::filter(Year %in% yrs, Variable == var) %>%
     # compute the 10/50/90 and aggregate by start month
-    dplyr::group_by(StartMonth, Year, Variable) %>%
+    dplyr::group_by(ScenarioGroup, Year, Variable) %>%
     dplyr::summarise('50th' = median(Value), '10th' = stats::quantile(Value, .1), 
                      '90th' = stats::quantile(Value, .9)) %>%
     ungroup() %>%
     select(-Variable) %>%
-    tidyr::gather(Percentile, Value, -StartMonth, -Year)
+    tidyr::gather(Percentile, Value, -ScenarioGroup, -Year)
   
   # ploting values
   qLt <- c(3,1,2)
@@ -52,19 +52,19 @@ plotEOCYElev <- function(zz, yrs, var, myTitle, legendTitle, legendWrap = NULL,
   }
   
   # determine colors
-  plot_colors <- determine_plot_colors(plot_colors, unique(zz$StartMonth))
+  plot_colors <- determine_plot_colors(plot_colors, unique(zz$ScenarioGroup))
   
   # wrap legend lables, if specified
   if (!is.null(legendWrap)) {
     zz <- zz %>%
-      mutate(StartMonth = stringr::str_wrap(StartMonth, width = legendWrap))
+      mutate(ScenarioGroup = stringr::str_wrap(ScenarioGroup, width = legendWrap))
     
     # also update the plot color names
     names(plot_colors) <- stringr::str_wrap(names(plot_colors), width = legendWrap)
   }
   
   # plot
-  gg <- ggplot(zz, aes(Year,Value, color = StartMonth, linetype = Percentile))
+  gg <- ggplot(zz, aes(Year,Value, color = ScenarioGroup, linetype = Percentile))
   gg <- gg + geom_line(size = 1) + 
     scale_x_continuous(minor_breaks = 1990:3000, breaks = myLabs,
                        labels = myLabs) + 
@@ -173,7 +173,7 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL,
 #' `compare_crit_stats()` compares the probability that a single event 
 #' (variable) occurs/does not occur for multiple scenarios. 
 #' 
-#' @param zz Data frame. Must have Year, Variable, AggName, and Value columns.
+#' @param zz Data frame. Must have Year, Variable, ScenarioGroup, and Value columns.
 #' 
 #' @param yrs Years to show in plot. `zz` is filtered to only contain these
 #'   years.
@@ -195,10 +195,10 @@ singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL,
 #' @param annSize Text size for `annText`.
 #' 
 #' @param legendWrap Maximum number of character per line in color legend. 
-#'   StartMonth will be wrapped based on this value, if it is not `NULL`.
+#'   ScenarioGroup will be wrapped based on this value, if it is not `NULL`.
 #'   
 #' @param plot_colors Optional named vectors. If specified, names must match 
-#'   unique StartMonth values and can be used to set specific colors for each
+#'   unique ScenarioGroup values and can be used to set specific colors for each
 #'   scenario. If not used, default ggplot2 colors are used. 
 #'   
 #' @return `gg` object.
@@ -220,23 +220,23 @@ compare_crit_stats <- function(zz, yrs, variable, annText, plotTitle,
   
   zz <- zz %>%
     dplyr::filter(Year %in% yrs, Variable == variable) %>%
-    dplyr::group_by(Year, AggName) %>%
+    dplyr::group_by(Year, ScenarioGroup) %>%
     dplyr::summarise(Value = mean(Value))
   
   # determine plotting colors
-  plot_colors <- determine_plot_colors(plot_colors, unique(zz$AggName))
+  plot_colors <- determine_plot_colors(plot_colors, unique(zz$ScenarioGroup))
   
   if (!is.null(legendWrap)) {
-    aggsN <- as.character(as.factor(zz$AggName))
+    aggsN <- as.character(as.factor(zz$ScenarioGroup))
     aggs <- stringr::str_wrap(aggsN, width = legendWrap)
     names(aggs) <- aggsN
     zz <- zz %>%
-      dplyr::mutate(AggName = aggs[AggName])
+      dplyr::mutate(ScenarioGroup = aggs[ScenarioGroup])
     
     names(plot_colors) <- stringr::str_wrap(names(plot_colors), width = legendWrap)
   }
   
-  ggplot(zz, aes(Year, Value, color = AggName)) +
+  ggplot(zz, aes(Year, Value, color = ScenarioGroup)) +
     geom_line(size = 1) + 
     coord_cartesian(ylim = yL) +
     scale_x_continuous(
@@ -548,8 +548,8 @@ create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
   i1 <- iData %>%
     filter(Year %in% yrs) %>%
     filter(Variable %in% c('lbShortage', 'powell_wy_min_lt_3490'), 
-           Agg %in% names(scenNames)) %>%
-    mutate(ScenName = scenNames[Agg]) %>%
+           ScenarioGroup %in% names(scenNames)) %>%
+    mutate(ScenName = scenNames[ScenarioGroup]) %>%
     group_by(Year, Variable, ScenName) %>%
     # multiply by 100 to display as percent instead of decimal
     dplyr::summarise(PrctTraces = mean(Value)*100) 
@@ -689,7 +689,7 @@ create_mead_pe_scatter <- function(ui, o_files, traceMap)
       
       if (tmp_model == "CRSS") {
         pe <- feather::read_feather(o_files$cur_month_pe_file) %>%
-          filter(Agg == names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
+          filter(ScenarioGroup == names(ui[["ind_plots"]][["mead_pe_scatter"]])[i])
         
       } else if (tmp_model == "MTOM") {
         

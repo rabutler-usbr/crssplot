@@ -14,7 +14,7 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
       heat_title <- ui[["plot_group"]][[i]][["heat"]][["title"]]
       
       m_heat <- mead_system_condition_heatmap(
-        filter(z1, Agg %in% scen_names), 
+        filter(z1, ScenarioGroup %in% scen_names), 
         ui[["plot_group"]][[i]][["heat"]],
         my_title = paste("Lake Mead Conditions from", heat_title)
       )
@@ -29,7 +29,7 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
       message("   ... saved ", m_file)
       
       p_heat <- powell_system_condition_heatmap(
-        filter(z2, Agg %in% scen_names),
+        filter(z2, ScenarioGroup %in% scen_names),
         ui[["plot_group"]][[i]][["heat"]],
         my_title = paste("Lake Powell Conditions from", heat_title)
       )
@@ -69,13 +69,13 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
   zz <- dcp %>%
     ungroup() %>%
     filter(Year %in% yrs) %>%
-    mutate(Agg = scen_rename[Agg]) %>%
+    mutate(ScenarioGroup = scen_rename[ScenarioGroup]) %>%
     tidyr::spread(Variable, Value) %>%
     mutate(
       n2 = normal_no_recovery + normal_recovery,
       s1_and_2 = dcp2 + dcp3 + dcp4 + dcp5 + dcp6 + dcp7
     ) %>%
-    tidyr::gather(Variable, Value, -Year, -Agg) %>%
+    tidyr::gather(Variable, Value, -Year, -ScenarioGroup) %>%
     filter(Variable %in% c("surplus", "n2", "dcp1", "s1_and_2", "dcp8")) %>%
     mutate(Value = if_else(Value == 0, NA_real_, Value * 100)) %>%
     mutate(
@@ -84,7 +84,7 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       val_lab = if_else(val_lab == "0%", "<1%", val_lab)
     ) %>%
     mutate(
-      Agg = stringr::str_wrap(Agg, width = 10), 
+      ScenarioGroup = stringr::str_wrap(ScenarioGroup, width = 10), 
       Variable = factor(
         stringr::str_wrap(tier_names[Variable], y_wrap), 
         levels = rev(stringr::str_wrap(tier_names, y_wrap))
@@ -117,16 +117,16 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     ungroup() %>%
     select(-Month) %>%
     filter(Year %in% yrs) %>%
-    mutate(Agg = scen_rename[Agg]) %>%
+    mutate(ScenarioGroup = scen_rename[ScenarioGroup]) %>%
     tidyr::spread(Variable, Value) %>%
     mutate(
       ueb = uebGt823 + ueb823 + uebLt823,
       mer = mer823 + mer748,
       leb = lebGt823 + leb823 + lebLt823
     ) %>%
-    tidyr::gather(Variable, Value, -Year, -Agg, -TraceNumber, -Scenario) %>%
+    tidyr::gather(Variable, Value, -Year, -ScenarioGroup, -TraceNumber, -Scenario) %>%
     filter(Variable %in% c("eq", "ueb", "mer", "leb")) %>%
-    group_by(Year, Agg, Variable) %>%
+    group_by(Year, ScenarioGroup, Variable) %>%
     summarise(Value = mean(Value)) %>%
     ungroup() %>%
     mutate(Value = if_else(Value == 0, NA_real_, Value * 100)) %>%
@@ -136,7 +136,7 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       val_lab = if_else(val_lab == "0%", "<1%", val_lab)
     ) %>%
     mutate(
-      Agg = stringr::str_wrap(Agg, width = 10), 
+      ScenarioGroup = stringr::str_wrap(ScenarioGroup, width = 10), 
       Variable = factor(
         stringr::str_wrap(tier_names[Variable], y_wrap), 
         levels = rev(stringr::str_wrap(tier_names, y_wrap))
@@ -256,7 +256,7 @@ system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
   zz %>%
     ggplot(aes(as.factor(Year), Variable, fill = Value)) +
     facet_wrap(
-      ~Agg, 
+      ~ScenarioGroup, 
       nrow = 1, 
       strip.position = "top", 
       labeller = label_wrap_gen()

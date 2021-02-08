@@ -36,9 +36,9 @@ getScenarioData <- function(scens,
     message('adding attribute...')
     
     if(aggFunction == 'aggFromScenList'){
-      zz <- dplyr::mutate(zz, Agg = eval(call(aggFunction, Scenario, scens)))
+      zz <- dplyr::mutate(zz, ScenarioGroup = eval(call(aggFunction, Scenario, scens)))
     } else{
-      zz <- dplyr::mutate(zz, Agg = eval(call(aggFunction, Scenario)))
+      zz <- dplyr::mutate(zz, ScenarioGroup = eval(call(aggFunction, Scenario)))
     }
     
     message('writing file...')

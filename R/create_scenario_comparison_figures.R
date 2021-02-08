@@ -18,10 +18,10 @@ create_scenario_comparison_figures <- function(pe, cs, ui, o_files)
       peYrs <- c(yrs2show[1] - 1, yrs2show)
       
       tmp_pe <- pe %>%
-        filter(StartMonth %in% cur_pg[["plot_scenarios"]])
+        filter(ScenarioGroup %in% cur_pg[["plot_scenarios"]])
       
       tmp_cs <- cs %>%
-        filter(AggName %in% cur_pg[["plot_scenarios"]])
+        filter(ScenarioGroup %in% cur_pg[["plot_scenarios"]])
       
       # 10/50/90 ----------------------
       message("    ... 10/50/90s")

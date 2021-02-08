@@ -113,9 +113,9 @@ getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth,
     # add same agg attribute
     if(addAggAttribute){      
       if(aggFunction == 'aggFromScenList'){
-        ic <- dplyr::mutate(ic, Agg = eval(call(aggFunction, Scenario, scens)))
+        ic <- dplyr::mutate(ic, ScenarioGroup = eval(call(aggFunction, Scenario, scens)))
       } else{
-        ic <- dplyr::mutate(ic, Agg = eval(call(aggFunction, Scenario)))
+        ic <- dplyr::mutate(ic, ScenarioGroup = eval(call(aggFunction, Scenario)))
       }
     }
     

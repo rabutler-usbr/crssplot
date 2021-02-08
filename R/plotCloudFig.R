@@ -6,7 +6,7 @@
 #' to only work for Powell and Mead elevation. Function adds in reclamation 
 #' object.
 #' 
-#' @param zz Data frame. Must have StartMonth, Year, Variable, and Value 
+#' @param zz Data frame. Must have ScenarioGroup, Year, Variable, and Value 
 #'   columns.
 #'   
 #' @param yrs Years to show in the plot. If any exist before the min in `zz`, 
@@ -38,9 +38,9 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   legendWrap <- ui$defaults$legend_wrap
   
   zz <- zz %>%
-    dplyr::filter(StartMonth %in% scenario, Year %in% yrs, Variable == var) %>%
+    dplyr::filter(ScenarioGroup %in% scenario, Year %in% yrs, Variable == var) %>%
     # compute the 10/50/90 and aggregate by start month
-    dplyr::group_by(StartMonth, Year, Variable) %>%
+    dplyr::group_by(ScenarioGroup, Year, Variable) %>%
     dplyr::summarise('Med' = median(Value), 'Min' = stats::quantile(Value, .1), 
                      'Max' = stats::quantile(Value, .9)) 
   
@@ -63,7 +63,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
     EQLine <- as.data.frame(utils::read.csv(
       system.file('extdata/EQLine.csv', package = "crssplot")
     ))
-    EQLine$StartMonth <- 'Historical Elevation'
+    EQLine$ScenarioGroup <- 'Historical Elevation'
     
     ##IGProj <- read.csv('C:/RCodes/Process-CRSS-Res-TribalWaterStudy/data/IGMedProjections_Powell.csv')
     ##IGProj$Variable <- 'Powell.Pool Elevation'
@@ -81,29 +81,29 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   }
   
   # Formatting data frame to match zz
-  hist$StartMonth <- 'Historical Elevation'
+  hist$ScenarioGroup <- 'Historical Elevation'
   hist$Med <- hist$Min <- hist$Max <- hist$EOCYPE
   hist <- within(hist, rm(EOCYPE))
-  hist <- hist[c("StartMonth","Year","Variable","Med","Min","Max")]
+  hist <- hist[c("ScenarioGroup","Year","Variable","Med","Min","Max")]
   
   # Formatting Interim Guidelines data frame to match zz
-  ##IGProj$StartMonth <- 'Median Interim Guidelines FEIS'
+  ##IGProj$ScenarioGroup <- 'Median Interim Guidelines FEIS'
   ##IGProj$Med <- IGProj$Min <- IGProj$Max <- IGProj$EOCYPE
   ##IGProj <- within(IGProj, rm(EOCYPE))
-  ##IGProj <- IGProj[c("StartMonth","Year","Variable","Med","Min","Max")]
+  ##IGProj <- IGProj[c("ScenarioGroup","Year","Variable","Med","Min","Max")]
   
   # Getting all scenarios passed to fxn
-  addIC <- unique(zz$StartMonth)
+  addIC <- unique(zz$ScenarioGroup)
   
   # Appending last historical year pool elevation for each scenario
   # Must figure out the last year of model projections, and then select the
   # historical year before that
   for (tmp_scen in addIC) {
-    first_mod_year <- min(filter(zz, StartMonth == tmp_scen)$Year)
+    first_mod_year <- min(filter(zz, ScenarioGroup == tmp_scen)$Year)
     tmp_hist <- hist %>%
       filter(Year == first_mod_year - 1) %>%
       # add in the Scenario name
-      mutate(StartMonth = tmp_scen)
+      mutate(ScenarioGroup = tmp_scen)
     zz <- bind_rows(zz, tmp_hist)
   }
   
@@ -115,7 +115,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   # setup colors --------------
   # # Setting colors for graph- ensures historical data is black on plot
   # historical_color <- "#000000"
-  # colorNames <- unique(zz$StartMonth)
+  # colorNames <- unique(zz$ScenarioGroup)
   # #DCP colors (to match AZ Big Bang slides)"#54FF9F","#F4A460"
   # #Grey for Interim Guidelines Projections (if included) #8B8682. Add to end.
   # #plotColors <- c("#000000","#F8766D", "#00BFC4") #Conor's reverted colors
@@ -125,7 +125,7 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   plotColors <- get_cloud_colors(ui, pg_i)
   
   # Adding factors so ggplot does not alphebetize legend
-  zz$StartMonth = factor(zz$StartMonth, levels = names(plotColors))
+  zz$ScenarioGroup = factor(zz$ScenarioGroup, levels = names(plotColors))
   
   # labels ---------------
   # Generating labels for the lines in ggplot
@@ -181,15 +181,15 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
   LegendHeight = 2.5
   
   # Start making the plot
-  gg <- ggplot(zz, aes(x=Year, y=Med, color=StartMonth, group=StartMonth)) +
+  gg <- ggplot(zz, aes(x=Year, y=Med, color=ScenarioGroup, group=ScenarioGroup)) +
     theme_light()
   
   # Generate plot a to make ribbon legend
   name <- stringr::str_wrap("10th to 90th percentile of full range",20)
   gga <- gg + 
     geom_ribbon(
-      data = subset(zz,StartMonth %in% rev(addIC)),
-      aes(ymin=Min, ymax=Max, fill = StartMonth), 
+      data = subset(zz,ScenarioGroup %in% rev(addIC)),
+      aes(ymin=Min, ymax=Max, fill = ScenarioGroup), 
       alpha = 0.5, linetype = 2, size = 0.5*Medians
     ) +
     scale_fill_manual(
@@ -259,14 +259,14 @@ plotCloudFigs <- function(zz, yrs, var, myTitle, ui, pg_i)
       limits = c(yaxmin, yaxmax)
     ) +
     geom_ribbon(
-      data = subset(zz,StartMonth %in% addIC),
-      aes(ymin = Min, ymax = Max, fill = StartMonth), 
+      data = subset(zz,ScenarioGroup %in% addIC),
+      aes(ymin = Min, ymax = Max, fill = ScenarioGroup), 
       alpha = 0.5, linetype = 2, size = 0.5 * Medians
     ) +
     geom_line(size=Medians) +
     # add in the historical elevation on top of other lines
     geom_line(
-      data = filter(zz, StartMonth == "Historical Elevation"), 
+      data = filter(zz, ScenarioGroup == "Historical Elevation"), 
       aes(Year, Med), 
       size = Medians, color = plotColors["Historical Elevation"]
     ) +

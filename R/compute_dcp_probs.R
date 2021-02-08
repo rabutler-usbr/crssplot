@@ -4,7 +4,7 @@ compute_mead_dcp_probs <- function(zz, aggs, yrs)
 {
   zz %>% 
     filter(
-      Agg %in% aggs, 
+      ScenarioGroup %in% aggs, 
       Year %in% yrs, 
       Variable == "mead_dec_pe"
     ) %>%
@@ -23,10 +23,10 @@ compute_mead_dcp_probs <- function(zz, aggs, yrs)
       surplus = as.numeric(Value >= 1145)
     ) %>%
     select(-Variable, -Value, -Month) %>%
-    tidyr::gather(Variable, Value, -Year, -Scenario, -TraceNumber, -Agg) %>%
-    group_by(Year, Agg, Variable) %>%
+    tidyr::gather(Variable, Value, -Year, -Scenario, -TraceNumber, -ScenarioGroup) %>%
+    group_by(Year, ScenarioGroup, Variable) %>%
     summarise(Value = mean(Value)) %>%
-    group_by(Agg, Variable) %>%
+    group_by(ScenarioGroup, Variable) %>%
     arrange(Year) %>%
     mutate(Value = lag(Value))
 }
@@ -35,11 +35,11 @@ compute_powell_dcp_probs <- function(zz, aggs, yrs)
 {
   zz %>% 
     filter(
-      Agg %in% aggs, 
+      ScenarioGroup %in% aggs, 
       Year %in% yrs, 
       Variable == "powell_wy_min_lt_3490"
     ) %>%
-    group_by(Year, Agg, Variable) %>%
+    group_by(Year, ScenarioGroup, Variable) %>%
     summarise(Value = mean(Value))
 }
 
@@ -69,6 +69,6 @@ format_dcp_table <- function(zz)
     mutate(Value = Value * 100) %>%
     tidyr::spread(Year, Value) %>%
     ungroup() %>%
-    select(-Agg) %>%
+    select(-ScenarioGroup) %>%
     mutate(Variable = varname[Variable])
 }

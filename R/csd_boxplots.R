@@ -16,7 +16,7 @@ create_all_csd_boxplots <- function(zz, ui)
     
       message("  ... plot_group: ", i, " ", names(ui[["plot_group"]])[i])
       tmp_zz <- zz %>%
-        filter(Agg %in% cur_pg[["plot_scenarios"]])
+        filter(ScenarioGroup %in% cur_pg[["plot_scenarios"]])
       
       # get the years to show and the colors
       
@@ -82,7 +82,7 @@ csd_bxp <- function(zz, state, yrs, plot_colors)
   # boxplot the CSD -----------------------
     gg <- zz %>% 
       filter(Variable %in% state_info[["slots"]][state], Year %in% yrs) %>%
-      ggplot(aes(as.factor(Year), Value, fill = Agg)) +
+      ggplot(aes(as.factor(Year), Value, fill = ScenarioGroup)) +
       CRSSIO::stat_boxplot_custom() +
       scale_fill_manual(values = plot_colors) +
       labs(title = paste(state, "Annual Actual Use"), x = NULL, y = "acre-ft") +

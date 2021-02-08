@@ -67,7 +67,7 @@ process_all_rdfs <- function(ui, o_files, folder_paths, traceMap)
       'aggFromScenList', 
       sys_rwa
     )
-    message('finished geting annual computed state depletions data')
+    message('finished getting annual computed state depletions data')
   }
   
   invisible(sum(unlist(ui$process_data)))

@@ -48,12 +48,7 @@ process_everything <- function(ui)
 
   if (TRUE) {
     pe <- feather::read_feather(o_files$cur_month_pe_file) %>%
-      # The StartMonth column is used as the color variable in plotEOCYElev, and 
-      # the names that should show up in the legend/differentiate scenario groups
-      # are stored in the Agg Varaible. So easiest to just copy it from Agg to 
-      # StartMonth for now
-      dplyr::mutate(StartMonth = Agg) %>%
-      filter(StartMonth %in% all_plotted_scens)
+      filter(ScenarioGroup %in% all_plotted_scens)
     
     # compare crit stats for all scenarios
     # call once each for powell LT 3490, shortage, and surplus
@@ -65,15 +60,12 @@ process_everything <- function(ui)
                         'powell_wy_min_lt_3525', 'mead_min_lt_1025', 
                         "mead_min_lt_1025", "mead_dec_lt_1025", 
                         "powell_dec_lt_3525")
-      ) %>%
-      rename(AggName = Agg) %>%
-      select(-StartMonth)
+      )
     
     cs <- feather::read_feather(o_files$sys_cond_file) %>%
-      rename(AggName = Agg) %>%
       filter(Variable %in% c('lbSurplus', 'lbShortage')) %>%
       rbind(cs) %>%
-      filter(AggName %in% all_plotted_scens)
+      filter(ScenarioGroup %in% all_plotted_scens)
   }
   
   # TODO: switch this to be true if creating heatmap, or dcp table

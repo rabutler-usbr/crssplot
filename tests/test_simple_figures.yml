@@ -2,15 +2,16 @@
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
 process_data: FALSE
-#  sys_cond_data: FALSE
-#  pe_data: FALSE
-#  csd_data: FALSE
-#  crss_short_cond_data: TRUE
+#  sys_cond_data: TRUE
+#  pe_data: TRUE
+#  csd_data: TRUE
+#  crss_short_cond_data: FALSE
 defaults:
   end_year: 2026
 folders:
   i_folder: "`r system.file('extdata', 'Scenario', package = 'crssplot')`"
-  CRSSDIR: "."
+  #CRSSDIR: "."
+  CRSSDIR: "C:/alan/RPackages/crssplot/tests/testthat"
   crss_month: "auto_tests"
   pdf_name: 'test_file'
   extra_label: ""
