@@ -536,3 +536,7 @@ get_cloud_colors <- function(ui, pg_i)
   plot_colors
 }
 
+get_legend <- function(grob) {
+  grob$grobs[[which(sapply(grob$grobs, function(x) x$name) == "guide-box")]]
+}
+
