@@ -1,4 +1,5 @@
 #' plot_spec is a generic class for plot specifications
+#' @noRd
 plot_spec <- function(x, plot_type, pg)
 {
   # if plot_type does not exist, set create to FALSE and exit
@@ -27,6 +28,7 @@ new_plot_spec <- function(create)
 }
 
 #' std_comp_spec is a class for specifying the standard comparison plots
+#' @noRd
 std_comp_spec <- function(ui, pg)
 {
   x <- plot_spec(ui, "std_comparison", pg)
@@ -39,6 +41,7 @@ std_comp_spec <- function(ui, pg)
 }
 
 #' heat_spec is a class for specifying the heatmap plots
+#' @noRd
 heat_spec <- function(ui, pg)
 {
   x <- plot_spec(ui, "heat", pg) 
@@ -51,6 +54,7 @@ heat_spec <- function(ui, pg)
 }
 
 #' cloud_spec is a class for specifying the cloud plots
+#' @noRd
 cloud_spec <- function(ui, pg)
 {
   x <- plot_spec(ui, "cloud", pg) 
@@ -67,6 +71,7 @@ cloud_spec <- function(ui, pg)
 }
 
 #' csd_spec is a class for specifying the annual computed state depletions plots
+#' @noRd
 csd_spec <- function(ui, pg)
 {
   x <- plot_spec(ui, "csd_ann", pg) 
@@ -102,6 +107,7 @@ inherit_plot_specs <- function(x, ui, pg, plot_type)
 
 #' sets the specified `att` in `x`. Checks to see if it exists in `ui`. If it
 #' does not, then defaults to `att` in `pg`.
+#' @noRd
 inherit_from_pg <- function(x, att, ui, pg, plot_type)
 {
   assert_that(att %in% c("scen_names", "caption", "years", "scenarios", 

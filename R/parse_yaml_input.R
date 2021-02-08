@@ -502,6 +502,7 @@ check_unique_names <- function(ss, group_name)
 #' Takes one plot_group, and fully expands it, inheriting defaults from defaults
 #' plot_group (`pg`) will have scenarios, scen_names, plot_colors, years, 
 #' caption entries after it is expanded
+#' @noRd
 expand_plot_group <- function(pg, defaults)
 {
   TRUE

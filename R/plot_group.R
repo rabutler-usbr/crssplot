@@ -4,6 +4,7 @@
 #' Required elements in x: scenarios
 #' Will fill in: scen_names, plot_colors, years, caption
 #' Will create std_comparison, csd_ann, heat, cloud plot types and plots entry
+#' @noRd
 plot_group <- function(x, defaults)
 {
   assert_that("scenarios" %in% names(x))

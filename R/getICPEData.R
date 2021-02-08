@@ -37,6 +37,7 @@ get1TraceIc <- function(icName, icFile, icMonth, traceMap) {
 #'   in the excel file to the initial conditions dimension label
 #' @param icDimNumber: numeric dimension number for the initial condition label 
 #'   within the full scenario name
+#' @noRd
 getAndAppendIC <- function(scens, fileToAppend, oFile, icList, icMonth, 
                            addAggAttribute = TRUE, aggFunction, traceMap, 
                            icDimNumber = 6)

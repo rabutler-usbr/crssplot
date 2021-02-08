@@ -528,6 +528,7 @@ formatSimpleTable <- function(zz, scenNames, yrs)
 #'   up in the finished table and the entries are the Scenario Group variable
 #'   names that will be used to filter the scenarios
 #' @param yrs the years to show in the table
+#' @noRd
 # Assumes that there are only two scenarios to process
 create5YrSimpleTable <- function(iData, scenNames, yrs, addFootnote = NA, ofile)
 {

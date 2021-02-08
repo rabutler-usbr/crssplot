@@ -7,9 +7,10 @@ Authors@R:
            role = c("aut", "cre"),
            email = "rabutler@usbr.gov",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Creates the 'standard' set of CRSS figures that are used to 
-    review model runs. User input is provided via yml files to make it quick
-    and easy to make multiple comparisons from many different scenarios. 
+Description: Code to assist in analyzing and plotting CRSS data. Includes two 
+        pipelines: (1) user specified yaml creates a set of standard figures
+        comparing one or more scenarios. (2) A suite of generic plotting 
+        functions setup to create the main types of plots used in CRSS analyses.
 License: CC0
 Copyright: This software is in the public domain because it contains
         materials that originally came from the U.S. Bureau of
