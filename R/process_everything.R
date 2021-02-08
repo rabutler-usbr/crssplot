@@ -1,5 +1,4 @@
 
-#' @export
 process_everything <- function(ui)
 {
   # check and setup --------------------

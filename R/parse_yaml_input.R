@@ -4,8 +4,7 @@
 #' by [process_everything()].
 #' 
 #' @param file Path to the yml file.
-#' 
-#' @export
+#' @noRd
 parse_yaml_input <- function(file)
 {
   zz <- yaml::yaml.load_file(file)
