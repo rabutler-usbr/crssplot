@@ -1,7 +1,9 @@
 
-
-
-StatEExcCrv <- ggproto("StatEExcCrv", Stat,
+#' @rdname stat_emp_exc_crv
+#' @usage NULL
+#' @format NULL
+#' @export
+StatEmpExcCrv <- ggproto("StatEExcCrv", Stat,
                     compute_group = function(data, scales, n = NULL, pad = TRUE) {
                       # If n is NULL, use raw values; otherwise interpolate
                       if (is.null(n)) {
@@ -23,7 +25,17 @@ StatEExcCrv <- ggproto("StatEExcCrv", Stat,
                     required_aes = c("x")
 )
 
-stat_eexccrv <- function(mapping = NULL, data = NULL,
+#' Plot the empirical exceedance curve
+#' 
+#' `stat_emp_exc_crv()` plots the empirical exceedance curve. It is similar to 
+#' `ecdf()` and [ggplot2::stat_ecdf()] except that the exceedance curve is 
+#' computed as `1 - ecdf()`. Additionally, the value of the data is shown on 
+#' the y axis instead of the x axis.
+#' 
+#' @inheritParams ggplot2::stat_boxplot
+#' 
+#' @export
+stat_emp_exc_crv <- function(mapping = NULL, data = NULL,
                       geom = "step", position = "identity",
                       ...,
                       n = NULL,
@@ -34,7 +46,7 @@ stat_eexccrv <- function(mapping = NULL, data = NULL,
   layer(
     data = data,
     mapping = mapping,
-    stat = StatEExcCrv,
+    stat = StatEmpExcCrv,
     geom = geom,
     position = position,
     show.legend = show.legend,
