@@ -32,9 +32,19 @@ vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL,
   # check df -------------------------------
   check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
   
+  assert_that(
+    all(scenarios %in% unique(df$ScenarioGroup)),
+    msg = "All `scenarios` must exist in df$ScenarioGroup."
+  )
+  
   # update vars if NULL --------------------------
   if (is.null(vars)) {
     vars <- unique(df$Variable)
+  } else {
+    assert_that(
+      all(vars %in% df$Variable),
+      msg = "All specified `vars` must exist in `df$Variable`."
+    )
   }
   
   # var_labels ---------------------------------------
@@ -66,7 +76,7 @@ vars_plot_probs <- function(df, scenarios,  years = NULL, vars = NULL,
     dplyr::summarise(Value = mean(Value))
   
   # parse ... and other plot options
-  plot_colors <- determine_plot_colors(plot_colors, vars)
+  plot_colors <- determine_plot_colors(plot_colors, vars, "Variable")
   
   myLabs <- get_year_breaks(years)
   

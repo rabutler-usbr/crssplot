@@ -21,6 +21,11 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
   # check df -------------------------------
   check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
   
+  assert_that(
+    all(vars %in% df$Variable), 
+    msg = "All specified `vars` must exist in `df$Variable`"
+  )
+  
   # check historical -----------------------
   if (!is.null(historical)) {
     req_cols <- "Year"

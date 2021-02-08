@@ -29,6 +29,11 @@ scens_plot_boxplot <- function(df, vars, years = NULL, scenarios = NULL,
   # check df -------------------------------
   check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
   
+  assert_that(
+    all(vars %in% df$Variable), 
+    msg = "All specified `vars` must exist in `df$Variable`"
+  )
+  
   # update scenarios if NULL --------------------------
   if (is.null(scenarios)) {
     scenarios <- unique(df$ScenarioGroup)
