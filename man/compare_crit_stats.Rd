@@ -19,7 +19,7 @@ compare_crit_stats(
 )
 }
 \arguments{
-\item{zz}{Data frame. Must have Year, Variable, AggName, and Value columns.}
+\item{zz}{Data frame. Must have Year, Variable, ScenarioGroup, and Value columns.}
 
 \item{yrs}{Years to show in plot. \code{zz} is filtered to only contain these
 years.}
@@ -41,10 +41,10 @@ Is this more a subtitle? Test it out?}
 \item{annSize}{Text size for \code{annText}.}
 
 \item{legendWrap}{Maximum number of character per line in color legend.
-StartMonth will be wrapped based on this value, if it is not \code{NULL}.}
+ScenarioGroup will be wrapped based on this value, if it is not \code{NULL}.}
 
 \item{plot_colors}{Optional named vectors. If specified, names must match
-unique StartMonth values and can be used to set specific colors for each
+unique ScenarioGroup values and can be used to set specific colors for each
 scenario. If not used, default ggplot2 colors are used.}
 }
 \value{

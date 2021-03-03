@@ -7,7 +7,7 @@
 plotCloudFigs(zz, yrs, var, myTitle, ui, pg_i)
 }
 \arguments{
-\item{zz}{Data frame. Must have StartMonth, Year, Variable, and Value
+\item{zz}{Data frame. Must have ScenarioGroup, Year, Variable, and Value
 columns.}
 
 \item{yrs}{Years to show in the plot. If any exist before the min in \code{zz},

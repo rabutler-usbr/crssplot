@@ -8,16 +8,6 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   
   all_vars <- unique(cs$Variable)
   
-  # critStatsFig1 <- plotCritStats(
-  #   dplyr::filter(
-  #     cs, 
-  #     ScenarioGroup == scenario, 
-  #     !(Variable %in% c('mead_min_lt_1020','lbSurplus'))
-  #   ), 
-  #   yrs2show, 
-  #   ann_txt
-  # )
-  
   critStatsFig1 <- vars_plot_probs(
     cs,
     scenarios = scenario,
@@ -29,15 +19,6 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   ) +
     theme(legend.position = "bottom") +
     guides(color = guide_legend(ncol = 4, title = NULL))
-  
-  # critStatsFig2 <- plotCritStats(dplyr::filter(
-  #   cs, 
-  #   ScenarioGroup == scenario, 
-  #   !(Variable %in% c('mead_dec_lt_1025','lbSurplus'))
-  # ), 
-  # yrs2show, 
-  # ann_txt
-  # )
   
   critStatsFig2 <- vars_plot_probs(
     cs,
@@ -51,18 +32,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
     theme(legend.position = "bottom") +
     guides(color = guide_legend(ncol = 4, title = NULL))
   
-  # shortage surplus figure
-  # defaults ok for legendTitle, nC, and legLoc
-  # ssPlot <- plotShortageSurplus(
-  #   dplyr::filter(
-  #     sys_cond, 
-  #     Variable %in% c('lbShortage', 'lbSurplus'),
-  #     ScenarioGroup == scenario
-  #   ), 
-  #   yrs2show, 
-  #   scenario
-  # )
-  
+  # shortage surplus figure ---------------------
   my_title <- paste(
     'Percent of Traces with Lower Basin Surplus or Shortage\nResults from the',
     scenario, 'CRSS Run*'
@@ -80,17 +50,7 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   ) +
     theme(legend.position = "bottom")
   
-  # stacked barplot of different shortage tiers
-  # default for annSize is ok
-  # shortStack <- plotShortStackedBar(
-  #   dplyr::filter(
-  #     sys_cond, 
-  #     Variable %in% c('lbShortageStep1','lbShortageStep2','lbShortageStep3'),
-  #     ScenarioGroup == scenario
-  #   ), 
-  #   yrs2show, 
-  #   ann_txt
-  # )
+  # stacked barplot of different shortage tiers ---------------------------
   var_name <- c("lbShortageStep1" = "Step 1 Shortage",
                "lbShortageStep2" = "Step 2 Shortage",
                "lbShortageStep3" = "Step 3 Shortage")

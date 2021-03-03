@@ -15,7 +15,7 @@ plotEOCYElev(
 )
 }
 \arguments{
-\item{zz}{Data frame. Must have Year, Variable, StartMonth, and Value
+\item{zz}{Data frame. Must have Year, Variable, ScenarioGroup, and Value
 columns.}
 
 \item{yrs}{Years to show in plot. \code{zz} is filtered to only contain these
@@ -28,10 +28,10 @@ years.}
 \item{legendTitle}{Color legend title.}
 
 \item{legendWrap}{Maximum number of character per line in color legend.
-StartMonth will be wrapped based on this value, if it is not \code{NULL}.}
+ScenarioGroup will be wrapped based on this value, if it is not \code{NULL}.}
 
 \item{plot_colors}{Optional named vectors. If specified, names must match
-unique StartMonth values and can be used to set specific colors for each
+unique ScenarioGroup values and can be used to set specific colors for each
 scenario. If not used, default ggplot2 colors are used.}
 }
 \value{
@@ -40,6 +40,6 @@ scenario. If not used, default ggplot2 colors are used.}
 \description{
 \code{plotEOCYElev()} computes and then plots the 10, 50, and 90 percentiles for
 the specified variable (\code{var}). Plots for different scenarios, denoted by
-\code{StartMonth} column; all unique values in the StartMonth column are included
+\code{ScenarioGroup} column; all unique values in the ScenarioGroup column are included
 in the plot.
 }
