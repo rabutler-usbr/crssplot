@@ -76,28 +76,18 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       s1_and_2 = dcp2 + dcp3 + dcp4 + dcp5 + dcp6 + dcp7
     ) %>%
     tidyr::gather(Variable, Value, -Year, -ScenarioGroup) %>%
-    filter(Variable %in% c("surplus", "n2", "dcp1", "s1_and_2", "dcp8")) %>%
-    mutate(Value = if_else(Value == 0, NA_real_, Value * 100)) %>%
-    mutate(
-      val_lab = paste0(formatC(Value, digits=0, format = "f"), "%"),
-      val_lab = if_else(val_lab == "NA%", "", val_lab),
-      val_lab = if_else(val_lab == "0%", "<1%", val_lab)
-    ) %>%
-    mutate(
-      ScenarioGroup = stringr::str_wrap(ScenarioGroup, width = 10), 
-      Variable = factor(
-        stringr::str_wrap(tier_names[Variable], y_wrap), 
-        levels = rev(stringr::str_wrap(tier_names, y_wrap))
-      )
-    )
+    filter(Variable %in% c("surplus", "n2", "dcp1", "s1_and_2", "dcp8"))
   
-  gg <- system_conditions_heat_map(
+  gg <- vars_plot_heatmap(
     zz, 
-    n_yrs, 
-    tier_names, 
-    my_title,
-    y_title = "Previous Decemeber Elevation",
-    heat_ui
+    scenarios = unique(zz$ScenarioGroup),
+    vars = names(tier_names),
+    var_labels = tier_names,
+    title = my_title,
+    subtitle = "Percent of Traces in each Elevation Range",
+    y_lab = "Previous December Elevation",
+    caption = heat_ui[['caption']], 
+    legend_wrap = 15
   ) %>%
     add_logo_vertical()
   
@@ -125,31 +115,28 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       leb = lebGt823 + leb823 + lebLt823
     ) %>%
     tidyr::gather(Variable, Value, -Year, -ScenarioGroup, -TraceNumber, -Scenario) %>%
-    filter(Variable %in% c("eq", "ueb", "mer", "leb")) %>%
-    group_by(Year, ScenarioGroup, Variable) %>%
-    summarise(Value = mean(Value)) %>%
-    ungroup() %>%
-    mutate(Value = if_else(Value == 0, NA_real_, Value * 100)) %>%
-    mutate(
-      val_lab = paste0(formatC(Value, digits=0, format = "f"), "%"),
-      val_lab = if_else(val_lab == "NA%", "", val_lab),
-      val_lab = if_else(val_lab == "0%", "<1%", val_lab)
-    ) %>%
-    mutate(
-      ScenarioGroup = stringr::str_wrap(ScenarioGroup, width = 10), 
-      Variable = factor(
-        stringr::str_wrap(tier_names[Variable], y_wrap), 
-        levels = rev(stringr::str_wrap(tier_names, y_wrap))
-      )
-    )
+    filter(Variable %in% c("eq", "ueb", "mer", "leb"))
   
-  gg <- system_conditions_heat_map(
+  # gg <- system_conditions_heat_map(
+  #   zz, 
+  #   n_yrs, 
+  #   tier_names, 
+  #   my_title,
+  #   y_title = '',
+  #   heat_ui
+  # ) %>%
+  #   add_logo_vertical()
+  
+  gg <- vars_plot_heatmap(
     zz, 
-    n_yrs, 
-    tier_names, 
-    my_title,
-    y_title = '',
-    heat_ui
+    scenarios = unique(zz$ScenarioGroup),
+    vars = names(tier_names),
+    var_labels = tier_names,
+    title = my_title,
+    subtitle = "Percent of Traces in each Elevation Range",
+    y_lab = "",
+    caption = heat_ui[['caption']],
+    legend_wrap = 15
   ) %>%
     add_logo_vertical()
   
