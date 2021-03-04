@@ -53,7 +53,7 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
   zzMon <- feather::read_feather(file.path(iFolder, "crssShortCond_mon.feather"))
   
   zz <- zz %>%
-    filter(Year == dataYear) %>%
+    filter(Year == dataYear, Scenario == scenario) %>%
     group_by(Scenario, Year, TraceNumber) %>%
     tidyr::spread(Variable, Value) %>%
     mutate(lbGains = nfAbvMead + nfBelowMead,
@@ -62,7 +62,8 @@ getCRSSConditionsData <- function(iFolder, scenario, filterOn, dataYear)
   lbAvg <- mean(zz$lbGains)
  
   zzMon <- zzMon %>%
-    filter(Year == dataYear, Month %in% c("October", "November", "December")) %>%
+    filter(Year == dataYear, Month %in% c("October", "November", "December"),
+           Scenario == scenario) %>%
     group_by(Scenario, TraceNumber, Year, Variable) %>%
     summarise(Value = sum(Value)/1000000) %>% # now OND total release 
     group_by(Scenario, TraceNumber, Year) %>%
@@ -203,9 +204,10 @@ create_short_condition_figure <- function(ui, folder_paths)
     if (ui[["ind_plots"]][["shortage_conditions"]][[i]][["create"]]) {
       tmp_scen <- ui[["ind_plots"]][["shortage_conditions"]][[i]]
       sl <- tmp_scen[["segment_locs"]]
-      txl <- tmp_scen[["annotaion_loc"]]
+      txl <- tmp_scen[["annotation_loc"]]
       
       # filterOn being set to pe shows results for traces that are <= 1077
+      
       shortCond <- plotFirstYearShortCond(
         tmp_scen[["model"]],
         iFile = folder_paths[["res_folder"]], 
@@ -214,6 +216,7 @@ create_short_condition_figure <- function(ui, folder_paths)
         tmp_scen[["year"]],
         colorVar = tmp_scen[["color_var"]]
       )
+      
       shortCond <- shortCond + 
         annotate('segment', x = sl[1], xend = sl[2], y = sl[3], yend = sl[4], 
                  arrow = grid::arrow(length = unit(.3,'cm')), size = 1) +

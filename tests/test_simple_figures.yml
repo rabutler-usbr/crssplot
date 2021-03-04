@@ -1,11 +1,11 @@
 # define the CRSS processing for this month's run
 # note that for list, they need to be same data types, e..g, ints or floats
 ---
-process_data: FALSE
-#  sys_cond_data: TRUE
-#  pe_data: TRUE
-#  csd_data: TRUE
-#  crss_short_cond_data: FALSE
+process_data: FALSE 
+  # sys_cond_data: FALSE
+  # pe_data: FALSE
+  # csd_data: FALSE
+  # crss_short_cond_data: TRUE
 defaults:
   end_year: 2026
 folders:
@@ -31,6 +31,13 @@ scenarios:
       model: CRSS
       ann_text: "this is my annotation text"
       add_threshold_stats: TRUE
+    shortage_conditions:
+      model: CRSS
+      year: 2022
+      color_var: WYRelease
+      subtitle: "my subtitle here"
+      segment_locs: [1.1, 1.2, 1074.0, 1075.0]
+      annotation_loc: [10.1,1074.0]
   - name: April ST CT
     folder: "Apr2020_2021,ISM1988_2018,CT,IG_DCP,MTOM_Most"
     ic: {powell: 3610.24, mead: 1084.70}
