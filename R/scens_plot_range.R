@@ -113,7 +113,7 @@ scens_plot_range <- function(df, vars, years = NULL, scenarios = NULL,
   }
   
   if (!is.null(ops$legend_wrap)) {
-    zz <- zz %>%
+    df <- df %>%
       mutate(ScenarioGroup = stringr::str_wrap(
         ScenarioGroup, 
         width = ops$legend_wrap
