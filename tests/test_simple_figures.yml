@@ -26,6 +26,11 @@ scenarios:
       ann_text: Results from the April 2020 CRSS
       end_year: 2036
     std_ind_tables: TRUE
+    pe_scatter:
+      year: 2021
+      model: CRSS
+      ann_text: "this is my annotation text"
+      add_threshold_stats: TRUE
   - name: April ST CT
     folder: "Apr2020_2021,ISM1988_2018,CT,IG_DCP,MTOM_Most"
     ic: {powell: 3610.24, mead: 1084.70}
