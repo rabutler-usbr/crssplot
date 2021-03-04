@@ -135,6 +135,7 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
   }
   
   # plot --------------------------------------------
+  yL <- c(0, 1)
   gg <- ggplot(
     df, 
     aes(Year, Value, color = ScenarioGroup)
@@ -145,7 +146,12 @@ scens_plot_probs <- function(df, vars,  years = NULL, scenarios = NULL,
       minor_breaks = 1900:3000, 
       labels = myLabs
     ) + 
-    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    coord_cartesian(ylim = yL) +
+    scale_y_continuous(
+      minor_breaks = seq(yL[1], yL[2], 0.05), 
+      breaks = seq(yL[1], yL[2], 0.10),
+      labels = scales::percent_format(accuracy = 1)
+    ) +
     labs(y = ops$y_lab, title = ops$title, caption = ops$caption, 
          subtitle = ops$subtitle) +
     scale_color_manual(
