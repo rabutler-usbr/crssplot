@@ -112,7 +112,7 @@ var_plot_trace_scatter <- function(df, scenarios,  years, vars, color_by = NULL,
     ) +
     labs(
       y = ops$y_lab, title = ops$title, caption = ops$caption, 
-      x = "trace number", color = ops$color_label, subtitle = ops$subtitle
+      x = "Trace Number", color = ops$color_label, subtitle = ops$subtitle
     ) + 
     theme_crss()
   
