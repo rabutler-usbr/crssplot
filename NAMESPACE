@@ -2,7 +2,6 @@
 
 export(StatEmpExcCrv)
 export(create_results_package)
-export(csd_bxp)
 export(plotCloudFigs)
 export(plotFirstYearShortCond)
 export(scens_plot_boxplot)

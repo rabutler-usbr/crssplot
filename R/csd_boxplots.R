@@ -26,8 +26,6 @@ create_all_csd_boxplots <- function(zz, ui)
       
       # call the boxplot for each state
       for (state in states) {
-        #csd_bxp(zz, state, yrs, plot_colors)
-        #tmp <- csd_bxp(tmp_zz, state, pg_years, pg_color)
         tmp <- scens_plot_boxplot(
           tmp_zz,
           vars = state_info[["slots"]][state],
@@ -67,43 +65,4 @@ csd_state_info <- function()
   names(app) <- states
   
   list(states = states, slots = slots, apportionment = app)
-}
-
-#' Annual boxplot for one variable and multiple scenarios
-#' 
-#' `csd_bxp()` creates an annual boxplot for one variable and multiple 
-#' scenarios. It uses all scenarios found in `zz`. It could be more generic, 
-#' except that it relies on `csd_state_info()` that maps state names, to their
-#' computed state depletions slot, and includes their apportionment.
-#' 
-#' @param zz Data frame. Must have Variable, Year, Value, and Agg columns. 
-#' 
-#' @param state One of: c("CO", "NM", "UT", "WY","AZ", "NV", "CA", "MX").
-#' 
-#' @param yrs The years to show in plot. `zz` is filtered to only contain 
-#'   these years.
-#'   
-#' @param plot_colors Named vector. Names must match unique Agg values. Sets 
-#'   plots to use specific colors for each scenario.
-#'   
-#' @return `gg` object.
-#' 
-#' @export
-csd_bxp <- function(zz, state, yrs, plot_colors)
-{
-  state_info <- csd_state_info()
-
-  # boxplot the CSD -----------------------
-    gg <- zz %>% 
-      filter(Variable %in% state_info[["slots"]][state], Year %in% yrs) %>%
-      ggplot(aes(as.factor(Year), Value, fill = ScenarioGroup)) +
-      CRSSIO::stat_boxplot_custom() +
-      scale_fill_manual(values = plot_colors) +
-      labs(title = paste(state, "Annual Actual Use"), x = NULL, y = "acre-ft") +
-      geom_hline(
-        yintercept = state_info[["apportionment"]][state], 
-        linetype = 2, color = "red"
-      )
-  
-  gg
 }
