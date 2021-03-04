@@ -6,7 +6,8 @@ create_all_csd_boxplots <- function(zz, ui)
 {
   # loop through multiple plot groups
   olist <- list()
-  states <- csd_state_info()[["states"]]
+  state_info <- csd_state_info()
+  states <- state_info[["states"]]
 
   for (i in seq_along(ui[["plot_group"]])) {
     
@@ -25,7 +26,20 @@ create_all_csd_boxplots <- function(zz, ui)
       
       # call the boxplot for each state
       for (state in states) {
-        tmp <- csd_bxp(tmp_zz, state, pg_years, pg_color)
+        #csd_bxp(zz, state, yrs, plot_colors)
+        #tmp <- csd_bxp(tmp_zz, state, pg_years, pg_color)
+        tmp <- scens_plot_boxplot(
+          tmp_zz,
+          vars = state_info[["slots"]][state],
+          years = pg_years,
+          plot_colors = pg_color,
+          title = paste(state, "Annual Actual Use"),
+          y_lab = "acre-ft"
+        ) +
+          geom_hline(
+            yintercept = state_info[["apportionment"]][state], 
+            linetype = 2, color = "red"
+          )
         
         olist <- c(olist, list(tmp))
       }
