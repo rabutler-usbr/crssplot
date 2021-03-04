@@ -1,87 +1,4 @@
 
-#' Scatter plot for one year of Mead elevation
-#' 
-#' `singleYearPEScatter()` plots elevation vs. trace number for one year. It 
-#' specifically colors points based on pre-specified elevation thresholds: 
-#' below 1,075', 1,075'-1,076', 1,076'-1,077', and above 1,077'. 
-#' 
-#' @param zz Data frame. Must have Year, Variable, Value, and TraceNumber 
-#'   columns.
-#'   
-#' @param yr Year to create plot for. 
-#' 
-#' @param var The variable to plot. This is not necessary, as the other 
-#'   components are so specific that they can really only apply to Mead 
-#'   elevation.
-#'   
-#' @param myTitle Title of plot.
-#' 
-#' @param caption Caption (`labs(caption = caption)`). 
-#' 
-#' @param addThreshStats Boolean. If `TRUE`, annotates figure with the number
-#'   of traces that fall into each of the four elevation bins. 
-#'   
-#' @param return `gg` object.
-#' 
-#' @export
-singleYearPEScatter <- function(zz, yr, var, myTitle, caption = NULL, 
-                                addThreshStats)
-{
-  zz <- zz %>% filter(Year == yr, Variable == var) %>%
-    mutate(TheColor = ifelse(Value <= 1075, '<= 1,075\'', 
-                             ifelse(Value <= 1076,"1,075'-1,076'",
-                                    ifelse(Value <= 1077, "1,076'-1,077'",
-                                           "> 1,077'"))))
-  
-  myCols <- c('<= 1,075\'' = '#b2182b',
-              "1,075'-1,076'" = '#ef8a62',
-              "1,076'-1,077'" = '#9970ab',
-              "> 1,077'" = '#2166ac')
-  zz$TheColor <- factor(zz$TheColor, levels = names(myCols))
-  
-  gg <- ggplot(zz, aes(TraceNumber, Value, color = TheColor)) + 
-    geom_point(size = 3, shape = 18) +
-    labs(
-      x = 'Trace Number', y = 'Pool Elevation [ft]', 
-      title = myTitle, caption = caption
-    ) + 
-    scale_y_continuous(
-      labels = scales::comma, 
-      minor_breaks = seq(800, 1200, 5)
-    ) +
-    scale_color_manual(values = myCols) +
-    theme(legend.title = element_blank())
-  
-  if (addThreshStats) {
-    nn <- zz %>%
-      mutate(lt1075 = ifelse(Value <= 1075, 1, 0),
-             lt1076 = ifelse(Value <= 1076 & Value > 1075, 1, 0),
-             lt1077 = ifelse(Value <= 1077 & Value > 1075, 1, 0)) %>%
-      ungroup() %>%
-      summarise(
-        lt1075 = sum(lt1075), 
-        lt1076 = sum(lt1076), 
-        lt1077 = sum(lt1077)
-      )
-    
-    myText <- paste0(
-      nn$lt1075, ' runs are below 1,075 ft\n',
-      'an additional ', nn$lt1076, 
-      ' runs are within 1 ft of being below 1,075 ft\n',
-      nn$lt1077, ' runs are within 2 ft of being below 1,075 ft')
-    
-    gg <- gg + geom_hline(yintercept = 1075, color = 'red', size = 1) +
-      annotate(
-        geom = 'text', 
-        x = 1, 
-        y = max(zz$Value) - 5, 
-        label = myText, 
-        hjust = 0
-      )
-  }
-  gg
-}
-
 # assumes zz is data already read in and will return one variable for the given 
 # yrs rownames of zz should be years, and colnames should be variable names
 getSingleVarData <- function(zz, yrs, var)
@@ -333,16 +250,6 @@ create_mead_pe_scatter <- function(ui, o_files, traceMap)
         'Elevations from', 
         ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["model"]]
       )
-      # singleYearPEScatter(zz, yr, var, myTitle, caption = NULL, addThreshStats)
-
-      # gg <- singleYearPEScatter(
-      #   pe, 
-      #   ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["year"]], 
-      #   'mead_dec_pe', 
-      #   scatterTitle, 
-      #   caption = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["ann_text"]],
-      #   addThreshStats = ui[["ind_plots"]][["mead_pe_scatter"]][[i]][["add_threshold_stats"]]
-      # )
       
       pe <- mutate(
         pe,
