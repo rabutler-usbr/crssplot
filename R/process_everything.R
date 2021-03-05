@@ -195,25 +195,6 @@ process_everything <- function(ui)
     plot_both_clouds(pe, ui, folder_paths)
   }
   
-  # conditional probabilities ---------------------------
-  if (plot_flags[["cond_probs"]]){
-    message("... conditional probabilities")
-    cp_scens <- get_cond_prob_scens(ui)
-    get_all_cond_probs(sys_cond, cp_scens, yrs2show, ui)
-  }
-
-  # 5 year simple table -------------------------
-  if (isTRUE(plot_flags[["simple_5yr"]])) {
-    ## create the 5-yr simple table that compares to the previous run
-    message("... creating 5-year simple table")
-    tmp_data <- feather::read_feather(o_files$sys_cond_file) %>%
-      rbind(feather::read_feather(o_files$cur_month_pe_file))
-    
-    create_all_simple_5yr(tmp_data, ui, folder_paths)
-    
-    rm(tmp_data)
-  }
-  
 }
 
 # checks if the i_folder input is an r statement. if it is, then it parses it
