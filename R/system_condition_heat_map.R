@@ -117,16 +117,6 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     tidyr::gather(Variable, Value, -Year, -ScenarioGroup, -TraceNumber, -Scenario) %>%
     filter(Variable %in% c("eq", "ueb", "mer", "leb"))
   
-  # gg <- system_conditions_heat_map(
-  #   zz, 
-  #   n_yrs, 
-  #   tier_names, 
-  #   my_title,
-  #   y_title = '',
-  #   heat_ui
-  # ) %>%
-  #   add_logo_vertical()
-  
   gg <- vars_plot_heatmap(
     zz, 
     scenarios = unique(zz$ScenarioGroup),
@@ -143,7 +133,7 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
   gg
 }
 
-add_logo_vertical <- function(gg)
+add_logo_vertical <- function(gg, x = 1.455)
 {
   # now uses cowplot::draw_image which relies on "magick"
   logo_path <- system.file(
@@ -154,7 +144,7 @@ add_logo_vertical <- function(gg)
   cowplot::ggdraw(gg) +
     cowplot::draw_image(
       logo_path, 
-      x = 1.455, y = .13, 
+      x = x, y = .13, 
       hjust = 1, vjust = 1, 
       width = 1, height = .12
     )
@@ -214,79 +204,6 @@ add_logo_shield <- function(gg)
   ))
   
   gg
-}
-
-#' Create a heat map of conditions
-#' 
-#' `system_condition_heat_map()` creates a heat map of conditions 
-#' (`zz$Variable`) for all years (`zz$Year`) and scenarios (`zz$Agg`) in `zz`.
-#' 
-#' @param zz Data frame with Year, Variable, Value, and Agg columns.
-#' 
-#' @param n_yrs Unnecessary parameter. Could be computed as 
-#'   length(unique(zz$Year))
-#'   
-#' @param tier_names Unnecessary parameter. Used to determine number of tiers,
-#'   but it can also be computed as length(unique(zz$Variable)).
-#'   
-#' @param my_title Used in labs(title)
-#' 
-#' @param y_title Used in labs(y)
-#' 
-#' @param heat_ui Only `$caption` entry is accessed directly.
-#' 
-#' @export
-system_conditions_heat_map <- function(zz, n_yrs, tier_names, my_title, y_title,
-                                       heat_ui)
-{
-  # plot as a side-by-side heatmap
-  zz %>%
-    ggplot(aes(as.factor(Year), Variable, fill = Value)) +
-    facet_wrap(
-      ~ScenarioGroup, 
-      nrow = 1, 
-      strip.position = "top", 
-      labeller = label_wrap_gen()
-    ) +
-    geom_tile() +
-    # # from https://uigradients.com/#HoneyDew
-    # scale_fill_gradient(
-    #   low = "#F8FFAE", 
-    #   high = "#43C6AC", 
-    #   na.value = "grey90", 
-    #   trans = "sqrt"
-    # ) + 
-    scale_fill_gradient(
-      low = "#ffffff",
-      high = "#006699",
-      na.value = "grey90",
-      trans = "sqrt"
-    ) +
-    geom_vline(xintercept = seq(1.5, n_yrs, 1), color = "white", size = 1) +
-    geom_hline(
-      yintercept = seq(0.5, length(tier_names) + 0.5), 
-      color = "white", size = 1
-    ) +
-    geom_text(aes(label = val_lab), size = 3, color = "black") +
-    theme_light() +
-    theme(
-      axis.text.x = element_text(size = 10),
-      axis.text.y = element_text(size = 10),
-      axis.title.y = element_text(color = "grey30", margin = margin(r = 12)),
-      strip.text = element_text(size = 12),
-      axis.ticks.x = element_blank(),
-      panel.spacing = unit(0, "lines"), 
-      legend.key.height = unit(2, "lines"),
-      legend.spacing.x = unit(0, "lines"),
-      panel.grid = element_blank(),
-      panel.border = element_blank()
-    ) +
-    labs(
-      y = y_title, 
-      x = NULL, fill = "%", title = my_title,
-      subtitle = "Percent of Traces in each Elevation Range",
-      caption = heat_ui[['caption']]
-    )
 }
 
 powell_tier_names <- function() {
