@@ -2,6 +2,7 @@
 
 export(StatEmpExcCrv)
 export(create_results_package)
+export(gg_get_legend)
 export(plotFirstYearShortCond)
 export(scens_plot_boxplot)
 export(scens_plot_cloud)

@@ -33,6 +33,7 @@ Imports:
     gridExtra,
     imager,
     magick,
+    methods,
     patchwork,
     purrr,
     readxl,
