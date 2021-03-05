@@ -14,12 +14,6 @@ get_plot_flags <- function(ui)
     cloud <- cloud | ui[["plot_group"]][[i]][["cloud"]][["create"]]
   }
   
-  cond_probs <- FALSE
-
-  for (i in seq_along(ui[["scen_tree"]])) {
-    cond_probs <- cond_probs | ui[["scen_tree"]][[i]][["cond_probs"]]
-  }
-  
   # mead_pe_scatter
   for (i in seq_along(ui[["ind_plots"]][["mead_pe_scatter"]])) {
     mead_pe_scatter <- mead_pe_scatter | 
@@ -34,11 +28,9 @@ get_plot_flags <- function(ui)
   
   list(
     csd_flag = csd_flag, 
-    cond_probs = cond_probs, 
     std_comparison = std_comparison,
     heat = heat,
     cloud = cloud,
-    simple_5yr = simple_5yr,
     mead_pe_scatter = mead_pe_scatter,
     shortage_conditions = shortage_conditions
   )
