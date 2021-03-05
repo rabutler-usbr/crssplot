@@ -94,7 +94,8 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
   ops <- list(...)
   # these are the plotting options this function can handle
   exp_ops <- c("y_lab", "title", "caption", "color_label", "legend_wrap", 
-               "facet_scales", "facet_nrow", "facet_ncol", "fill_label")
+               "facet_scales", "facet_nrow", "facet_ncol", "fill_label", 
+               "subtitle")
   
   check_options(names(ops), exp_ops)
  
@@ -148,7 +149,9 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
       guide = guide_legend(title = ops$color_label),
       labels = scen_labels
     ) +
-    labs(y = ops[["y_lab"]]) +
+    labs(y = ops[["y_lab"]], title = ops[["title"]], 
+         subtitle = ops[['subtitle']], x = NULL, caption = ops[['caption']],
+         color = ops[['color_label']]) +
     scale_x_continuous(
       breaks = myLabs,
       minor_breaks = 1900:3000, 
