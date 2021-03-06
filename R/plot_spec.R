@@ -186,3 +186,11 @@ is_att_specified <- function(ui, att)
   else
     return(FALSE)
 }
+
+should_create_plot <- function(x, ...) {
+  UseMethod("should_create_plot")
+}
+
+should_create_plot.plot_group <- function(x, plot_type, ...) {
+  isTRUE(x[[plot_type]][['create']])
+}

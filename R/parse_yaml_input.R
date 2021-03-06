@@ -473,10 +473,13 @@ set_plot_groups <- function(ui)
       )
     )
     check_unique_names(pg_names, "plot_group")
-    
+
     for (pg in ui[["plot_group"]]) {
       plot_group[[names(pg)]] <- plot_group(pg[[1]], ui[["defaults"]])
     }
+    
+    class(plot_group) <- "plot_groups"
+    validate_plot_groups(plot_group)
     
     # 2 convert to expected list structure
     ui[["plot_group"]] <- plot_group
@@ -505,4 +508,52 @@ check_unique_names <- function(ss, group_name)
 expand_plot_group <- function(pg, defaults)
 {
   TRUE
+}
+
+validate_plot_groups <- function(pgs) {
+  # all entries should be plot_group objects
+  bad <- c()
+  for (i in seq_along(pgs)) {
+    if (!is.plot_group(pgs[[i]])) {
+      bad <- c(bad, i)
+    }
+  }
+  
+  bad <- names(pgs)[bad]
+  
+  assert_that(
+    length(bad) == 0, 
+    msg = paste0(
+      "Object is not valid plot_groups object.\n",
+      "The following entries are not `plot_group` objects: ", bad
+    )
+  )
+  
+  # if the plot_group has the publish flag, then it must be creating:
+  # cloud figures, heat figures, and std_comparison
+  bad <- c()
+  for (i in seq_along(pgs)) {
+    pg <- pgs[[i]]
+    if (has_publish(pg)) {
+      if (!all(should_create_plot(pg, "cloud"), should_create_plot(pg, "heat"),
+               should_create_plot(pg, "std_comparison"))) {
+        bad <- c(bad, i)
+      }
+    }
+  }
+  
+  bad <- names(pgs)[bad]
+  assert_that(
+    length(bad) == 0,
+    msg = paste(
+      "The following plot groups have `publish = TRUE`, but do not contain the necessary plot types (cloud, heat, and std_comparison):",
+      bad, sep = "\n"
+    )
+  )
+  
+  invisible(pgs)
+}
+
+is.plot_groups <- function(x) {
+  inherits(x, "plot_groups")
 }

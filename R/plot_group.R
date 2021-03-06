@@ -16,7 +16,7 @@ validate_plot_group <- function(x)
 {
   valid_names <- c("scenarios", "scen_names", "plot_colors", "years", "caption",
                    "std_comparison", "csd_ann", "heat", "cloud", "plots", 
-                   "plot_scenarios")
+                   "plot_scenarios", 'publish')
   assert_that(all(names(x) %in% valid_names))
   assert_that(all(valid_names %in% names(x)))
   
@@ -39,7 +39,8 @@ new_plot_group <- function(x, defaults)
       std_comparison = new_plot_spec(FALSE),
       csd_ann = new_plot_spec(FALSE),
       heat = new_plot_spec(FALSE),
-      cloud = new_plot_spec(FALSE)
+      cloud = new_plot_spec(FALSE),
+      publish = isTRUE(x[['publish']])
     ),
     class = "plot_group"
   )
@@ -48,7 +49,7 @@ new_plot_group <- function(x, defaults)
   # go through the different plot types; for now just store them as is
 
   plot_types <- c("std_comparison", "csd_ann", "heat", "cloud")
- 
+
   if (exists("plots", where = x)) {
     # plots are specified as sequence. Create these plots based on defaults
     create_plots <- x[["plots"]]
@@ -90,6 +91,9 @@ new_plot_group <- function(x, defaults)
         create_plots <- c(create_plots, pt)
     }
   
+  }
+  if (is.null(create_plots)) {
+    create_plots <- ''
   }
   
   pg[["plots"]] <- create_plots
@@ -137,4 +141,8 @@ get_pg_years <- function(x, defaults)
 get_pg_caption <- function(x)
 {
   x[["caption"]]
+}
+
+is.plot_group <- function(x) {
+  inherits(x, "plot_group")
 }

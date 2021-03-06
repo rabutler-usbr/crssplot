@@ -52,7 +52,7 @@ process_everything <- function(ui)
     
     # compare crit stats for all scenarios
     # call once each for powell LT 3490, shortage, and surplus
-    # get the necessary variables by filtering from the pe and syscond data files
+    # get the necessary variables by filtering from the pe and syscond files
     cs <- pe %>%
       filter(
         Variable %in% c('mead_min_lt_1000', 'mead_min_lt_1020', 
@@ -141,7 +141,7 @@ process_everything <- function(ui)
       o_files
     )
   }  
-  
+browser()  
   # csd boxplots ---------------------------
   if (plot_flags[["csd_flag"]]) {
     message("... CSD boxplots")

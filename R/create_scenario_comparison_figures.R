@@ -8,7 +8,7 @@ create_scenario_comparison_figures <- function(pe, cs, ui, o_files)
   
   for (i in seq_along(ui[["plot_group"]])) {
     
-    if (ui[["plot_group"]][[i]][["std_comparison"]][["create"]]) {
+    if (should_create_plot(ui[["plot_group"]][[i]], "std_comparison")) {
     
       message("  ... plot_group: ", i, " ", names(ui[["plot_group"]])[i])
         
