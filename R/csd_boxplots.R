@@ -24,6 +24,7 @@ create_all_csd_boxplots <- function(zz, ui)
       pg_color <- cur_pg[["plot_colors"]]
       pg_years <- cur_pg[["csd_ann"]][["years"]]
       
+      tmp_list <- gg_list()
       # call the boxplot for each state
       for (state in states) {
         tmp <- scens_plot_boxplot(
@@ -39,12 +40,16 @@ create_all_csd_boxplots <- function(zz, ui)
             linetype = 2, color = "red"
           )
         
-        olist <- c(olist, list(tmp))
+        tmp_list <- c(tmp_list, gg_list(tmp))
       }
+      
+      names(tmp_list) <- paste0(states, "_csd_bxp")
+      
+      olist[[names(ui[["plot_group"]])[i]]] <- tmp_list
     }
   }
   
-  olist
+  pgs_out(olist)
 }
 
 csd_state_info <- function()

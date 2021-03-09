@@ -129,9 +129,10 @@ create_mead_pe_scatter <- function(ui, o_files, traceMap)
           )
       }
       
-      gg_out[[i]] <- gg
+      gg_out[[names(ui[["ind_plots"]][["mead_pe_scatter"]])[i]]] <- 
+        gg_list("ind_mead_scatter" = gg)
     }
   }
 
-  gg_out
+  pgs_out(gg_out)
 }

@@ -13,6 +13,8 @@ plot_both_clouds <- function(pe, ui, folder_paths)
     'extdata/HistMeadPE.csv', package = "crssplot"
   ))
   
+  all_clouds <- list()
+  
   for (i in seq_along(ui[["plot_group"]])) {
     p_title <- 'Lake Powell End-of-December Elevation'
     m_title <- 'Lake Mead End-of-December Elevation'
@@ -93,8 +95,13 @@ plot_both_clouds <- function(pe, ui, folder_paths)
         dpi = 600
       )
       message("   ... saved ", m_file)
+      
+      all_clouds[[names(ui[["plot_group"]])[i]]] <- 
+        gg_list("powell_cloud" = powellCloud, "mead_cloud" = meadCloud)
     }
   }
+  
+  pgs_out(all_clouds)
 }
 
 get_cloud_colors <- function(ui, pg_i)

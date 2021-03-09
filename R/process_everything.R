@@ -89,7 +89,7 @@ process_everything <- function(ui)
     # system condition heatmap -------------------------
     message("... System conditions heatmap")
     
-    create_mead_powell_heatmaps(
+    pgs_heat <- create_mead_powell_heatmaps(
       lb_dcp, sys_cond, 
       ui,
       folder_paths
@@ -124,77 +124,86 @@ process_everything <- function(ui)
     # drop Mead LT 1025 from one plot and Mead LT 1020 from 
     # the other plot
     tmp <- create_std_ind_figures(cs, sys_cond, cur_scen, ui)
-    ind_figs <- c(ind_figs, tmp)
+    ind_figs[[cur_scen]] <- tmp
     
     create_cs_csv(cs, cur_scen, folder_paths, ui)
   }
   
-  comp_figs <- list()
+  pgs_ind_figs <- pgs_out(ind_figs)
+  
+  pgs_comp_figs <- pgs_out(list())
   if (plot_flags[["std_comparison"]]) {
     # std comparison figures -------------
     # includes previous month's results too
     message("... Scenario comparison figures")
 
-    comp_figs <- create_scenario_comparison_figures(
+    pgs_comp_figs <- create_scenario_comparison_figures(
       pe, cs, 
       ui, 
       o_files
     )
   }  
-browser()  
+
   # csd boxplots ---------------------------
   if (plot_flags[["csd_flag"]]) {
     message("... CSD boxplots")
     csd_ann <- feather::read_feather(o_files[["csd_file"]])
-    comp_figs <- c(comp_figs, create_all_csd_boxplots(csd_ann, ui))
+    pgs_comp_figs <- c(pgs_comp_figs, create_all_csd_boxplots(csd_ann, ui))
   }
-  
+
   # mead pe scatter ------------------
-  scatter_figs <- list()
+  pgs_scatter_figs <- pgs_out(list())
   if (plot_flags[["mead_pe_scatter"]]) {
     message("... Mead elevation scatter plot")
-    scatter_figs <- create_mead_pe_scatter(ui, o_files, traceMap)
+    pgs_scatter_figs <- create_mead_pe_scatter(ui, o_files, traceMap)
   }
   
   # conditions leading to shortage ---------------------------------
   # pulled annotation out of generic function
-  short_cond_figs <- list()
+  pgs_short_cond <- pgs_out(list())
   if (plot_flags[["shortage_conditions"]]) {
     message("... conditions leading to shortage")
-    short_cond_figs <- create_short_condition_figure(ui, folder_paths)
+    pgs_short_cond <- create_short_condition_figure(ui, folder_paths)
   }
   
   # Save figures -----------------------
-  if (length(comp_figs) > 0 || length(ind_figs) > 0 || 
-      length(scatter_figs) > 0 || length(short_cond_figs > 0)) {
+  if (FALSE) {if (length(pgs_comp_figs) > 0 || length(pgs_ind_figs) > 0 || 
+      length(pgs_scatter_figs) > 0 || length(pgs_short_cond > 0)) {
     # save figures and table
     message("\ncreating pdf: ", o_files$main_pdf, "\n")
     grDevices::pdf(o_files$main_pdf, width = 8, height = 6)
     
-    for (i in seq_along(comp_figs)) {
-      print(comp_figs[[i]])
+    for (i in seq_along(pgs_comp_figs)) {
+      print(pgs_comp_figs[[i]])
     }
     
-    for (i in seq_along(ind_figs)) {
-      print(ind_figs[[i]])
+    for (i in seq_along(pgs_ind_figs)) {
+      print(pgs_ind_figs[[i]])
     }
     
-    for (i in seq_along(scatter_figs)) {
-      print(scatter_figs[[i]])
+    for (i in seq_along(pgs_scatter_figs)) {
+      print(pgs_scatter_figs[[i]])
     }
     
-    for (i in seq_along(short_cond_figs)) {
-      print(short_cond_figs[[i]])
+    for (i in seq_along(pgs_short_cond)) {
+      print(pgs_short_cond[[i]])
     }
     grDevices::dev.off()
-  }
+  }}
   
   # plot Clouds ----------------
   if (plot_flags[["cloud"]]) {
     message("... cloud figures")
-    plot_both_clouds(pe, ui, folder_paths)
+    pgs_clouds <- plot_both_clouds(pe, ui, folder_paths)
   }
   
+  # publish --------------------
+  # publish, i.e., create RMarkdown presentation, based on saved figures
+  pgs_publish <- c(pgs_clouds, pgs_comp_figs, pgs_heat)
+  # save figures as rds file. the above includes all figures and all plot groups
+  # but save_publish_figs only returns those required in any published 
+  # presentations
+  pgs_publish <- save_publish_figs(pgs_publish, ui)
 }
 
 # checks if the i_folder input is an r statement. if it is, then it parses it

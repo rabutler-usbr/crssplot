@@ -192,3 +192,13 @@ construct_file_name <- function(ui, folder_paths, group_num, folder_name,
     paste0(names(ui[["plot_group"]])[group_num], "_", file_name)
   )
 }
+
+# gets output folder from ui
+get_output_folder <- function(ui, subdir = NULL) {
+  file.path(
+    ui[["folders"]][["CRSSDIR"]], 
+    "results",
+    ui[['folders']][['crss_month']], 
+    subdir
+  )
+}

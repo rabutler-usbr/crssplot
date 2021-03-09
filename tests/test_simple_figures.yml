@@ -46,6 +46,7 @@ scenarios:
 plot_group: 
   - aug2obs:
       scenarios: ["April ST 2007 UCRC", "April ST CT"]
+      publish: TRUE
       std_comparison:
         years: [2021, 2026]
       csd_ann:
@@ -61,6 +62,10 @@ plot_group:
         title_append: from April 2020 CRSS
         caption: "This and that"
         years: [1999,2026]
+  - pg2:
+      scenarios: ["April ST 2007 UCRC", "April ST CT"]
+      std_comparison:
+        years: [2021, 2026]
 # can also specify
 # plots:
 #  - std_comparison

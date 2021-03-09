@@ -65,10 +65,10 @@ create_std_ind_figures <- function(cs, sys_cond, scenario, ui)
   ) +
     theme(legend.position = "bottom")
   
-  list(
-    critStatsFig1,
-    critStatsFig2,
-    ssPlot,
-    shortStack
+  gg_list(
+    "ind_crit_stats1" = critStatsFig1,
+    "ind_crit_stats2" = critStatsFig2,
+    "ind_short_surplus" = ssPlot,
+    "ind_stacked_short" = shortStack
   )
 }

@@ -2,7 +2,7 @@
 create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
 {
   # loop through all plot_groups, and if create == TRUE, create the heat map
-  
+  heat_pgs <- list()
   for (i in seq_along(ui[["plot_group"]])) {
     
     if (ui[["plot_group"]][[i]][["heat"]][["create"]]) {
@@ -42,9 +42,14 @@ create_mead_powell_heatmaps <- function(z1, z2, ui, folder_paths)
         units = "in"
       )
       message("   ... saved ", p_file)
+      
+      heat_pgs[[names(ui[["plot_group"]])[i]]] <- gg_list(
+        "powell_heat" = p_heat, "mead_heat" = m_heat
+      )
     }
   }
-  invisible(TRUE)
+  
+  pgs_out(heat_pgs)  
 }
 
 #' Call `system_conditions_heat_map()` with Mead specific data. 

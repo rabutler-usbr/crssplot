@@ -234,9 +234,10 @@ create_short_condition_figure <- function(ui, folder_paths)
         ) +
         theme(legend.title = element_text(size = 10))
       
-      gg_out[[i]] <- shortCond
+      gg_out[[names(ui[["ind_plots"]][["shortage_conditions"]])[i]]] <- 
+        gg_list("ind_shortage_conditions" = shortCond)
     }
   } 
   
-  gg_out
+  pgs_out(gg_out)
 }

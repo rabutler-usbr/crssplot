@@ -122,22 +122,20 @@ create_scenario_comparison_figures <- function(pe, cs, ui, o_files)
         legend_wrap = ui$defaults$legend_wrap,
         plot_colors = cur_pg[["plot_colors"]]
       )
-      
-      olist <- c(
-        olist, 
-        list(
-          powellPE,
-          meadPE,
-          p_3525_fig,
-          p_3490_fig,
-          m_1025_fig,
-          m_1000_fig,
-          shortFig,
-          surpFig
+
+      olist[[names(ui[["plot_group"]])[i]]] <- 
+        gg_list(
+          "powellPE" = powellPE,
+          "meadPE" =meadPE,
+          "p3525" = p_3525_fig,
+          "p3490" = p_3490_fig,
+          "m1025" = m_1025_fig,
+          "m1000" = m_1000_fig,
+          "shortage" = shortFig,
+          "surplus" = surpFig
         )
-      )
     }
   }
   
-  olist
+  pgs_out(olist)
 }
