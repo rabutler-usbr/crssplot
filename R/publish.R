@@ -10,8 +10,8 @@ has_publish.plot_groups <- function(x, ...) {
   any(sapply(x, function(i) has_publish(i)))
 }
 
-#' @pgs pgs_out object (all plot groups and figures)
-#' @ui ui object
+#' @param pgs pgs_out object (all plot groups and figures)
+#' @param ui ui object
 #' @noRd
 save_publish_figs <- function(pgs, ui) {
   message("   ... saving publication figures")
