@@ -119,7 +119,8 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
       mer = mer823 + mer748,
       leb = lebGt823 + leb823 + lebLt823
     ) %>%
-    tidyr::gather(Variable, Value, -Year, -ScenarioGroup, -TraceNumber, -Scenario) %>%
+    tidyr::gather(Variable, Value, -Year, -ScenarioGroup, -TraceNumber, 
+                  -Scenario) %>%
     filter(Variable %in% c("eq", "ueb", "mer", "leb"))
   
   gg <- vars_plot_heatmap(
