@@ -12,7 +12,7 @@ Code to assist in analyzing and plotting CRSS data. Includes two
         functions setup to create the main types of plots used in CRSS analyses.
 }
 \author{
-\strong{Maintainer}: Alan Butler \email{rabutler@usbr.gov} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Alan Butler \email{rabutler@usbr.gov} (\href{https://orcid.org/0000-0002-8625-6386}{ORCID})
 
 }
 \keyword{internal}
