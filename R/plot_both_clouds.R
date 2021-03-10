@@ -53,7 +53,7 @@ plot_both_clouds <- function(pe, ui, folder_paths)
       powellCloud <- add_dcp_start(powellCloud) %>%
         add_ig_start() %>%
         add_powell_ig_tiers() %>%
-        add_logo_vertical(1.395)
+        add_logo_vertical(.86, .03, .95, .23)
       
       ggsave(
         p_file, 
@@ -84,7 +84,7 @@ plot_both_clouds <- function(pe, ui, folder_paths)
       meadCloud <- add_dcp_start(meadCloud) %>%
         add_ig_start() %>%
         add_mead_ig_tiers() %>%
-        add_logo_vertical(1.395)
+        add_logo_vertical(.86, .03, .95, .23)
       
       ggsave(
         m_file,

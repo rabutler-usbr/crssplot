@@ -82,7 +82,7 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     ) %>%
     tidyr::gather(Variable, Value, -Year, -ScenarioGroup) %>%
     filter(Variable %in% c("surplus", "n2", "dcp1", "s1_and_2", "dcp8"))
-  
+
   gg <- vars_plot_heatmap(
     zz, 
     scenarios = unique(zz$ScenarioGroup),
@@ -94,7 +94,7 @@ mead_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     caption = heat_ui[['caption']], 
     legend_wrap = 15
   ) %>%
-    add_logo_vertical()
+    add_logo_vertical(.92, .02, .99, .22)
   
   gg
 }
@@ -133,82 +133,38 @@ powell_system_condition_heatmap <- function(dcp, heat_ui, my_title, y_wrap = 15)
     caption = heat_ui[['caption']],
     legend_wrap = 15
   ) %>%
-    add_logo_vertical()
+    add_logo_vertical(.92, .02, .99, .22)
   
   gg
 }
 
-add_logo_vertical <- function(gg, x = 1.455)
+add_logo_vertical <- function(gg, left, bottom, right, top)
 {
-  # now uses cowplot::draw_image which relies on "magick"
   logo_path <- system.file(
-    "extdata/logo/BofR-vert-cmyk.png", 
+    "extdata/logo/BofR-vert-cmyk-125.png", 
     package = "crssplot"
   )
   
-  cowplot::ggdraw(gg) +
-    cowplot::draw_image(
-      logo_path, 
-      x = x, y = .13, 
-      hjust = 1, vjust = 1, 
-      width = 1, height = .12
-    )
+  add_logo_pw(gg, logo_path, left, bottom, right, top)
 }
 
-add_logo_horiz <- function(gg)
-{
-  # arrange all 3 plots together
-  gg_grob <- ggplotGrob(gg)
+add_logo_pw <- function(gg, logo_path, left, bottom, right, top) {
   
+  logo <- png::readPNG(logo_path, native = TRUE)
+  
+  gg + 
+    patchwork::inset_element(logo, left, bottom, right, top, align_to = "full")
+}
+
+add_logo_horiz <- function(gg, left, bottom, right, top)
+{
   # logo -------------------------------
   logo_path <- system.file(
     "extdata/logo/BofR-horiz-cmyk.png", 
     package = "crssplot"
   )
-  logo <- imager::load.image(logo_path)
-  logo <- grid::rasterGrob(logo, interpolate = TRUE)
-  
-  l2 <- ggplot() +
-    geom_blank() + 
-    theme_minimal() +
-    annotation_custom(logo)
 
-  gg <- gridExtra::grid.arrange(gridExtra::arrangeGrob(
-    gg_grob, grid::nullGrob(), l2,
-    layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
-    heights = c(.9, .1),
-    widths = c(.8, .2)
-    #bottom = cap_text
-  ))
-  
-  gg
-}
-
-add_logo_shield <- function(gg)
-{
-  # arrange all 3 plots together
-  gg_grob <- ggplotGrob(gg)
-  
-  # logo -------------------------------
-  #saved from the BOR page footer
-  logo <- imager::load.image("code/logo/seal-white.png") 
-  
-  logo <- grid::rasterGrob(logo, interpolate = TRUE)
-  
-  l2 <- ggplot() +
-    geom_blank() + 
-    theme_minimal() +
-    annotation_custom(logo)
-  
-  gg <- gridExtra::grid.arrange(gridExtra::arrangeGrob(
-    gg_grob, grid::nullGrob(), l2,
-    layout_matrix = matrix(c(1,1,2,3), ncol = 2, byrow = TRUE),
-    heights = c(.9, .1),
-    widths = c(.9, .1)
-    #bottom = cap_text
-  ))
-  
-  gg
+  add_logo_pw(gg, logo_path, left, bottom, right, top)
 }
 
 powell_tier_names <- function() {
