@@ -105,6 +105,14 @@ crss_res_directory_setup <- function(i_folder, get_pe_data, get_sys_cond_data,
   }
   message("Tables will be saved to: ", tables)
   
+  # publish folder ------------------
+  publish <- file.path(oFigs, "publish")
+  if (!file.exists(publish)) {
+    message("Creating folder: ", publish)
+    dir.create(publish)
+  }
+  message("Rmarkdown publishable reports will be saved to: ", publish)
+  
   # return
   list(figs_folder = oFigs, res_folder = resFolder, png_out = png_out, 
        figure_data = fig_data, tables = tables)

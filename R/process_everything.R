@@ -198,12 +198,20 @@ process_everything <- function(ui)
   }
   
   # publish --------------------
-  # publish, i.e., create RMarkdown presentation, based on saved figures
-  pgs_publish <- c(pgs_clouds, pgs_comp_figs, pgs_heat)
-  # save figures as rds file. the above includes all figures and all plot groups
-  # but save_publish_figs only returns those required in any published 
-  # presentations
-  pgs_publish <- save_publish_figs(pgs_publish, ui)
+  if (has_publish(ui[["plot_group"]])) {
+    message("... publication rmds")
+    # publish, i.e., create RMarkdown presentation, based on saved figures
+    pgs_publish <- c(pgs_clouds, pgs_comp_figs, pgs_heat)
+    # save figures as rds file. the above includes all figures and all plot groups
+    # but save_publish_figs only returns those required in any published 
+    # presentations
+    pgs_publish <- save_publish_figs(pgs_publish, ui)
+    
+    # create rmd files
+    rmd_files <- create_publish_rmds(names(pgs_publish), ui) %>%
+      # render rmd files
+      render_all_files()
+  }
 }
 
 # checks if the i_folder input is an r statement. if it is, then it parses it

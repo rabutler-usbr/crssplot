@@ -34,16 +34,18 @@ Imports:
     imager,
     magick,
     methods,
-    patchwork,
+    patchwork (>= 1.1.0),
     purrr,
     readxl,
     rlang,
+    rmarkdown,
     RWDataPlyr (>= 0.6.0),
     scales,
     stringr,
     tibble,
     tidyr,
     utils,
+    xfun,
     yaml
 Suggests: 
     testthat

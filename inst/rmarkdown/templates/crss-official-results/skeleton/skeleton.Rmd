@@ -1,0 +1,49 @@
+---
+title: {{pub_title}}
+date: "`r  format(Sys.Date(), '%B %d, %Y')`"
+output: html_document
+params:
+  figs_file: {{figs_file}}
+  pg_name: {{pg_name}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width = 9)
+library(ggplot2)
+library(patchwork)
+library(crssplot)
+figs <- readRDS(params$figs_file)
+figs <- figs[[params$pg_name]]
+```
+
+## August 2020 vs January 2021
+### Full Hydrology
+
+```{r}
+(figs$powell_cloud + figs$mead_cloud) +
+ plot_layout(guides = "collect")
+```
+
+## August 2020 vs January 2021
+### Full Hydrology
+
+```{r}
+(figs$p3525 | gg_move_y_axis(figs$p3490)) +
+  plot_layout(guides = "collect")
+```
+
+## August 2020 vs January 2021
+### Full Hydrology
+
+```{r}
+(figs$shortage | gg_move_y_axis(figs$surplus)) +
+  plot_layout(guides = "collect")
+```
+
+## August 2020 vs January 2021
+### Full Hydrology
+
+```{r}
+(figs$m1025 | gg_move_y_axis(figs$m1000)) +
+  plot_layout(guides = "collect")
+```
