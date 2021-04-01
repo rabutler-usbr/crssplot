@@ -1,6 +1,6 @@
 Package: crssplot
 Title: Create Standard CRSS Plots
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "Alan",
            family = "Butler",

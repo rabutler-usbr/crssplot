@@ -18,8 +18,8 @@ Goals are to:
 
 ## Setup
 
-    library(devtools)
-    devtools::install_github('rabutler-usbr/crsspub')
+    library(remotes)
+    remotes::install_github('rabutler-usbr/crssplot')
 
 ## Standard Figures
 
@@ -33,8 +33,7 @@ Goals are to:
 
 <!-- end list -->
 
-    ui <- parse_yaml_input("path/to/yml/file.yml")
-    process_everything(ui)
+    create_results_package("path/to/yml/file.yml")
 
 See
 [doc/README.md](https://github.com/BoudlerCodeHub/Process-CRSS-Res/doc/README.md)
@@ -268,9 +267,9 @@ tmp_df <- bind_rows(
     summarise(Value = sum(Value)) %>%
     mutate(Variable = "leb")
 )
-#> `summarise()` regrouping output by 'Year', 'TraceNumber' (override with `.groups` argument)
-#> `summarise()` regrouping output by 'Year', 'TraceNumber' (override with `.groups` argument)
-#> `summarise()` regrouping output by 'Year', 'TraceNumber' (override with `.groups` argument)
+#> `summarise()` has grouped output by 'Year', 'TraceNumber'. You can override using the `.groups` argument.
+#> `summarise()` has grouped output by 'Year', 'TraceNumber'. You can override using the `.groups` argument.
+#> `summarise()` has grouped output by 'Year', 'TraceNumber'. You can override using the `.groups` argument.
 
 vars_plot_heatmap(
   tmp_df, unique(tmp_df$ScenarioGroup),
@@ -284,3 +283,7 @@ vars_plot_heatmap(
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+## Log:
+
+  - 2021-04-01: v0.0.1
