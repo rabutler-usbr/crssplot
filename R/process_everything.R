@@ -46,7 +46,7 @@ process_everything <- function(ui)
   all_plotted_scens <- get_all_plot_scenarios(ui)
   plot_flags <- get_plot_flags(ui)
 
-  if (TRUE) {
+    if (TRUE) {
     pe <- feather::read_feather(o_files$cur_month_pe_file) %>%
       filter(ScenarioGroup %in% all_plotted_scens)
     
@@ -167,7 +167,8 @@ process_everything <- function(ui)
   }
   
   # Save figures -----------------------
-  if (FALSE) {if (length(pgs_comp_figs) > 0 || length(pgs_ind_figs) > 0 || 
+  # TODO: remove outer if once done testing publish
+  if (TRUE) {if (length(pgs_comp_figs) > 0 || length(pgs_ind_figs) > 0 || 
       length(pgs_scatter_figs) > 0 || length(pgs_short_cond > 0)) {
     # save figures and table
     message("\ncreating pdf: ", o_files$main_pdf, "\n")
