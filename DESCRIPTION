@@ -32,6 +32,7 @@ Imports:
     gridExtra,
     methods,
     patchwork (>= 1.1.0),
+    png,
     purrr,
     readxl,
     rlang,
