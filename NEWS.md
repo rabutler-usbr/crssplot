@@ -1,3 +1,7 @@
+# crssplot 0.0.2.9000
+
+- Added `connect_historical` paramters to `scens_plot_cloud()`. When this parameter is `TRUE`, then the historical data and projected data are "connected" for plotting purposes. 
+
 # crssplot 0.0.2
 
 *Released April 25, 2021*

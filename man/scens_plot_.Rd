@@ -30,6 +30,7 @@ scens_plot_cloud(
   scenarios = NULL,
   plot_colors = NULL,
   scen_labels = NULL,
+  connect_historical = TRUE,
   ...
 )
 
@@ -113,6 +114,13 @@ have a "Year" column, and the same number of additional columns as the
 length of \code{vars}. If there is only one variable, then the column names in
 this data frame do not matter (except for Year). However, if there are
 more than one variable, then the column names must match those in \code{vars}.}
+
+\item{connect_historical}{If \code{historical} data are provided, and this is
+\code{TRUE}, then the historical year prior to the first projected year of data
+will be "connected" to the projections so as to provide a connected look
+to the plot. If \code{FALSE}, then projected data are shown as they natively
+exist in \code{df} and if \code{historical} data are not provided this has no affect
+on the output.}
 
 \item{color_by}{For \code{var_plot_trace_scatter()}, the points can be colored
 based on a specified column in the \code{df}. This should be specified as a

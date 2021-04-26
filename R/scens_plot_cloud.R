@@ -12,12 +12,19 @@
 #'   length of `vars`. If there is only one variable, then the column names in 
 #'   this data frame do not matter (except for Year). However, if there are 
 #'   more than one variable, then the column names must match those in `vars`.
+#'   
+#' @param connect_historical If `historical` data are provided, and this is 
+#'   `TRUE`, then the historical year prior to the first projected year of data
+#'   will be "connected" to the projections so as to provide a connected look 
+#'   to the plot. If `FALSE`, then projected data are shown as they natively 
+#'   exist in `df` and if `historical` data are not provided this has no affect
+#'   on the output.
 #' 
 #' @rdname scens_plot_
 #' @export
 scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL, 
                              scenarios = NULL, plot_colors = NULL, 
-                             scen_labels = NULL, ...) {
+                             scen_labels = NULL, connect_historical = TRUE, ...) {
   # check df -------------------------------
   check_required_columns(df, c("Year", "Variable", "ScenarioGroup", "Value"))
   
@@ -77,6 +84,26 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
     )
 
   if (!is.null(historical)) {
+    if (isTRUE(connect_historical)) {
+      # repeat the year before projections start in the projection data
+      last_year <- min(df$Year) - 1
+      h_tmp <- dplyr::filter(historical, Year == last_year)
+      h_tmp$ScenarioGroup <- NULL
+      
+      # repeat these data for bottom and top columns
+      h_tmp$bottom <- h_tmp$middle
+      h_tmp$top <- h_tmp$middle
+      
+      # repeat these data for each Scenario Group
+      tmpsg <- unique(df$ScenarioGroup)
+      h_tmp <- dplyr::bind_rows(lapply(tmpsg, function(i) {
+        tmp <- h_tmp
+        tmp$ScenarioGroup <- i
+        tmp
+      }))
+      df <- bind_rows(h_tmp, df)
+    }
+    
     df <- bind_rows(df, historical)
   }
   
@@ -136,7 +163,6 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
   gg <- ggplot(df, aes(Year)) +
     geom_ribbon(data = filter(df, ScenarioGroup != "Historical"),
                 aes(ymin = bottom, ymax = top, fill = ScenarioGroup), 
-                    #color = ScenarioGroup),
                 alpha = 0.5, linetype = 2, size = 0.5) +
     geom_line(aes(y = middle, color = ScenarioGroup), size = 1) +
     scale_fill_manual(
