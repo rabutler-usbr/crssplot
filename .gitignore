@@ -10,6 +10,7 @@ tests/testthat/results/auto_tests/tempData/*
 tests/testthat/results/auto_tests/tables/*
 tests/testthat/results/auto_tests/png/*
 tests/testthat/results/auto_tests/figure_data/*
+tests/testthat/results/auto_tests/publish/*
 tests/testthat/results/auto_tests/test_file.pdf
 
 
