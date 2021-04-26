@@ -3,9 +3,12 @@
 
 # crssplot
 
-**WIP** - working to convert
+[![Project Status: WIP – Initial development is in progress, but there
+has not yet been a stable, usable release suitable for the
+public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+Working to convert
 [BoulderCodeHub/Process-CRSS-Res](https://github.com/BoulderCodeHub/Process-CRSS-Res)
-into a package.
+into an R package.
 
 Goals are to:
 
@@ -286,4 +289,5 @@ vars_plot_heatmap(
 
 ## Log:
 
+  - 2021-04-25: v0.0.2
   - 2021-04-01: v0.0.1

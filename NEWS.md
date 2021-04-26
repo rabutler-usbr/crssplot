@@ -1,3 +1,10 @@
+# crssplot 0.0.2
+
+*Released April 25, 2021*
+
+- Added initial working "publish" feature that will create PowerPoint file containing specific results that are routinely published, i.e., provided to stakeholders. 
+- Updated Mead and Powell historical elevation data that are used by the cloud plots in the "standard results".
+
 # crssplot 0.0.1
 
 *Released April 1, 2021*
