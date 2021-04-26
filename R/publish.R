@@ -3,7 +3,7 @@ has_publish <- function(x, ...) {
 }
 
 has_publish.plot_group <- function(x, ...) {
-  isTRUE(x[['publish']])
+  isTRUE(x[['publish']]) || is.list(x[["publish"]])
 }
 
 has_publish.plot_groups <- function(x, ...) {
@@ -48,15 +48,28 @@ create_publish_rmds <- function(pg_names, ui) {
     package = "crssplot"
   )
   
+  ppt_file <- system.file("rmarkdown", "templates", "crss-official-results", 
+                          "skeleton", "bor_template.pptx", package = "crssplot")
+  file.copy(ppt_file, file.path(output_folder, "bor_template.pptx"))
+  
   # parameters in the rmd file are figs_file, pub_title, and pg_name. 
   # first two are same for every file, the last is set in loop
   figs_file <- get_output_folder(ui, "tempData/publish_pgs.rds")
-  pub_title <- paste(format(Sys.Date(), "%B %Y"), "Official CRSS Results")
+  pub_title <- paste(
+    "Colorado River Basin", 
+    format(Sys.Date(), "%B %Y"), 
+    "Update of Projected Future Conditions"
+  )
   
   # for each plot group (name), get the rmd template, fill it in, and then save
   # it in the publication directory
   o_files <- c()
   for (pg_name in pg_names) {
+    pub_options <- get_publish_options(pg_name, ui)
+    slide_title <- pub_options$title
+    slide_subtitle <- pub_options$subtitle
+    pub_section <- pub_options$section
+    
     tmp_rmd <- knitr::knit_expand(rmd)
     tmp_file <-  stringr::str_replace_all(pg_name, " ", "-") %>%
       fs::path_sanitize()
@@ -76,4 +89,28 @@ render_all_files <- function(rmd_files) {
   }
   
   invisible(rmd_files)
+}
+
+get_publish_options <- function(pg_name, ui) {
+  tmp_pg <- ui[["plot_group"]][[pg_name]][["publish"]]
+  
+  if (exists("title", where = tmp_pg)) {
+    title <- tmp_pg[['title']]
+  } else {
+    title <- pg_name
+  }
+  
+  if (exists("subtitle", where = tmp_pg)) {
+    subtitle <- tmp_pg[['subtitle']]
+  } else {
+    subtitle = ''
+  }
+  
+  if (exists('section', where = tmp_pg)) {
+    section = tmp_pg[['section']]
+  } else {
+    section = "CRSS Results"
+  }
+  
+  list('title' = title, 'subtitle' = subtitle, 'section' = section)
 }

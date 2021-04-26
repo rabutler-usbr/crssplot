@@ -40,7 +40,7 @@ new_plot_group <- function(x, defaults)
       csd_ann = new_plot_spec(FALSE),
       heat = new_plot_spec(FALSE),
       cloud = new_plot_spec(FALSE),
-      publish = isTRUE(x[['publish']])
+      publish = get_pg_publish(x)
     ),
     class = "plot_group"
   )
@@ -145,4 +145,19 @@ get_pg_caption <- function(x)
 
 is.plot_group <- function(x) {
   inherits(x, "plot_group")
+}
+
+get_pg_publish <- function(x) {
+  if (!is.list(x[['publish']])) {
+    r <- isTRUE(x[['publish']])
+  } else {
+    vnames <- c('title', 'subtitle', 'section')
+    vnames <- vnames[names(x[['publish']]) %in% vnames]
+    r <- x[['publish']][vnames]
+    if (length(r) == 0) {
+      r <- FALSE
+    }
+  }
+  
+  r
 }

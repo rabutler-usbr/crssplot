@@ -1,7 +1,9 @@
 ---
 title: {{pub_title}}
-date: "`r  format(Sys.Date(), '%B %d, %Y')`"
-output: html_document
+subtitle: "`r  format(Sys.Date(), '%B %Y')`"
+output:
+  powerpoint_presentation:
+    reference_doc: bor_template.pptx
 params:
   figs_file: {{figs_file}}
   pg_name: {{pg_name}}
@@ -18,33 +20,51 @@ side_by_side <- function(p1, p2) {
   (p1 | p2) +
     plot_layout(guides = "collect")
 }
+
+add_space <- function(p1) {
+  (plot_spacer() | p1 | plot_spacer()) +
+  plot_layout(widths = c(.15, .7, .15))
+}
+
 ```
 
-## August 2020 vs January 2021
-### Full Hydrology
+# {{pub_section}}
+
+## {{slide_title}}     {{slide_subtitle}}
 
 ```{r fig.height = 6.5}
-side_by_side(figs$powell_cloud[[1]], figs$mead_cloud)
+# [[1]] removes the logos from the plots since those are included on the slides
+side_by_side(figs$powell_cloud[[1]], figs$mead_cloud[[1]])
 ```
 
-## August 2020 vs January 2021
-### Full Hydrology
+## {{slide_title}}     {{slide_subtitle}}
+
 
 ```{r}
 side_by_side(figs$p3525, gg_move_y_axis(figs$p3490))
 ```
 
-## August 2020 vs January 2021
-### Full Hydrology
+## {{slide_title}}     {{slide_subtitle}}
 
 ```{r}
 side_by_side(figs$shortage, gg_move_y_axis(figs$surplus))
 ```
 
-## August 2020 vs January 2021
-### Full Hydrology
+## {{slide_title}}     {{slide_subtitle}}
 
 ```{r}
 side_by_side(figs$m1025, gg_move_y_axis(figs$m1000))
+```
+
+## {{slide_title}}     {{slide_subtitle}}
+
+```{r, fig.width=14, fig.height=5.6}
+add_space(figs$powell_heat[[1]])
+```
+
+## {{slide_title}}     {{slide_subtitle}}
+
+```{r}
+add_space(figs$mead_heat[[1]])
 ```
 

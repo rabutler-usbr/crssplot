@@ -46,7 +46,10 @@ scenarios:
 plot_group: 
   - aug2obs:
       scenarios: ["April ST 2007 UCRC", "April ST CT"]
-      publish: TRUE
+      publish:
+        section: Comparison of April 2020 Results with the Stress Test Hydrology 
+        title: April 2007 UCRC vs. April Current Projected
+        subtitle: Stress Test Hydrology
       std_comparison:
         years: [2021, 2026]
       csd_ann:
