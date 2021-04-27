@@ -137,8 +137,16 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
   }
   
   # change scenario names, and the plot colors to wrap
+  all_scens <- unique(df$ScenarioGroup)
   df$ScenarioGroup <- stringr::str_wrap(df$ScenarioGroup, tmp_width)
   names(plot_colors) <- stringr::str_wrap(names(plot_colors), tmp_width)
+  
+  # ensure "Historical" shows up last in the legend
+  if ("Historical" %in% all_scens) {
+    all_scens <- c(all_scens[all_scens != "Historical"], "Historical")
+    all_scens <- stringr::str_wrap(all_scens, tmp_width)
+    df$ScenarioGroup <- factor(df$ScenarioGroup, levels = all_scens)
+  }
   
   if (!exists("color_label", where = ops)) {
     ops[["color_label"]] <- stringr::str_wrap(

@@ -72,16 +72,22 @@ pal <- c(
   "April ST 2007 UCRC" = "#138d75",
   "April ST CT" = "#f1c40f"
 )
+# make sure historical shows up in correct order of the legend when names 
+# come both before and after "H" alphabetically. We want Historical to always be
+# last.
 
-p1 <- scens_plot_cloud(ex_pe, "mead_dec_pe", historical = h_mead, 
-                       legend_wrap = 20,
-                       plot_colors = pal, y_lab = "feet", years = 2020:2026) +
+tmp <- ex_pe %>% 
+  mutate(ScenarioGroup = if_else(ScenarioGroup == "April ST CT", "A", "M"))
+
+p1 <- scens_plot_cloud(tmp, "mead_dec_pe", historical = h_mead, 
+                       legend_wrap = 20, y_lab = "feet", years = 2020:2026) +
   theme_cloud()
 
 p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"), 
                        historical = hh, legend_wrap = 20,
                        plot_colors = pal, y_lab = "feet", years = 2020:2026,
-                       facet_scales = "free_y", fill_label = "ok then") +
+                       facet_scales = "free_y", fill_label = "ok then",
+                       connect_historical = FALSE) +
   theme_cloud()
 
 print(p1)
