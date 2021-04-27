@@ -20,12 +20,12 @@ save_publish_figs <- function(pgs, ui) {
   req_figures <- c("powell_heat", "mead_heat", "p3525", "p3490", "m1025", 
                    "m1000", "shortage", "surplus", "powell_cloud", "mead_cloud")
   
-  for (i in seq_along(pgs)) {
-    if (!has_publish(ui[['plot_group']][[names(pgs[i])]])) {
-      pgs[[i]] <- NULL
+  for (tmp_pg in names(pgs)) {
+    if (!has_publish(ui[['plot_group']][[tmp_pg]])) {
+      pgs[[tmp_pg]] <- NULL
     } else {
       # limit to only the figures we need
-      pgs[[i]] <- pgs[[i]][req_figures]
+      pgs[[tmp_pg]] <- pgs[[tmp_pg]][req_figures]
     }
   }
   
