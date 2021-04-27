@@ -30,7 +30,7 @@
 #'   plot_colors = pc, 
 #'   scen_labels = sl,
 #'   title = "PE", 
-#'   caption = "this is a caption")
+#'   caption = "this is a caption"
 #' )
 #' 
 #' # change to two rows in stead of two columns for showing two variables
@@ -38,7 +38,7 @@
 #'   ex_pe, 
 #'   c("powell_dec_pe", "mead_dec_pe"), 
 #'   facet_scales = "free_y",
-#'   facet_nrow = 2)
+#'   facet_nrow = 2
 #' )
 #' 
 #' @rdname scens_plot_

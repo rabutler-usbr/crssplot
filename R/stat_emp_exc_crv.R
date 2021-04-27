@@ -32,7 +32,7 @@ StatEmpExcCrv <- ggproto("StatEExcCrv", Stat,
 #' computed as `1 - ecdf()`. Additionally, the value of the data is shown on 
 #' the y axis instead of the x axis.
 #' 
-#' @inheritParams ggplot2::stat_boxplot
+#' @inheritParams ggplot2::stat_ecdf
 #' 
 #' @export
 stat_emp_exc_crv <- function(mapping = NULL, data = NULL,

@@ -1,4 +1,9 @@
+#' Customized ggplot2 themes
+#' 
+#' `theme_crss()` and `theme_cloud()` are custom themes used in typical CRSS 
+#' related plots. 
 #' @export
+#' @rdname theme_crss
 theme_crss <- function() {
   theme_gray() %+replace%
     theme(
@@ -10,6 +15,7 @@ theme_crss <- function() {
 }
 
 #' @export
+#' @rdname theme_crss
 theme_cloud <- function() {
   
   LegendText <- 8

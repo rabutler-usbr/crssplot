@@ -40,8 +40,7 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{Use to override the default connection between
-\code{geom_boxplot} and \code{stat_boxplot}.}
+\item{geom}{The geometric object to use display the data}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
@@ -51,8 +50,14 @@ often aesthetics, used to set an aesthetic to a fixed value, like
 \code{colour = "red"} or \code{size = 3}. They may also be parameters
 to the paired geom/stat.}
 
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
-a warning. If \code{TRUE}, missing values are silently removed.}
+\item{n}{if NULL, do not interpolate. If not NULL, this is the number
+of points to interpolate with.}
+
+\item{pad}{If \code{TRUE}, pad the ecdf with additional points (-Inf, 0)
+and (Inf, 1)}
+
+\item{na.rm}{If \code{FALSE} (the default), removes missing values with
+a warning.  If \code{TRUE} silently removes missing values.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.

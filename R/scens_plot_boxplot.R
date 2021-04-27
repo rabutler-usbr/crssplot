@@ -10,6 +10,8 @@
 #' scens_plot_boxplot(ex_pe, vars = "powell_dec_pe")
 #' 
 #' # fully customized for multiple variables, custom colors, and custom names
+#' tst_names <- c("April ST 2007 UCRC" = "Scen 1", "April ST CT" = "Scen 2")
+#' pal <- c("April ST 2007 UCRC" = "#fc8d62", "April ST CT" = "#8da0cb")
 #' scens_plot_boxplot(
 #'   ex_pe, 
 #'   vars = c("powell_dec_pe", "mead_dec_pe"), 

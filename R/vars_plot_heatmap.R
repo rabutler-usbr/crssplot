@@ -6,6 +6,9 @@
 #' `y_lab`, `color_label`, `legend_wrap`, `facet_scales`, `facet_nrow`, 
 #' and `facet_ncol` plot options.
 #' 
+#' @param var_labels Similar to `scen_labels`, this is a named character that 
+#'   allows the user to cusomize the variable names that show up in the legend.
+#' 
 #' @examples 
 #' 
 #' vv <- c("mead_min_lt_1000", "mead_min_lt_1020", "powell_wy_min_lt_3490", 

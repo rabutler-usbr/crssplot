@@ -126,6 +126,9 @@ on the output.}
 based on a specified column in the \code{df}. This should be specified as a
 string, and should exist in \code{df}.}
 
+\item{var_labels}{Similar to \code{scen_labels}, this is a named character that
+allows the user to cusomize the variable names that show up in the legend.}
+
 \item{plot_type}{For \code{vars_plot_probs()}, should the plot use lines
 (\code{'line'}), or stacked bars (\code{'stacked bar'}). Can also use \code{1} or \code{2},
 respectively.}
@@ -207,6 +210,8 @@ order the scenarios will show up in the legend.
 scens_plot_boxplot(ex_pe, vars = "powell_dec_pe")
 
 # fully customized for multiple variables, custom colors, and custom names
+tst_names <- c("April ST 2007 UCRC" = "Scen 1", "April ST CT" = "Scen 2")
+pal <- c("April ST 2007 UCRC" = "#fc8d62", "April ST CT" = "#8da0cb")
 scens_plot_boxplot(
   ex_pe, 
   vars = c("powell_dec_pe", "mead_dec_pe"), 
@@ -245,7 +250,7 @@ scens_plot_range(ex_pe,
   plot_colors = pc, 
   scen_labels = sl,
   title = "PE", 
-  caption = "this is a caption")
+  caption = "this is a caption"
 )
 
 # change to two rows in stead of two columns for showing two variables
@@ -253,7 +258,7 @@ scens_plot_range(
   ex_pe, 
   c("powell_dec_pe", "mead_dec_pe"), 
   facet_scales = "free_y",
-  facet_nrow = 2)
+  facet_nrow = 2
 )
 
 # scatter plot for Mead elevation in Dec. 2021
@@ -265,7 +270,7 @@ var_plot_trace_scatter(
 )
 
 # add in a new variable to be used to color the points:
-zz <- mutate(ex_pe, color_cat = case_when(
+zz <- dplyr::mutate(ex_pe, color_cat = dplyr::case_when(
   Value > 1095 ~ "No concern",
   Value > 1076 ~ "Some concern",
   Value > 1074 ~ "Moderate concern",

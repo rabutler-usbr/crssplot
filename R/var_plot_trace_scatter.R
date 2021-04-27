@@ -18,7 +18,7 @@
 #' )
 #' 
 #' # add in a new variable to be used to color the points:
-#' zz <- mutate(ex_pe, color_cat = case_when(
+#' zz <- dplyr::mutate(ex_pe, color_cat = dplyr::case_when(
 #'   Value > 1095 ~ "No concern",
 #'   Value > 1076 ~ "Some concern",
 #'   Value > 1074 ~ "Moderate concern",
@@ -46,12 +46,12 @@ var_plot_trace_scatter <- function(df, scenarios,  years, vars, color_by = NULL,
   
   # check vars and years --------------------------
   assert_that(
-    vars %in% unique(df$Variable) && length(vars) == 1, 
+    all(vars %in% unique(df$Variable)) && length(vars) == 1, 
     msg = "In `var_plot_trace_scatter()`, there should be only 1 `vars` and it must exist in `df`."
   )
   
   assert_that(
-    years %in% unique(df$Year) && length(years) == 1, 
+    all(years %in% unique(df$Year)) && length(years) == 1, 
     msg = "In `var_plot_trace_scatter()`, there should be only 1 `years` and it must exist in `df`."
   )
   

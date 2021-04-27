@@ -5,7 +5,7 @@
 
 h_mead <- read.csv(system.file("extdata/HistMeadPE.csv", package = "crssplot"))
 h_powell <- read.csv(
-  system.file("inst/extdata/HistPowellPE.csv", package = "crssplot")
+  system.file("extdata/HistPowellPE.csv", package = "crssplot")
 )
 hh <- h_mead
 colnames(hh)[2] <- "mead_dec_pe"

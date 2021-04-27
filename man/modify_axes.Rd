@@ -24,6 +24,7 @@ the same range.
 \examples{
 library(ggplot2)
 library(dplyr)
+library(patchwork)
 
 # two plots with different y-axis ranges
 p1 <- ex_pe \%>\%
