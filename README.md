@@ -31,7 +31,7 @@ Goals are to:
     Specification](https://github.com/BoulderCodeHub/Process-CRSS-Res/wiki/yaml-specification)
     includes the details about the yaml file configuration.
       - It does not matter where you save this file. It can be saved in
-        this repository or in the CRSS folder.
+        a data analysis folder or in the CRSS folder.
 2.  Then call:
 
 <!-- end list -->
@@ -47,7 +47,30 @@ publication process.
 
 This section demonstrates how to use the generic plotting functions to
 recreate the standard CRSS results, though it does so using a
-truncated/sample set of them.
+truncated/sample set of them. The available plotting functions are
+described below. Except for the last function, all plots are time series
+plots.
+
+  - `scens_plot_*()` - these functions compare scenarios using different
+    colors and show different variables as facets.
+      - `scens_plot_range()` - show 10/50/90th percentiles as line
+        plots.
+      - `scens_plot_cloud()` - show 10/50/90th percentiles as a shaded
+        “cloud”. Can additionally show historical data.
+      - `scens_plot_probs()` - show probabilities of binary flags
+        occurring.
+      - `scens_plot_boxplot()` - show boxplots of data each year.
+  - `vars_plot_*()` - these functions compare variables using different
+    colors and show different scenarios as facets.
+      - `vars_plot_probs()` - show probabilities of binary flags
+        occurring as a line plot.
+      - `vars_plot_heatmap()`- show probabilities of binary flags
+        occurring using a heat map.
+  - `var_plot_trace_scatter()` - show a scatter plot of a variable’s
+    value vs. trace for a single variable and single year of data.
+    Different scenarios are shown as facets.
+
+<!-- end list -->
 
 ``` r
 library(crssplot)
@@ -196,6 +219,23 @@ p1 + p2 +
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
+``` r
+tmp_labs <- c("April ST 2007 UCRC" = "Scenario 1", "April ST CT" = "Scenario 2")
+scens_plot_boxplot(
+  ex_pe, 
+  vars = c("powell_dec_pe", "mead_dec_pe"), 
+  years = 2021:2036,
+  title = "Mead and Powell", subtitle = "End-of-December Elevation",
+  y_lab = "(feet)", caption = "Results from April 20xx",
+  facet_scales = "free_y", 
+  plot_colors = pal,
+  scen_labels = tmp_labs,
+  legend_wrap = 10
+)
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
 *Need LB Shortage added to data frame.* Not a limitation of the
 plotting, rather a limitation of the example data I’m using.
 
@@ -221,7 +261,7 @@ vars_plot_probs(
   labs(color = NULL)
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 ``` r
 vv <- c(
@@ -244,7 +284,7 @@ vars_plot_probs(
   labs(color = NULL)
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 ``` r
 vv <- c(
@@ -285,7 +325,18 @@ vars_plot_heatmap(
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+
+``` r
+var_plot_trace_scatter(
+  ex_pe, 
+  vars = "mead_dec_pe", 
+  years = 2021, 
+  scenarios = c("April ST CT", "April ST 2007 UCRC")
+)
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 ## Log:
 
