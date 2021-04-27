@@ -222,7 +222,7 @@ scens_plot_boxplot(
 scens_plot_probs(ex_pe, "powell_wy_min_lt_3525", y_lab = "percent")
 
 # quick simple plot of one variable
-scens_plot_range(ex_pe, "mead_dec_pe"))
+scens_plot_range(ex_pe, "mead_dec_pe")
 
 # now add ylabel 
 scens_plot_range(ex_pe, "mead_dec_pe", y_lab = "feet")
@@ -235,7 +235,7 @@ scens_plot_range(
 )
 
 # subset scenarios
-scens_plot_range(ex_pe, "mead_dec_pe", scenarios = "April ST CT"))
+scens_plot_range(ex_pe, "mead_dec_pe", scenarios = "April ST CT")
 
 # custom colors and scenario labels + add title and caption
 pc <- c("April ST CT" = "red", "April ST 2007 UCRC" = "black")

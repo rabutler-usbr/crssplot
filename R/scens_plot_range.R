@@ -7,7 +7,7 @@
 #' 
 #' @examples
 #' # quick simple plot of one variable
-#' scens_plot_range(ex_pe, "mead_dec_pe"))
+#' scens_plot_range(ex_pe, "mead_dec_pe")
 #' 
 #' # now add ylabel 
 #' scens_plot_range(ex_pe, "mead_dec_pe", y_lab = "feet")
@@ -20,7 +20,7 @@
 #' )
 #' 
 #' # subset scenarios
-#' scens_plot_range(ex_pe, "mead_dec_pe", scenarios = "April ST CT"))
+#' scens_plot_range(ex_pe, "mead_dec_pe", scenarios = "April ST CT")
 #' 
 #' # custom colors and scenario labels + add title and caption
 #' pc <- c("April ST CT" = "red", "April ST 2007 UCRC" = "black")
