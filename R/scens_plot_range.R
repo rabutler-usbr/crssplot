@@ -124,6 +124,15 @@ scens_plot_range <- function(df, vars, years = NULL, scenarios = NULL,
       names(plot_colors), 
       width = ops$legend_wrap
     )
+    
+    # make scenarios show up in the order specified by scenarios (if provided)
+    df$ScenarioGroup <- factor(
+      df$ScenarioGroup, 
+      levels = stringr::str_wrap(scenarios, ops$legend_wrap)
+    )
+  } else {
+    # make scenarios show up in the order specified by scenarios (if provided)
+    df$ScenarioGroup <- factor(df$ScenarioGroup, levels = scenarios)
   }
   
   # plot --------------------------------------------
@@ -141,10 +150,10 @@ scens_plot_range <- function(df, vars, years = NULL, scenarios = NULL,
     labs(y = ops$y_lab, title = ops$title, caption = ops$caption) +
     scale_color_manual(
       values = plot_colors, 
-      guide = guide_legend(title = ops$color_label),
+      guide = guide_legend(title = ops$color_label, order = 1),
       labels = scen_labels
     ) +
-    scale_linetype_manual(values = qLt) +
+    scale_linetype_manual(values = qLt, guide = guide_legend(order = 2)) +
     theme_crss()
   
   if (length(vars) > 1) {

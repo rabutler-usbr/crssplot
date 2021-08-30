@@ -1,6 +1,6 @@
 Package: crssplot
 Title: Create Standard CRSS Plots
-Version: 0.0.2.9001-3
+Version: 0.0.2.9001-4
 Authors@R: person(given = "Alan", family = "Butler", role = c("aut",
         "cre"), email = "rabutler@usbr.gov", comment = c(ORCID =
         "0000-0002-8625-6386"))
