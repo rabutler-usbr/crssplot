@@ -89,6 +89,15 @@ scens_plot_boxplot <- function(df, vars, years = NULL, scenarios = NULL,
       names(plot_colors), 
       width = ops$legend_wrap
     )
+  
+    # make scenarios show up in the order specified by scenarios (if provided)
+    df$ScenarioGroup <- factor(
+      df$ScenarioGroup, 
+      levels = stringr::str_wrap(scenarios, ops$legend_wrap)
+    )
+  } else {
+    # make scenarios show up in the order specified by scenarios (if provided)
+    df$ScenarioGroup <- factor(df$ScenarioGroup, levels = scenarios)
   }
   
   # plot --------------------------
