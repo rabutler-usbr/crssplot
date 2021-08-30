@@ -1,16 +1,14 @@
 Package: crssplot
 Title: Create Standard CRSS Plots
-Version: 0.0.2.9001
-Authors@R: 
-    person(given = "Alan",
-           family = "Butler",
-           role = c("aut", "cre"),
-           email = "rabutler@usbr.gov",
-           comment = c(ORCID = "0000-0002-8625-6386"))
-Description: Code to assist in analyzing and plotting CRSS data. Includes two 
-        pipelines: (1) user specified yaml creates a set of standard figures
-        comparing one or more scenarios. (2) A suite of generic plotting 
-        functions setup to create the main types of plots used in CRSS analyses.
+Version: 0.0.2.9001-3
+Authors@R: person(given = "Alan", family = "Butler", role = c("aut",
+        "cre"), email = "rabutler@usbr.gov", comment = c(ORCID =
+        "0000-0002-8625-6386"))
+Description: Code to assist in analyzing and plotting CRSS data.
+        Includes two pipelines: (1) user specified yaml creates a set
+        of standard figures comparing one or more scenarios. (2) A
+        suite of generic plotting functions setup to create the main
+        types of plots used in CRSS analyses.
 License: CC0
 Copyright: This software is in the public domain because it contains
         materials that originally came from the U.S. Bureau of
@@ -19,33 +17,9 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Imports:
-    assertthat,
-    CoRiverNF,
-    CRSSIO (>= 0.7.0),
-    data.table,
-    dplyr,
-    feather,
-    fs,
-    ggplot2,
-    grDevices,
-    gridExtra,
-    methods,
-    patchwork (>= 1.1.0),
-    png,
-    purrr,
-    readxl,
-    rlang,
-    rmarkdown,
-    RWDataPlyr (>= 0.6.0),
-    scales,
-    stringr,
-    tibble,
-    tidyr,
-    utils,
-    xfun,
-    yaml
-Suggests: 
-    testthat
-Depends: 
-    R (>= 2.10)
+Imports: assertthat, CoRiverNF, CRSSIO (>= 0.7.0), data.table, dplyr,
+        feather, fs, ggplot2, grDevices, gridExtra, methods, patchwork
+        (>= 1.1.0), png, purrr, readxl, rlang, rmarkdown, RWDataPlyr
+        (>= 0.6.0), scales, stringr, tibble, tidyr, utils, xfun, yaml
+Suggests: testthat
+Depends: R (>= 2.10)
