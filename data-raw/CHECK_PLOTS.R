@@ -13,8 +13,11 @@ print(scens_plot_range(ex_pe, "mead_dec_pe", scenarios = "April ST CT"))
 pc <- c("April ST CT" = "red", "April ST 2007 UCRC" = "black")
 sl <- c("April ST CT" = "s1", "April ST 2007 UCRC" = "s2")
 print(scens_plot_range(ex_pe, "powell_dec_pe", plot_colors = pc, 
-                       scen_labels = sl, title = "PE", 
+                       scen_labels = sl, title = "PE", scenarios = names(sl), 
                        caption = "this is a caption"))
+print(scens_plot_range(ex_pe, "powell_dec_pe", plot_colors = pc, 
+                       scen_labels = sl, title = "PE", scenarios = rev(names(sl)), 
+                       caption = "reversed order of legend"))
 print(scens_plot_range(ex_pe, c("powell_dec_pe", "mead_dec_pe"), 
                        facet_scales = "free_y",
            facet_nrow = 2))
@@ -43,7 +46,18 @@ print(scens_plot_probs(
   plot_colors = pc, 
   scen_labels = sl,
   title = "Mead December < 1,025'", 
-  caption = "this is a caption"
+  caption = "this is a caption",
+  scenarios = names(sl)
+))
+
+print(scens_plot_probs(
+  ex_pe, 
+  "mead_dec_lt_1025", 
+  plot_colors = pc, 
+  scen_labels = sl,
+  title = "Mead December < 1,025'", 
+  caption = "reversed legend order",
+  scenarios = rev(names(sl))
 ))
 
 print(scens_plot_probs(
@@ -80,10 +94,16 @@ tmp <- ex_pe %>%
   mutate(ScenarioGroup = if_else(ScenarioGroup == "April ST CT", "A", "M"))
 
 p1 <- scens_plot_cloud(tmp, "mead_dec_pe", historical = h_mead, 
-                       legend_wrap = 20, y_lab = "feet", years = 2020:2026) +
+                       legend_wrap = 20, y_lab = "feet", years = 2020:2026,
+                       scenarios = c("A", "M")) +
   theme_cloud()
 
-p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"), 
+p2 <- scens_plot_cloud(tmp, "mead_dec_pe", historical = h_mead, 
+                       legend_wrap = 20, y_lab = "feet", years = 2020:2026,
+                       scenarios = c("M", "A"), caption = "reversed order") +
+  theme_cloud()
+
+p3 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"), 
                        historical = hh, legend_wrap = 20,
                        plot_colors = pal, y_lab = "feet", years = 2020:2026,
                        facet_scales = "free_y", fill_label = "ok then",
@@ -92,6 +112,7 @@ p2 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"),
 
 print(p1)
 print(p2)
+print(p3)
 
 # scens_plot_boxplot() ---------------------------------------------------
 gg <- scens_plot_boxplot(ex_pe, vars = "powell_dec_pe")
@@ -109,8 +130,23 @@ gg2 <- scens_plot_boxplot(
   facet_scales = "free_y", 
   plot_colors = pal,
   scen_labels = tst_names,
-  legend_wrap = 10
+  legend_wrap = 10,
+  scenarios = names(tst_names)
 )
+
+gg2_2 <- scens_plot_boxplot(
+  ex_pe, 
+  vars = c("powell_dec_pe", "mead_dec_pe"), 
+  years = 2021:2036,
+  title = "Mead and Powell", subtitle = "End-of-December Elevation",
+  y_lab = "(feet)", caption = "Results from April 20xx - reversed legend",
+  facet_scales = "free_y", 
+  plot_colors = pal,
+  scen_labels = tst_names,
+  legend_wrap = 10,
+  scenarios = rev(names(tst_names))
+)
+
 
 gg3 <- scens_plot_boxplot(
   ex_pe, 
@@ -126,6 +162,7 @@ gg3 <- scens_plot_boxplot(
 
 print(gg)
 print(gg2)
+print(gg2_2)
 print(gg3)
 
 # vars_plot_probs() line -------------------------------------------------
