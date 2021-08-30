@@ -3,6 +3,8 @@
 - Added `connect_historical` parameters to `scens_plot_cloud()`. When this parameter is `TRUE`, then the historical data and projected data are "connected" for plotting purposes. 
 - Fixed bug in the "publish" portion that was preventing `create_results_package()` to run properly when there were more than one plot_groups without the publish key. 
 - Fixed `scens_plot_cloud()` so that "Historical" is always the last entry in the legend.
+- `scens_plot_*()` functions modified so that `scenarios` argument sets the order that scenarios show up in legend.
+- `scens_plot_range()` and `scens_plot_cloud()` updated so that legends always show up in the same order.
 
 # crssplot 0.0.2
 
