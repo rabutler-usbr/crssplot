@@ -6,10 +6,11 @@
 \alias{crssplot-package}
 \title{crssplot: Create Standard CRSS Plots}
 \description{
-Code to assist in analyzing and plotting CRSS data. Includes two 
-        pipelines: (1) user specified yaml creates a set of standard figures
-        comparing one or more scenarios. (2) A suite of generic plotting 
-        functions setup to create the main types of plots used in CRSS analyses.
+Code to assist in analyzing and plotting CRSS data.
+        Includes two pipelines: (1) user specified yaml creates a set
+        of standard figures comparing one or more scenarios. (2) A
+        suite of generic plotting functions setup to create the main
+        types of plots used in CRSS analyses.
 }
 \author{
 \strong{Maintainer}: Alan Butler \email{rabutler@usbr.gov} (\href{https://orcid.org/0000-0002-8625-6386}{ORCID})
