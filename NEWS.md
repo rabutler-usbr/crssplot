@@ -6,6 +6,7 @@
 - `scens_plot_*()` functions modified so that `scenarios` argument sets the order that scenarios show up in legend.
 - `scens_plot_range()` and `scens_plot_cloud()` updated so that legends always show up in the same order.
 - Updated historical Powell and Mead data used by `create_results_package()`
+- Modified the code that shows surplus for Mead figures to only show it if the range gets up to 1150. 
 
 # crssplot 0.0.2
 

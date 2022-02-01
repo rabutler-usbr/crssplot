@@ -155,6 +155,7 @@ add_mead_ig_tiers <- function(gg) {
   line_size <- 0.6
   
   max_y <- ceiling(gg_y_range(gg)[2]/50)*50
+  max_y <- max(max_y, 1150)
   
   gg <- gg +
     geom_segment(
