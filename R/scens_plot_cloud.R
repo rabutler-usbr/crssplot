@@ -85,23 +85,25 @@ scens_plot_cloud <- function(df, vars, historical = NULL, years = NULL,
 
   if (!is.null(historical)) {
     if (isTRUE(connect_historical)) {
-      # repeat the year before projections start in the projection data
-      last_year <- min(df$Year) - 1
-      h_tmp <- dplyr::filter(historical, Year == last_year)
-      h_tmp$ScenarioGroup <- NULL
-      
-      # repeat these data for bottom and top columns
-      h_tmp$bottom <- h_tmp$middle
-      h_tmp$top <- h_tmp$middle
-      
-      # repeat these data for each Scenario Group
+      # repeat the year before projections start in the projection data, but 
+      # need to do this separately for each Scenario Group as they might have
+      # different start years
+      # repeat this process for each Scenario Group
       tmpsg <- unique(df$ScenarioGroup)
-      h_tmp <- dplyr::bind_rows(lapply(tmpsg, function(i) {
-        tmp <- h_tmp
-        tmp$ScenarioGroup <- i
-        tmp
+      
+      h_rep <- dplyr::bind_rows(lapply(tmpsg, function(i) {
+        
+        last_year <- min(dplyr::filter(df, ScenarioGroup == i)$Year) - 1
+        h_tmp <- dplyr::filter(historical, Year == last_year)
+        h_tmp$ScenarioGroup <- NULL
+        
+        # repeat these data for bottom and top columns
+        h_tmp$bottom <- h_tmp$middle
+        h_tmp$top <- h_tmp$middle
+        h_tmp$ScenarioGroup <- i
+        h_tmp
       }))
-      df <- bind_rows(h_tmp, df)
+      df <- bind_rows(h_rep, df)
     }
     
     df <- bind_rows(df, historical)

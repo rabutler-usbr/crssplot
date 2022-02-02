@@ -110,9 +110,20 @@ p3 <- scens_plot_cloud(ex_pe, c("powell_dec_pe", "mead_dec_pe"),
                        connect_historical = FALSE) +
   theme_cloud()
 
+# recreating example where scenaros start in different years
+tmp_pe <- bind_rows(
+  filter(ex_pe, ScenarioGroup == "April ST CT"),
+  filter(ex_pe, ScenarioGroup == "April ST 2007 UCRC", Year > 2021)
+)
+
+p4 <- scens_plot_cloud(tmp_pe, "powell_dec_pe", years = 2020:2026, 
+                       historical = h_powell) +
+  labs(title = "different start years")
+
 print(p1)
 print(p2)
 print(p3)
+print(p4)
 
 # scens_plot_boxplot() ---------------------------------------------------
 gg <- scens_plot_boxplot(ex_pe, vars = "powell_dec_pe")
